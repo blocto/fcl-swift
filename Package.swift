@@ -7,32 +7,30 @@ let package = Package(
     name: "FCL",
     platforms: [
         .iOS(.v13),
-        .macOS(.v10_15),
-        .tvOS(.v13),
-        .watchOS(.v6)
     ],
     products: [
-        // Products define the executables and libraries a package produces, and make them visible to other packages.
         .library(
             name: "FCL",
             targets: ["FCL"]
-        )
+        ),
     ],
     dependencies: [
         .package(url: "https://github.com/portto/flow-swift-sdk.git", .upToNextMajor(from: "0.1.0")),
-        .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", from: "4.0.0")
+        .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", from: "4.0.0"),
+        .package(url: "https://github.com/portto/blocto-ios-sdk.git", .upToNextMinor(from: "0.2.2")),
     ],
     targets: [
         .target(
             name: "FCL",
             dependencies: [
                 "SwiftyJSON",
-                .product(name: "FlowSDK", package: "flow-swift-sdk")
+                .product(name: "FlowSDK", package: "flow-swift-sdk"),
+                .product(name: "BloctoSDK", package: "blocto-ios-sdk"),
             ]
         ),
         .testTarget(
             name: "FCLTests",
             dependencies: ["FCL"]
-        )
+        ),
     ]
 )

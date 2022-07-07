@@ -13,7 +13,6 @@ public enum ServiceType: String, Decodable {
     case preAuthz = "pre-authz"
     case userSignature = "user-signature"
     case backChannel = "back-channel-rpc"
-    case localView = "local-view"
     case openId = "open-id"
     case accountProof = "account-proof"
     case authnRefresh = "authn-refresh"

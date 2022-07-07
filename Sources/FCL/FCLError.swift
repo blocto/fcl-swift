@@ -9,4 +9,7 @@ import Foundation
 
 public enum FCLError {
     case authenticateFailed
+    case userNotFound
+    case walletProviderNotSpecified
+    case presentableNotFound
 }

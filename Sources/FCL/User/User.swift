@@ -9,10 +9,10 @@ import Foundation
 import Cadence
 
 struct User: Decodable {
+
     var fclType: String = "USER"
     var fclVersion: String = "1.0.0"
     let address: Address
-    let cid: String
     var loggedIn: Bool = false
     let expiresAt: TimeInterval
     let services: [Service]
@@ -29,6 +29,22 @@ struct User: Decodable {
         case loggedIn
         case expiresAt
         case services
+    }
+
+    internal init(
+        fclType: String = "USER",
+        fclVersion: String = "1.0.0",
+        address: Address,
+        loggedIn: Bool = false,
+        expiresAt: TimeInterval,
+        services: [Service]
+    ) {
+        self.fclType = fclType
+        self.fclVersion = fclVersion
+        self.address = address
+        self.loggedIn = loggedIn
+        self.expiresAt = expiresAt
+        self.services = services
     }
 
 }

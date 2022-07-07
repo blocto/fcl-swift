@@ -7,11 +7,12 @@
 
 import Foundation
 import SwiftyJSON
+import UIKit
 
 struct Service: Decodable {
     let fclType: String
     let fclVersion: String
-    let type: ServiceType?
+    let type: ServiceType
     let method: ServiceMethod?
     let endpoint: URL?
     let uid: String?
@@ -20,6 +21,32 @@ struct Service: Decodable {
     let provider: ServiceProvider?
     let params: [String: String]
     let data: ServiceDataType
+    
+    func getRequest() throws -> URLRequest {
+        switch type {
+        case .authn:
+            
+        case .authz:
+            
+        case .preAuthz:
+            
+        case .userSignature:
+            
+        case .backChannel:
+            guard let endpoint = service.endpoint,
+                  var request = URLComponents(string: endpoint) else {
+                throw FCLError.authenticateFailed
+            }
+            request.queryItems = service.params.map { URLQueryItem(name: $0.key, value: $0.value) }
+            return request
+        case .openId:
+            
+        case .accountProof:
+            
+        case .authnRefresh:
+            
+        }
+    }
 
     enum CodingKeys: String, CodingKey {
         case fclType = "fType"
@@ -39,7 +66,7 @@ struct Service: Decodable {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.fclType = try? container.decode(String.self, forKey: .fType)
         self.fclVersion = try? container.decode(String.self, forKey: .fVsn)
-        self.type = try? container.decode(ServiceType.self, forKey: .type)
+        self.type = try container.decode(ServiceType.self, forKey: .type)
         self.method = try? container.decode(ServiceMethod.self, forKey: .method)
         self.endpoint = try? container.decode(URL.self, forKey: .endpoint)
         self.uid = try? container.decode(String.self, forKey: .uid)
