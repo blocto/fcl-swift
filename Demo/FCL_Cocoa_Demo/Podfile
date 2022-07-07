@@ -1,0 +1,10 @@
+platform :ios, '13.0'
+
+target 'FCL_Cocoa_Demo' do
+  use_frameworks!
+
+  pod 'FCL', :path => '../../'
+  pod 'FlowSDK', :git => 'git@github.com:portto/flow-swift-sdk.git', :tag => '0.1.2'
+  pod 'Cadence', :git => 'git@github.com:portto/flow-swift-sdk.git'
+
+end

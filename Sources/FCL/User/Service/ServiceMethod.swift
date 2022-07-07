@@ -14,7 +14,7 @@ public enum ServiceMethod: String, Decodable {
     case iframeRPC = "IFRAME/RPC"
     case data = "DATA"
     
-    var httpMethod: String {
+    var httpMethod: String? {
         switch self {
         case .httpGet:
             return "GET"

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct CompositeSignature: Decodable {
+public struct CompositeSignature: Decodable {
     let fclType: String
     let fclVersion: String
     let address: String
@@ -16,8 +16,8 @@ struct CompositeSignature: Decodable {
     let signature: String
     
     enum CodingKeys: String, CodingKey {
-        case fType
-        case fVsn
+        case fclType = "fType"
+        case fclVersion = "fVsn"
         case address = "addr"
         case keyId
         case signature

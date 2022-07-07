@@ -28,9 +28,9 @@ struct AuthnResponse: Decodable {
     
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        fType = try? container.decode(String.self, forKey: .fType)
-        fVsn = try? container.decode(String.self, forKey: .fVsn)
-        status = try container.decode(Status.self, forKey: .status)
+        fclType = try? container.decode(String.self, forKey: .fclType)
+        fclVersion = try? container.decode(String.self, forKey: .fclVersion)
+        status = try container.decode(ResponseStatus.self, forKey: .status)
         updates = try? container.decode(Service.self, forKey: .updates)
         do {
             local = try container.decode(Service.self, forKey: .local)
@@ -47,7 +47,8 @@ struct PollingWrappedResponse<Model: Decodable>: Decodable {
     let fclType: String?
     let fclVersion: String?
     let status: ResponseStatus
-    var data: Model?
+    let data: Model?
+    let reason: String?
 
     enum CodingKeys: String, CodingKey {
         case fclType = "f_type"
@@ -59,13 +60,15 @@ struct PollingWrappedResponse<Model: Decodable>: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.fclType = try? container.decode(String.self, forKey: .fType)
-        self.fclVersion = try? container.decode(String.self, forKey: .fVsn)
+        self.fclType = try? container.decode(String.self, forKey: .fclType)
+        self.fclVersion = try? container.decode(String.self, forKey: .fclVersion)
         self.status = try container.decode(ResponseStatus.self, forKey: .status)
         switch status {
         case .pending:
+            self.reason = nil
             self.data = nil
         case .approved:
+            self.reason = nil
             self.data = try container.decode(Model.self, forKey: .data)
         case .declined:
             self.reason = try? container.decode(String.self, forKey: .reason)

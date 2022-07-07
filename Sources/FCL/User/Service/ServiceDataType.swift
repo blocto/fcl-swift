@@ -52,8 +52,8 @@ import SwiftyJSON
 */
 
 public enum ServiceDataType {
-    case .openId(JSON)
-    case .accountProof(ServiceAccountProof)
-    case .json(JSON)
-    case .notExist
+    case openId(JSON)
+    case accountProof(ServiceAccountProof)
+    case json(JSON)
+    case notExist
 }

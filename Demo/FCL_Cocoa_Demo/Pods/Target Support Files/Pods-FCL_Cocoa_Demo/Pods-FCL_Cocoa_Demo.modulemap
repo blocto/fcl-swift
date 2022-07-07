@@ -1,0 +1,6 @@
+framework module Pods_FCL_Cocoa_Demo {
+  umbrella header "Pods-FCL_Cocoa_Demo-umbrella.h"
+
+  export *
+  module * { export * }
+}

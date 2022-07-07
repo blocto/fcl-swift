@@ -6,13 +6,14 @@
 //
 
 import Foundation
+import UIKit
 
-protocol Presentable {
+public protocol Presentable {
 
     func present(
         _ viewControllerToPresent: UIViewController,
         animated flag: Bool,
-        completion: (() -> Void)? = nil
+        completion: (() -> Void)?
     )
 
 }

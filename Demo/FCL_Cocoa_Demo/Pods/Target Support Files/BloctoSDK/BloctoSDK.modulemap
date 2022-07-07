@@ -1,0 +1,6 @@
+framework module BloctoSDK {
+  umbrella header "BloctoSDK-umbrella.h"
+
+  export *
+  module * { export * }
+}

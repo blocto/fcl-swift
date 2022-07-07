@@ -1,0 +1,6 @@
+framework module FCL {
+  umbrella header "FCL-umbrella.h"
+
+  export *
+  module * { export * }
+}

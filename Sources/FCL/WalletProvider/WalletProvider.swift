@@ -6,25 +6,24 @@
 //
 
 import Foundation
-import Cadence
 
 public protocol WalletProvider {
 
-    var providerInfo: ProviderInfo
-    var user: User?
+    var providerInfo: ProviderInfo { get }
+    var user: User? { get }
 
     init(providerInfo: ProviderInfo)
 
-    async func authn() throws
+    func authn() async throws
 
-    async func authz() -> String throws
+    func authz() async throws -> String
 
-    async func getUserSignature(hexString: String) throws -> [CompositeSignature]
+    func getUserSignature(_ message: String) async throws -> [CompositeSignature]
 
-    async func preAuthz() throws
+    func preAuthz() async throws
 
-    async func openId() throws
+//    func openId() async throws
 
-    async func backChannelRPC() throws
+    func backChannelRPC() async throws
 
 }

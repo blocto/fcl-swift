@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import SDK
+import FlowSDK
 import BloctoSDK
 import SwiftyJSON
 
@@ -18,41 +18,42 @@ final class BloctoWalletProvider: WalletProvider {
             desc: nil,
             icon: URL(string: "https://fcl-discovery.onflow.org/images/blocto.png"))
         return BloctoWalletProvider(providerInfo: providerInfo)
-    }
+    }()
     
-    var providerInfo: ProviderInfo
+    let providerInfo: ProviderInfo
     var user: User?
     
     init(providerInfo: ProviderInfo) {
         self.providerInfo = providerInfo
     }
     
-    async func authn() throws {
+    func authn() async throws {
         // Blocto SDK
-        let address = BloctoSDK.requestAccount()
-        user = User(
-            address: Address(hexString: address),
-            expiresAt: 0,
-            services: [])
-        user?.loggedIn = true
+//        let address = BloctoSDK.shared.flow.
+//        user = User(
+//            address: Address(hexString: address),
+//            expiresAt: 0,
+//            services: [])
+//        user?.loggedIn = true
     }
     
-    async func authz() throws {
+    func authz() async throws -> String {
         guard let user = user else { throw FCLError.userNotFound }
 //        BloctoSDK.
+        return ""
     }
     
-    async func getUserSignature(_ signable: Signable) throws -> [Transaction.Signature] {
+    func getUserSignature(_ message: String) async throws -> [CompositeSignature] {
         guard let user = user else { throw FCLError.userNotFound }
-
+        return []
     }
     
-    async func preAuthz() throws {
+    func preAuthz() async throws {
         guard let user = user else { throw FCLError.userNotFound }
     }
     
-    async func openId() throws -> JSON
+//    func openId() async throws -> JSON {}
     
-    async func backChannelRPC() throws
+    func backChannelRPC() async throws {}
     
 }

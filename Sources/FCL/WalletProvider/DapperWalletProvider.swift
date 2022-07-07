@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FlowSDK
 
 final class DapperWalletProvider: WalletProvider {
 
@@ -16,52 +17,53 @@ final class DapperWalletProvider: WalletProvider {
             icon: URL(string: "https://meetdapper.com/logos/logo_dapper_new.png")
         )
         return DapperWalletProvider(providerInfo: info)
-    }
+    }()
 
     var providerInfo: ProviderInfo
     var user: User?
 
     private var accessNodeApi: URL = URL(string: "https://dapper-http-post.vercel.app/api/authn")!
-    
+
     init(providerInfo: ProviderInfo) {
         self.providerInfo = providerInfo
     }
 
-    async func authn() throws {
+    func authn() async throws {
         let session = URLSession(configuration: .default)
         let request = URLRequest(url: accessNodeApi)
-        let pollingResponse: PollingResponse = try await session.dataDecode(for: request)
+        let pollingResponse = try await session.dataAuthnResponse(for: request)
 
-        guard let localService = pollingResponse.local {
+        guard let localService = pollingResponse.local else {
             throw FCLError.authenticateFailed
         }
 
-        guard let updatesService = pollingResponse.updates {
+        guard let updatesService = pollingResponse.updates else {
             throw FCLError.authenticateFailed
         }
 
         try fcl.openWithWebAuthenticationSession(localService)
-        let authnResponse = await fcl.polling(service: updatesService)
+        let authnResponse = try await fcl.polling(service: updatesService)
 
         user = try fcl.buildUser(authn: authnResponse)
     }
 
-    async func authz() throws {
+    func authz() async throws -> String {
         guard let user = user else { throw FCLError.userNotFound }
         fcl.serviceOfType(services: user.services, type: .authz)
+        return ""
     }
 
-    async func getUserSignature(_ signable: Signable) throws -> [Transaction.Signature] {
+    func getUserSignature(_ message: String) async throws -> [CompositeSignature] {
+        guard let user = user else { throw FCLError.userNotFound }
+        return []
+    }
+
+    func preAuthz() async throws {
         guard let user = user else { throw FCLError.userNotFound }
 
     }
 
-    async func preAuthz() throws {
-        guard let user = user else { throw FCLError.userNotFound }
+//    func openId() async throws
 
-    }
-
-    async func openId() throws
-
-    async func backChannelRPC() throws
+    func backChannelRPC() async throws {}
 }

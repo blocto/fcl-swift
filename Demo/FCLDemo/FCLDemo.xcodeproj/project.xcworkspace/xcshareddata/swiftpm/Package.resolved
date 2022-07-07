@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "git@github.com:portto/flow-swift-sdk.git",
       "state" : {
-        "revision" : "d77c44f5bbb26e5e180eb7e9262d04d86d7e02f8",
-        "version" : "0.1.0"
+        "revision" : "fdac4e7c08db3fbdee5a22230bc3c004f47d2a3f",
+        "version" : "0.1.2"
       }
     },
     {
@@ -145,12 +145,21 @@
       }
     },
     {
+      "identity" : "secp256k1",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:portto/secp256k1.git",
+      "state" : {
+        "revision" : "72b5f1b4ba20cd529f77b0893d20ee43b892cc3f",
+        "version" : "0.0.4"
+      }
+    },
+    {
       "identity" : "secp256k1.swift",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/portto/secp256k1.swift",
       "state" : {
-        "revision" : "384260f763ea0d6de0e428a6bf71d52c15b79d2d",
-        "version" : "0.7.1"
+        "revision" : "28e8dcbc123136cf89682e2754abc603d783d908",
+        "version" : "0.7.2"
       }
     },
     {

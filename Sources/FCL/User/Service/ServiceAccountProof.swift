@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ServiceAccountProof: Decodable {
+public struct ServiceAccountProof: Decodable {
     let fclType: String
     let fclVersion: String
     let address: String

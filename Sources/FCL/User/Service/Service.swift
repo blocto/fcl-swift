@@ -25,26 +25,29 @@ struct Service: Decodable {
     func getRequest() throws -> URLRequest {
         switch type {
         case .authn:
-            
+            throw FCLError.userNotFound
         case .authz:
-            
+            throw FCLError.userNotFound
         case .preAuthz:
-            
+            throw FCLError.userNotFound
         case .userSignature:
-            
+            throw FCLError.userNotFound
         case .backChannel:
-            guard let endpoint = service.endpoint,
-                  var request = URLComponents(string: endpoint) else {
+            guard let endpoint = endpoint,
+                  var components = URLComponents(url: endpoint, resolvingAgainstBaseURL: false) else {
                 throw FCLError.authenticateFailed
             }
-            request.queryItems = service.params.map { URLQueryItem(name: $0.key, value: $0.value) }
-            return request
+            components.queryItems = params.map { URLQueryItem(name: $0.key, value: $0.value) }
+            guard let url = components.url else {
+                throw FCLError.urlNotFound
+            }
+            return URLRequest(url: url)
         case .openId:
-            
+            throw FCLError.userNotFound
         case .accountProof:
-            
+            throw FCLError.userNotFound
         case .authnRefresh:
-            
+            throw FCLError.userNotFound
         }
     }
 
@@ -64,8 +67,8 @@ struct Service: Decodable {
 
     init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.fclType = try? container.decode(String.self, forKey: .fType)
-        self.fclVersion = try? container.decode(String.self, forKey: .fVsn)
+        self.fclType = try container.decode(String.self, forKey: .fclType)
+        self.fclVersion = try container.decode(String.self, forKey: .fclVersion)
         self.type = try container.decode(ServiceType.self, forKey: .type)
         self.method = try? container.decode(ServiceMethod.self, forKey: .method)
         self.endpoint = try? container.decode(URL.self, forKey: .endpoint)
@@ -73,7 +76,7 @@ struct Service: Decodable {
         self.id = try? container.decode(String.self, forKey: .id)
         self.identity = try? container.decode(ServiceIdentity.self, forKey: .identity)
         self.provider = try? container.decode(ServiceProvider.self, forKey: .provider)
-        self.params = try? container.decode(JSON.self, forKey: .params) ?? [:]
+        self.params = (try? container.decode([String: String].self, forKey: .params)) ?? [:]
         switch type {
         case .openId:
             if let openId = try? container.decode(JSON.self, forKey: .data) {
@@ -101,7 +104,6 @@ struct Service: Decodable {
              .authz,
              .preAuthz,
              .backChannel,
-             .localView,
              .userSignature,
              .authnRefresh:
             if let json = try? container.decode(JSON.self, forKey: .data) {

@@ -8,7 +8,7 @@
 import Foundation
 import Cadence
 
-struct User: Decodable {
+public struct User: Decodable {
 
     var fclType: String = "USER"
     var fclVersion: String = "1.0.0"
@@ -25,7 +25,6 @@ struct User: Decodable {
         case fclType = "f_type"
         case fclVersion = "f_vsn"
         case address = "addr"
-        case cid
         case loggedIn
         case expiresAt
         case services

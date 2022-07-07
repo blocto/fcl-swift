@@ -14,7 +14,7 @@ struct ServiceProvider: Decodable {
     public let name: String?
     public let iconString: String?
     
-    public let iconURL: URL? {
+    public var iconURL: URL? {
         if let iconString = iconString {
             return URL(string: iconString)
         }

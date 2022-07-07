@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum ChainEnv {
+public enum Network {
     case mainnet
     case testnet
     case canarynet

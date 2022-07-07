@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct ProviderInfo {
+public struct ProviderInfo {
     let title: String
     let desc: String?
     let icon: URL?

@@ -14,7 +14,7 @@ public enum WalletSelection {
 
 public class Config {
 
-    var env: ChainEnv = .emulator
+    var network: Network = .emulator
 
     var appDetail: AppDetail?
 
@@ -25,7 +25,10 @@ public class Config {
     var addressReplacements: Set<AddressReplacement> = []
 
     public enum Option {
-        case env(ChainEnv)
+        @available(*, unavailable, renamed: "network", message: "Use network instead.")
+        case env(String)
+        case network(Network)
+
         case appDetail(AppDetail)
 
         @available(*, unavailable, renamed: "wallets", message: "Use supportedWalletProviders instead.")
@@ -36,19 +39,21 @@ public class Config {
         case addressReplacement(AddressReplacement)
 
         // User info
-        case challengeScope
-        case openId
+//        case challengeScope
+//        case openId
     }
 
-    func put(_ option: Option) -> Self {
+    public func put(_ option: Option) -> Self {
         switch option {
-        case let .env(env):
-            self.env = env
+        case let .network(network):
+            self.network = network
+        case .env:
+            break
         case let .appDetail(appDetail):
             self.appDetail = appDetail
         case .challengeHandshake:
             break
-        case let .supportedWalletProvider(walletProviders):
+        case let .supportedWalletProviders(walletProviders):
             walletProviderCandidates = walletProviders
             if walletProviders.count == 1,
                let firstProvider = walletProviders.first {

@@ -21,5 +21,6 @@ struct AuthnData: Decodable {
         case fclType = "f_type"
         case fclVersion = "f_vsn"
         case address = "addr"
+        case services
     }
 }

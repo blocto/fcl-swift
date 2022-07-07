@@ -12,7 +12,7 @@ public struct AddressReplacement: Hashable {
     let placeholder: String
     let replacement: String
     
-    init(
+    public init(
         placeholder: String,
         replacement: String
     ) {
