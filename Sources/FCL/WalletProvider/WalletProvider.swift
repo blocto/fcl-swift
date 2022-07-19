@@ -10,15 +10,12 @@ import Foundation
 public protocol WalletProvider {
 
     var providerInfo: ProviderInfo { get }
-    var user: User? { get }
 
-    init(providerInfo: ProviderInfo)
-
-    func authn() async throws
+    func authn(accountProofData: FCLAccountProofData?) async throws
 
     func authz() async throws -> String
 
-    func getUserSignature(_ message: String) async throws -> [CompositeSignature]
+    func getUserSignature(_ message: String) async throws -> [FCLCompositeSignature]
 
     func preAuthz() async throws
 

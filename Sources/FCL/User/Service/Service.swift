@@ -31,7 +31,14 @@ struct Service: Decodable {
         case .preAuthz:
             throw FCLError.userNotFound
         case .userSignature:
-            throw FCLError.userNotFound
+            guard let endpoint = endpoint else {
+                throw FCLError.serviceError
+            }
+            var request = URLRequest(url: endpoint)
+            request.httpMethod = method?.httpMethod
+            // TODO: imcomplete
+//            request.httpBody =
+            return request
         case .backChannel:
             guard let endpoint = endpoint,
                   var components = URLComponents(url: endpoint, resolvingAgainstBaseURL: false) else {

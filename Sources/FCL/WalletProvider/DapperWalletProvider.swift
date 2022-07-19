@@ -28,7 +28,7 @@ final class DapperWalletProvider: WalletProvider {
         self.providerInfo = providerInfo
     }
 
-    func authn() async throws {
+    func authn(accountProofData: FCLAccountProofData?) async throws {
         let session = URLSession(configuration: .default)
         let request = URLRequest(url: accessNodeApi)
         let pollingResponse = try await session.dataAuthnResponse(for: request)
@@ -40,6 +40,10 @@ final class DapperWalletProvider: WalletProvider {
         guard let updatesService = pollingResponse.updates else {
             throw FCLError.authenticateFailed
         }
+        
+        if accountProofData != nil {
+            log(message: "Dapper not support native account proof for now.")
+        }
 
         try fcl.openWithWebAuthenticationSession(localService)
         let authnResponse = try await fcl.polling(service: updatesService)
@@ -49,11 +53,11 @@ final class DapperWalletProvider: WalletProvider {
 
     func authz() async throws -> String {
         guard let user = user else { throw FCLError.userNotFound }
-        fcl.serviceOfType(services: user.services, type: .authz)
+        try fcl.serviceOfType(type: .authz)
         return ""
     }
 
-    func getUserSignature(_ message: String) async throws -> [CompositeSignature] {
+    func getUserSignature(_ message: String) async throws -> [FCLCompositeSignature] {
         guard let user = user else { throw FCLError.userNotFound }
         return []
     }

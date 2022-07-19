@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FlowSDK
 
 public enum WalletSelection {
     case authn(URL)
@@ -58,8 +59,6 @@ public class Config {
             if walletProviders.count == 1,
                let firstProvider = walletProviders.first {
                 selectedWalletProvider = firstProvider
-            } else if walletProviders.isEmpty {
-                selectedWalletProvider = BloctoWalletProvider.default
             }
         case let .addressReplacement(replacement):
             addressReplacements.insert(replacement)

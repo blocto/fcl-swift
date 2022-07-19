@@ -8,10 +8,16 @@
 import Foundation
 
 public enum FCLError: Swift.Error {
+    case `internal`
     case authenticateFailed
     case userNotFound
     case walletProviderNotSpecified
+    case walletProviderInitFailed
     case presentableNotFound
     case responseUnexpected
     case urlNotFound
+    case authnFailed(message: String)
+    case currentNetworkNotSupported
+    case unexpectedResult
+    case serviceError
 }

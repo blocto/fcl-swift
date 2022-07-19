@@ -12,10 +12,18 @@ import AuthenticationServices
 
 public let fcl: FCL = FCL()
 
+func log(message: String) {
+    print("FCL: " + message)
+}
+
 public class FCL: NSObject {
 
     public let config = Config()
     public var delegate: FCLDelegate?
+    
+    private var flowAPIClient: Client {
+        Client(network: config.network)
+    }
 
     private var webAuthSession: ASWebAuthenticationSession?
     private let requestSession = URLSession(configuration: .default)
@@ -52,15 +60,51 @@ public class FCL: NSObject {
         return try await login()
     }
 
+    // authn
+    public func authanticate(accountProofData: FCLAccountProofData?) async throws -> Address {
+        guard let walletProvider = config.selectedWalletProvider else {
+            throw FCLError.walletProviderNotSpecified
+        }
+        
+        try await walletProvider.authn(accountProofData: accountProofData)
+        guard let user = fcl.currentUser else {
+            throw FCLError.userNotFound
+        }
+        return user.address
+    }
+    
+    public func unauthenticate() {
+        fcl.currentUser = nil
+    }
+    
+    public func reauthenticate(accountProofData: FCLAccountProofData?) async throws -> Address {
+        unauthenticate()
+        return try await authanticate(accountProofData: accountProofData)
+    }
+
     // authz
     public func authorization() {}
 
-    public func signUserMessage(message: String) async throws -> [CompositeSignature] {
-        try await fcl.config.selectedWalletProvider?.getUserSignature(message) ?? []
+    public func signUserMessage(message: String) async throws -> [FCLCompositeSignature] {
+        // TODO: incomplete
+        if let serviceType = try serviceOfType(type: .userSignature) {
+            let request = try serviceType.getRequest()
+            
+        } else {
+            try await fcl.config.selectedWalletProvider?.getUserSignature(message) ?? []
+        }
+        return []
     }
 
-    public func query<QueryResult: Decodable>(script: String) async throws -> QueryResult {
-        throw FCLError.responseUnexpected
+    public func query(
+        script: String,
+        arguments: [Value]
+    ) async throws -> Value {
+        let result = try flowAPIClient.executeScriptAtLatestBlock(
+            script: Data(script.utf8),
+            arguments: arguments
+        ).wait()
+        return result
     }
 
     public func sendTransaction(_ transaction: Transaction) async throws -> String {
@@ -71,24 +115,13 @@ public class FCL: NSObject {
         throw FCLError.responseUnexpected
     }
 
-    // authn
-    public func authanticate(_ presentable: Presentable? = nil) async throws -> Address {
-        guard let walletProvider = config.selectedWalletProvider else {
-            throw FCLError.walletProviderNotSpecified
-        }
-
-        try await walletProvider.authn()
-        guard let user = walletProvider.user else {
-            throw FCLError.userNotFound
-        }
-        currentUser = user
-        return user.address
-    }
-
     // MARK: Internal
 
-    func serviceOfType(services: [Service], type: ServiceType) -> Service? {
-        services.first(where: { $0.type == type })
+    func serviceOfType(type: ServiceType) throws -> Service? {
+        guard let currentUser = currentUser else {
+            throw FCLError.userNotFound
+        }
+        return currentUser.services.first(where: { $0.type == type })
     }
 
     func openWithWebAuthenticationSession(_ service: Service) throws {
@@ -134,6 +167,7 @@ public class FCL: NSObject {
         }
         return User(
             address: Address(hexString: address),
+            accountProof: nil,
             loggedIn: true,
             expiresAt: 0,
             services: authn.data?.services ?? []
