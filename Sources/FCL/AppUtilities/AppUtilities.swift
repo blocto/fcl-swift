@@ -12,53 +12,6 @@ import FlowSDK
 
 public enum AppUtilities {
 
-    public static func accountProofContractAddress(
-        network: Network
-    ) throws -> Address {
-        switch network {
-        case .mainnet:
-            return Address(hexString: "0xb4b82a1c9d21d284")
-        case .testnet:
-            return Address(hexString: "0x74daa6f9c7ef24b1")
-        case .canarynet,
-             .emulator:
-            throw FCLError.currentNetworkNotSupported
-        }
-    }
-
-    public static func getVerifySignaturesScript(
-        isAccountProof: Bool,
-        fclCryptoContract: Address?
-    ) throws -> String {
-        let contractAddress: Address
-        if let fclCryptoContract = fclCryptoContract {
-            contractAddress = fclCryptoContract
-        } else {
-            contractAddress = try accountProofContractAddress(network: fcl.config.network)
-        }
-
-        let verifyFunction = isAccountProof
-            ? "verifyAccountProofSignatures"
-            : "verifyUserSignatures"
-
-        return """
-        import FCLCrypto from \(contractAddress.hexString)
-
-        pub fun main(
-            address: Address,
-            message: String,
-            keyIndices: [Int],
-            signatures: [String]
-        ): Bool {
-            return FCLCrypto.\(verifyFunction)(
-                address: address,
-                message: message,
-                keyIndices: keyIndices,
-                signatures: signatures)
-        }
-        """
-    }
-
     public static func verifyAccountProof(
         appIdentifier: String,
         accountProofData: AccountProofSignatureData,
@@ -78,29 +31,110 @@ public enum AppUtilities {
             siganature.append(.string(signature.signature))
         }
 
-        // Arrange
-        guard let user = fcl.currentUser else {
-            throw FCLError.userNotFound
-        }
         let arguments: [Cadence.Value] = [
-            .address(user.address),
+            .address(accountProofData.address),
             .string(verifyMessage),
             .array(indices),
             .array(siganature),
         ]
 
-        // Act
         let verifyScript = try getVerifySignaturesScript(
             isAccountProof: true,
             fclCryptoContract: fclCryptoContract
         )
         let result = try await fcl.query(
             script: verifyScript,
-            arguments: arguments)
+            arguments: arguments
+        )
         guard case let .bool(valid) = result else {
             throw FCLError.unexpectedResult
         }
         return valid
+    }
+
+    public static func verifyUserSignatures(
+        message: String,
+        signatures: [FCLCompositeSignature],
+        fclCryptoContract: Address?
+    ) async throws -> Bool {
+
+        guard let address = signatures.first?.address else {
+            throw FCLError.compositeSignatureInvalid
+        }
+
+        var indices: [Value] = []
+        var siganature: [Value] = []
+        for signature in signatures {
+            indices.append(.int(BigInt(signature.keyId)))
+            siganature.append(.string(signature.signature))
+        }
+
+        let arguments: [Cadence.Value] = [
+            .address(Address(hexString: address)),
+            .string(message),
+            .array(indices),
+            .array(siganature),
+        ]
+
+        let verifyScript = try getVerifySignaturesScript(
+            isAccountProof: false,
+            fclCryptoContract: fclCryptoContract
+        )
+        let result = try await fcl.query(
+            script: verifyScript,
+            arguments: arguments
+        )
+        guard case let .bool(valid) = result else {
+            throw FCLError.unexpectedResult
+        }
+        return valid
+    }
+
+    static func accountProofContractAddress(
+        network: Network
+    ) throws -> Address {
+        switch network {
+        case .mainnet:
+            return Address(hexString: "0xb4b82a1c9d21d284")
+        case .testnet:
+            return Address(hexString: "0x74daa6f9c7ef24b1")
+        case .canarynet,
+             .emulator:
+            throw FCLError.currentNetworkNotSupported
+        }
+    }
+
+    static func getVerifySignaturesScript(
+        isAccountProof: Bool,
+        fclCryptoContract: Address?
+    ) throws -> String {
+        let contractAddress: Address
+        if let fclCryptoContract = fclCryptoContract {
+            contractAddress = fclCryptoContract
+        } else {
+            contractAddress = try accountProofContractAddress(network: fcl.config.network)
+        }
+
+        let verifyFunction = isAccountProof
+            ? "verifyAccountProofSignatures"
+            : "verifyUserSignatures"
+
+        return """
+        import FCLCrypto from \(contractAddress.hexStringWithPrefix)
+
+        pub fun main(
+            address: Address,
+            message: String,
+            keyIndices: [Int],
+            signatures: [String]
+        ): Bool {
+            return FCLCrypto.\(verifyFunction)(
+                address: address,
+                message: message,
+                keyIndices: keyIndices,
+                signatures: signatures)
+        }
+        """
     }
 
 }

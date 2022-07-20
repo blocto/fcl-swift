@@ -19,6 +19,7 @@ public protocol WalletProvider {
 
     func preAuthz() async throws
 
+    // TODO: implementation
 //    func openId() async throws
 
     func backChannelRPC() async throws

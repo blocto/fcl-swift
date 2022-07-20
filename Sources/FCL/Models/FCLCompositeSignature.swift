@@ -1,5 +1,5 @@
 //
-//  CompositeSignature.swift
+//  FCLCompositeSignature.swift
 //
 //
 //  Created by Andrew Wang on 2022/6/30.
@@ -17,8 +17,8 @@ public struct FCLCompositeSignature: Decodable {
     let signature: String
 
     enum CodingKeys: String, CodingKey {
-        case fclType = "fType"
-        case fclVersion = "fVsn"
+        case fclType = "f_type"
+        case fclVersion = "f_vsn"
         case address = "addr"
         case keyId
         case signature
@@ -29,8 +29,8 @@ public struct FCLCompositeSignature: Decodable {
         keyId: Int,
         signature: String
     ) {
-        self.fclType = "CompositeSignature"
-        self.fclVersion = "1.0.0"
+        self.fclType = Pragma.compositeSignature.fclType
+        self.fclVersion = Pragma.compositeSignature.fclVersion
         self.address = address
         self.keyId = keyId
         self.signature = signature

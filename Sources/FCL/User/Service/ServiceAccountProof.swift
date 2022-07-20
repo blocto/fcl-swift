@@ -31,8 +31,8 @@ public struct ServiceAccountProof: Decodable {
         signatures: [FCLCompositeSignature],
         timestamp: TimeInterval = 0
     ) {
-        self.fclType = Pragma.servicePragma.fclType
-        self.fclVersion = Pragma.servicePragma.fclVersion
+        self.fclType = Pragma.service.fclType
+        self.fclVersion = Pragma.service.fclVersion
         self.address = address
         self.nonce = nonce
         self.signatures = signatures

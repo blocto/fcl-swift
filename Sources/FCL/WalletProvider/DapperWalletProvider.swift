@@ -52,22 +52,28 @@ final class DapperWalletProvider: WalletProvider {
     }
 
     func authz() async throws -> String {
+        // TODO: implementation
         guard let user = user else { throw FCLError.userNotFound }
         try fcl.serviceOfType(type: .authz)
         return ""
     }
 
     func getUserSignature(_ message: String) async throws -> [FCLCompositeSignature] {
+        // TODO: implementation
         guard let user = user else { throw FCLError.userNotFound }
         return []
     }
 
     func preAuthz() async throws {
+        // TODO: implementation
         guard let user = user else { throw FCLError.userNotFound }
 
     }
 
+    // TODO: implementation
 //    func openId() async throws
 
-    func backChannelRPC() async throws {}
+    func backChannelRPC() async throws {
+        // TODO: implementation
+    }
 }

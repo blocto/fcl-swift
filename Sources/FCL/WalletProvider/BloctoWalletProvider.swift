@@ -11,10 +11,10 @@ import BloctoSDK
 import SwiftyJSON
 import Cadence
 
-final class BloctoWalletProvider: WalletProvider {
+final public class BloctoWalletProvider: WalletProvider {
 
     var bloctoFlowSDK: BloctoFlowSDK
-    let providerInfo: ProviderInfo = ProviderInfo(
+    public let providerInfo: ProviderInfo = ProviderInfo(
         title: "Blocto",
         desc: nil,
         icon: URL(string: "https://fcl-discovery.onflow.org/images/blocto.png")
@@ -26,9 +26,9 @@ final class BloctoWalletProvider: WalletProvider {
     ///   - bloctoAppIdentifier: identifier from app registered in blocto developer dashboard.
     ///        testnet dashboard: https://developers-staging.blocto.app/
     ///        mannet dashboard: https://developers.blocto.app/
-    ///   - window: used for presenting webView if no Blocto app installed.
+    ///   - window: used for presenting webView if no Blocto app installed. If pass nil then we will get the top ViewContoller from keyWindow.
     ///   - testnet: indicate flow network to use.
-    init(
+    public init(
         bloctoAppIdentifier: String,
         window: UIWindow?,
         testnet: Bool
@@ -48,16 +48,16 @@ final class BloctoWalletProvider: WalletProvider {
 
     /// Ask user to authanticate and get flow address along with account proof if provide accountProofData
     /// - Parameter accountProofData: AccountProofData used for proving a user controls an on-chain account, optional.
-    func authn(accountProofData: FCLAccountProofData?) async throws {
+    public func authn(accountProofData: FCLAccountProofData?) async throws {
         let (address, accountProof): (String, AccountProofSignatureData?) = try await withCheckedThrowingContinuation { continuation in
-            var accountProofData: AccountProofData?
-            if let fclAccountProofData = accountProofData {
-                accountProofData = AccountProofData(
-                    appId: fclAccountProofData.appId,
-                    nonce: fclAccountProofData.nonce
+            var bloctoAccountProofData: AccountProofData?
+            if let accountProofData = accountProofData {
+                bloctoAccountProofData = AccountProofData(
+                    appId: accountProofData.appId,
+                    nonce: accountProofData.nonce
                 )
             }
-            bloctoFlowSDK.authanticate(accountProofData: accountProofData) { result in
+            bloctoFlowSDK.authanticate(accountProofData: bloctoAccountProofData) { result in
                 switch result {
                 case let .success((address, accountProof)):
                     if let fclAccountProofData = accountProofData {
@@ -69,7 +69,7 @@ final class BloctoWalletProvider: WalletProvider {
                             )
                         }
                         let accountProofSignatureData = AccountProofSignatureData(
-                            address: address,
+                            address: Address(hexString: address),
                             nonce: fclAccountProofData.nonce,
                             signatures: fclAccountProofSignatures
                         )
@@ -92,24 +92,30 @@ final class BloctoWalletProvider: WalletProvider {
         )
     }
 
-    func authz() async throws -> String {
+    public func authz() async throws -> String {
+        // TODO: implementation
         guard let user = fcl.currentUser else { throw FCLError.userNotFound }
 //        BloctoSDK.
         return ""
     }
 
-    func getUserSignature(_ message: String) async throws -> [FCLCompositeSignature] {
+    public func getUserSignature(_ message: String) async throws -> [FCLCompositeSignature] {
+        // TODO: implementation
         guard let user = fcl.currentUser else { throw FCLError.userNotFound }
         return []
     }
 
-    func preAuthz() async throws {
+    public func preAuthz() async throws {
+        // TODO: implementation
         guard let user = fcl.currentUser else { throw FCLError.userNotFound }
     }
 
+    // TODO: implementation
 //    func openId() async throws -> JSON {}
 
-    func backChannelRPC() async throws {}
+    public func backChannelRPC() async throws {
+        // TODO: implementation
+    }
 
     private static func getKeyWindow() -> UIWindow? {
         UIApplication.shared.connectedScenes

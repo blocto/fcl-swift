@@ -9,7 +9,7 @@ import Foundation
 import SwiftyJSON
 import UIKit
 
-struct Service: Decodable {
+public struct Service: Decodable {
     let fclType: String
     let fclVersion: String
     let type: ServiceType
@@ -21,7 +21,7 @@ struct Service: Decodable {
     let provider: ServiceProvider?
     let params: [String: String]
     let data: ServiceDataType
-    
+
     func getRequest() throws -> URLRequest {
         switch type {
         case .authn:
@@ -36,9 +36,12 @@ struct Service: Decodable {
             }
             var request = URLRequest(url: endpoint)
             request.httpMethod = method?.httpMethod
-            // TODO: imcomplete
-//            request.httpBody =
-            return request
+            let newRequest = try ParameterEncoding.encode(
+                urlRequest: request,
+                parameters: params,
+                type: .jsonEncoding
+            )
+            return newRequest
         case .backChannel:
             guard let endpoint = endpoint,
                   var components = URLComponents(url: endpoint, resolvingAgainstBaseURL: false) else {
@@ -59,8 +62,8 @@ struct Service: Decodable {
     }
 
     enum CodingKeys: String, CodingKey {
-        case fclType = "fType"
-        case fclVersion = "fVsn"
+        case fclType = "f_type"
+        case fclVersion = "f_vsn"
         case type
         case method
         case endpoint
@@ -72,7 +75,7 @@ struct Service: Decodable {
         case data
     }
 
-    init(from decoder: Decoder) throws {
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.fclType = try container.decode(String.self, forKey: .fclType)
         self.fclVersion = try container.decode(String.self, forKey: .fclVersion)
