@@ -14,8 +14,8 @@ struct ServiceIdentity: Decodable {
     let keyId: Int
     
     enum CodingKeys: String, CodingKey {
-        case fclType = "fType"
-        case fclVersion = "fVsn"
+        case fclType = "f_type"
+        case fclVersion = "f_vsn"
         case address
         case keyId
     }

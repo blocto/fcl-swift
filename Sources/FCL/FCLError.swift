@@ -9,6 +9,7 @@ import Foundation
 
 public enum FCLError: Swift.Error {
     case `internal`
+    case parameterEncodingFailed
     case authenticateFailed
     case userNotFound
     case walletProviderNotSpecified
@@ -20,4 +21,5 @@ public enum FCLError: Swift.Error {
     case currentNetworkNotSupported
     case unexpectedResult
     case serviceError
+    case compositeSignatureInvalid
 }

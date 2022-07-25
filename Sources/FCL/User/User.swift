@@ -10,13 +10,13 @@ import Cadence
 
 public struct User: Decodable {
 
-    var fclType: String = Pragma.userPragma.fclType
-    var fclVersion: String = Pragma.userPragma.fclVersion
-    let address: Address
-    var loggedIn: Bool = false
-    let expiresAt: TimeInterval
-    var accountProof: AccountProofSignatureData?
-    let services: [Service]
+    public var fclType: String = Pragma.user.fclType
+    public var fclVersion: String = Pragma.user.fclVersion
+    public let address: Address
+    public var loggedIn: Bool = false
+    public let expiresAt: TimeInterval
+    public var accountProof: AccountProofSignatureData?
+    public let services: [Service]
 
     var expiresAtDate: Date {
         Date(timeIntervalSince1970: expiresAt)
@@ -31,7 +31,7 @@ public struct User: Decodable {
         case services
     }
 
-    init(
+    public init(
         fclType: String,
         fclVersion: String,
         address: Address,
@@ -49,7 +49,7 @@ public struct User: Decodable {
         self.services = services
     }
     
-    init(
+    public init(
         address: Address,
         accountProof: AccountProofSignatureData?,
         loggedIn: Bool = false,

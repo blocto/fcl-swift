@@ -1,6 +1,0 @@
-framework module secp256k1Wrapper {
-  umbrella header "secp256k1Wrapper-umbrella.h"
-
-  export *
-  module * { export * }
-}

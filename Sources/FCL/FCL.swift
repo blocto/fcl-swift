@@ -28,7 +28,7 @@ public class FCL: NSObject {
     private var webAuthSession: ASWebAuthenticationSession?
     private let requestSession = URLSession(configuration: .default)
 
-    var currentUser: User?
+    public var currentUser: User?
 
     override init() {
         super.init()
@@ -89,7 +89,6 @@ public class FCL: NSObject {
         // TODO: incomplete
         if let serviceType = try serviceOfType(type: .userSignature) {
             let request = try serviceType.getRequest()
-            
         } else {
             try await fcl.config.selectedWalletProvider?.getUserSignature(message) ?? []
         }

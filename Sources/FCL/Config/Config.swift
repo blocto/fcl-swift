@@ -44,6 +44,7 @@ public class Config {
 //        case openId
     }
 
+    @discardableResult
     public func put(_ option: Option) -> Self {
         switch option {
         case let .network(network):

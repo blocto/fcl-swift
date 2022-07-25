@@ -4,7 +4,11 @@ target 'FCL_Cocoa_Demo' do
   use_frameworks!
 
   pod 'FCL', :path => '../../'
-  pod 'FlowSDK', :git => 'git@github.com:portto/flow-swift-sdk.git', :tag => '0.1.2'
+  pod 'FlowSDK', :git => 'git@github.com:portto/flow-swift-sdk.git'
   pod 'Cadence', :git => 'git@github.com:portto/flow-swift-sdk.git'
+  
+  # should be removed
+  pod 'BloctoSDK/Flow', :path => '../../../blocto-ios-sdk'
+  pod 'BigInt'
 
 end
