@@ -1,6 +1,0 @@
-framework module FlowSDK {
-  umbrella header "FlowSDK-umbrella.h"
-
-  export *
-  module * { export * }
-}

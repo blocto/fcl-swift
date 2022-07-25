@@ -1,6 +1,0 @@
-framework module secp256k1Swift {
-  umbrella header "secp256k1Swift-umbrella.h"
-
-  export *
-  module * { export * }
-}

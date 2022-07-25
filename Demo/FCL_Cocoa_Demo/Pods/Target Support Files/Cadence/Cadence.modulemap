@@ -1,6 +1,0 @@
-framework module Cadence {
-  umbrella header "Cadence-umbrella.h"
-
-  export *
-  module * { export * }
-}
