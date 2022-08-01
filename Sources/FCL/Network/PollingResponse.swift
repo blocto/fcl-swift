@@ -7,14 +7,17 @@
 
 import Foundation
 
-struct AuthnResponse: Decodable {
+/// Used for authn, authz and pre-authz
+struct AuthResponse: Decodable {
     let fclType: String?
     let fclVersion: String?
     let status: ResponseStatus
-    var updates: Service?
-    var local: Service?
-    var data: AuthnData?
+    var updates: Service? // authn
+    var local: Service? // authn, authz
+    var data: AuthData?
     let reason: String?
+    let compositeSignature: AuthData? // authz
+    let authorizationUpdates: Service? // authz
     
     enum CodingKeys: String, CodingKey {
         case fclType = "f_type"
@@ -24,6 +27,8 @@ struct AuthnResponse: Decodable {
         case local
         case data
         case reason
+        case compositeSignature
+        case authorizationUpdates
     }
     
     init(from decoder: Decoder) throws {
@@ -38,11 +43,14 @@ struct AuthnResponse: Decodable {
             let locals = try? container.decode([Service].self, forKey: .local)
             local = locals?.first
         }
-        data = try? container.decode(AuthnData.self, forKey: .data)
+        data = try? container.decode(AuthData.self, forKey: .data)
         reason = try? container.decode(String.self, forKey: .reason)
+        compositeSignature = try? container.decode(AuthData.self, forKey: .compositeSignature)
+        authorizationUpdates = try? container.decode(Service.self, forKey: .authorizationUpdates)
     }
 }
 
+/// Used for post pre-authz response
 struct PollingWrappedResponse<Model: Decodable>: Decodable {
     let fclType: String?
     let fclVersion: String?

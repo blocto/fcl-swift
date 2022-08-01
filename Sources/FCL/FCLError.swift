@@ -21,5 +21,16 @@ public enum FCLError: Swift.Error {
     case currentNetworkNotSupported
     case unexpectedResult
     case serviceError
+    case invalidRequest
     case compositeSignatureInvalid
+    case invaildProposer
+    case fetchAccountFailure
+    case resolverNotFound
+    case missingPayer
+    case accountNotFound
+    case unauthenticated
+    case preAuthzNotFound
+    case encodeFailed
+    case scriptNotFound
+    case valueNotFound
 }

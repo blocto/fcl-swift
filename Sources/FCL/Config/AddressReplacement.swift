@@ -1,20 +1,21 @@
 //
 //  AddressReplacement.swift
-//  
+//  FCL
 //
 //  Created by Andrew Wang on 2022/6/29.
 //
 
 import Foundation
+import Cadence
 
-public struct AddressReplacement: Hashable {
+struct AddressReplacement: Hashable {
     
     let placeholder: String
-    let replacement: String
+    let replacement: Address
     
     public init(
         placeholder: String,
-        replacement: String
+        replacement: Address
     ) {
         self.placeholder = placeholder
         self.replacement = replacement

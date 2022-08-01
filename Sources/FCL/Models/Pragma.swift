@@ -16,6 +16,8 @@ struct Pragma {
     static let pollingResponse = Pragma(fclType: "PollingResponse", fclVersion: Constants.fclVersion)
     static let compositeSignature = Pragma(fclType: "CompositeSignature", fclVersion: Constants.fclVersion)
     static let openId = Pragma(fclType: "OpenId", fclVersion: Constants.fclVersion)
+    static let preSignable = Pragma(fclType: "PreSignable", fclVersion: "1.0.1")
+    static let signable = Pragma(fclType: "Signable", fclVersion: "1.0.1")
 
     let fclType: String
     let fclVersion: String

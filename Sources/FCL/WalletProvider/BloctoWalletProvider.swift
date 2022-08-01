@@ -11,7 +11,7 @@ import BloctoSDK
 import SwiftyJSON
 import Cadence
 
-final public class BloctoWalletProvider: WalletProvider {
+public final class BloctoWalletProvider: WalletProvider {
 
     var bloctoFlowSDK: BloctoFlowSDK
     public let providerInfo: ProviderInfo = ProviderInfo(
@@ -20,6 +20,15 @@ final public class BloctoWalletProvider: WalletProvider {
         icon: URL(string: "https://fcl-discovery.onflow.org/images/blocto.png")
     )
     let bloctoAppIdentifier: String
+    let isTestnet: Bool
+
+    private var bloctoAppScheme: String {
+        if isTestnet {
+            return "blocto-staging://"
+        } else {
+            return "blocto://"
+        }
+    }
 
     /// Initial wallet provider
     /// - Parameters:
@@ -37,6 +46,7 @@ final public class BloctoWalletProvider: WalletProvider {
         guard let window = window ?? Self.getKeyWindow() else {
             throw FCLError.walletProviderInitFailed
         }
+        self.isTestnet = testnet
         BloctoSDK.shared.initialize(
             with: bloctoAppIdentifier,
             window: window,
@@ -49,6 +59,58 @@ final public class BloctoWalletProvider: WalletProvider {
     /// Ask user to authanticate and get flow address along with account proof if provide accountProofData
     /// - Parameter accountProofData: AccountProofData used for proving a user controls an on-chain account, optional.
     public func authn(accountProofData: FCLAccountProofData?) async throws {
+        if let bloctoAppSchemeURL = URL(string: bloctoAppScheme),
+           await UIApplication.shared.canOpenURL(bloctoAppSchemeURL) {
+            // blocto app installed
+            try await setupUserByBloctoSDK(accountProofData)
+        } else {
+            // blocto app not install
+            // TODO: imcomplete
+        }
+    }
+
+    public func authz() async throws -> String {
+        // TODO: implementation
+        guard let user = fcl.currentUser else { throw FCLError.userNotFound }
+//        BloctoSDK.
+        return ""
+    }
+
+    public func getUserSignature(_ message: String) async throws -> [FCLCompositeSignature] {
+        // TODO: implementation
+        guard let user = fcl.currentUser else { throw FCLError.userNotFound }
+        return []
+    }
+
+    public func preAuthz() async throws {
+        // TODO: implementation
+        guard let user = fcl.currentUser else { throw FCLError.userNotFound }
+    }
+
+    // TODO: implementation
+//    func openId() async throws -> JSON {}
+
+    public func backChannelRPC() async throws {
+        // TODO: implementation
+    }
+
+    private static func getKeyWindow() -> UIWindow? {
+        UIApplication.shared.connectedScenes
+            .filter { $0.activationState == .foregroundActive }
+            .compactMap { $0 as? UIWindowScene }
+            .first?.windows
+            .filter(\.isKeyWindow).first
+    }
+
+    private func topViewController(from window: UIWindow) -> UIViewController? {
+        var topController: UIViewController?
+        while let presentedViewController = window.rootViewController?.presentedViewController {
+            topController = presentedViewController
+        }
+        return topController
+    }
+
+    private func setupUserByBloctoSDK(_ accountProofData: FCLAccountProofData?) async throws {
         let (address, accountProof): (String, AccountProofSignatureData?) = try await withCheckedThrowingContinuation { continuation in
             var bloctoAccountProofData: AccountProofData?
             if let accountProofData = accountProofData {
@@ -90,47 +152,6 @@ final public class BloctoWalletProvider: WalletProvider {
             expiresAt: 0,
             services: []
         )
-    }
-
-    public func authz() async throws -> String {
-        // TODO: implementation
-        guard let user = fcl.currentUser else { throw FCLError.userNotFound }
-//        BloctoSDK.
-        return ""
-    }
-
-    public func getUserSignature(_ message: String) async throws -> [FCLCompositeSignature] {
-        // TODO: implementation
-        guard let user = fcl.currentUser else { throw FCLError.userNotFound }
-        return []
-    }
-
-    public func preAuthz() async throws {
-        // TODO: implementation
-        guard let user = fcl.currentUser else { throw FCLError.userNotFound }
-    }
-
-    // TODO: implementation
-//    func openId() async throws -> JSON {}
-
-    public func backChannelRPC() async throws {
-        // TODO: implementation
-    }
-
-    private static func getKeyWindow() -> UIWindow? {
-        UIApplication.shared.connectedScenes
-            .filter { $0.activationState == .foregroundActive }
-            .compactMap { $0 as? UIWindowScene }
-            .first?.windows
-            .filter(\.isKeyWindow).first
-    }
-
-    private func topViewController(from window: UIWindow) -> UIViewController? {
-        var topController: UIViewController? = nil
-        while let presentedViewController = window.rootViewController?.presentedViewController {
-            topController = presentedViewController
-        }
-        return topController
     }
 
 }
