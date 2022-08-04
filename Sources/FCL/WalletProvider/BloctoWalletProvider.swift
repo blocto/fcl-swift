@@ -112,9 +112,9 @@ public final class BloctoWalletProvider: WalletProvider {
 
     private func setupUserByBloctoSDK(_ accountProofData: FCLAccountProofData?) async throws {
         let (address, accountProof): (String, AccountProofSignatureData?) = try await withCheckedThrowingContinuation { continuation in
-            var bloctoAccountProofData: AccountProofData?
+            var bloctoAccountProofData: FlowAccountProofData?
             if let accountProofData = accountProofData {
-                bloctoAccountProofData = AccountProofData(
+                bloctoAccountProofData = FlowAccountProofData(
                     appId: accountProofData.appId,
                     nonce: accountProofData.nonce
                 )
