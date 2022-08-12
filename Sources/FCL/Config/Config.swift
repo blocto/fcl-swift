@@ -88,7 +88,7 @@ public class Config {
 
         // User info
 //        case challengeScope "challenge.scope"
-        case openId([Scope])
+//        case openId([Scope])
     }
 
     @discardableResult
@@ -115,8 +115,8 @@ public class Config {
             location = origin
         case let .computeLimit(limit):
             computeLimit = limit
-        case let .openId(scopes):
-            openIdScopes = scopes
+//        case let .openId(scopes):
+//            openIdScopes = scopes
         }
         return self
     }

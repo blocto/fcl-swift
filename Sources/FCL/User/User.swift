@@ -15,8 +15,27 @@ public struct User: Decodable {
     public let address: Address
     public var loggedIn: Bool = false
     public let expiresAt: TimeInterval
-    public var accountProof: AccountProofSignatureData?
+    private var accountProofData: AccountProofSignatureData?
     public let services: [Service]
+
+    public var accountProof: AccountProofSignatureData? {
+        if let proof = accountProofData {
+            return proof
+        } else {
+            do {
+                let accountProofService = try fcl.serviceOfType(type: .accountProof)
+                if case let .accountProof(serviceAccountProof) = accountProofService?.data {
+                    return AccountProofSignatureData(
+                        address: address,
+                        nonce: serviceAccountProof.nonce,
+                        signatures: serviceAccountProof.signatures)
+                }
+                return nil
+            } catch {
+                return nil
+            }
+        }
+    }
 
     var expiresAtDate: Date {
         Date(timeIntervalSince1970: expiresAt)
@@ -43,7 +62,7 @@ public struct User: Decodable {
         self.fclType = fclType
         self.fclVersion = fclVersion
         self.address = address
-        self.accountProof = accountProof
+        self.accountProofData = accountProof
         self.loggedIn = loggedIn
         self.expiresAt = expiresAt
         self.services = services
@@ -57,7 +76,7 @@ public struct User: Decodable {
         services: [Service]
     ) {
         self.address = address
-        self.accountProof = accountProof
+        self.accountProofData = accountProof
         self.loggedIn = loggedIn
         self.expiresAt = expiresAt
         self.services = services

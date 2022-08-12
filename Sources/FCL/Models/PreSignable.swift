@@ -8,7 +8,7 @@
 import Foundation
 import Cadence
 
-struct PreSignable: Encodable {
+public struct PreSignable: Encodable {
     let fclType: String = Pragma.preSignable.fclType
     let fclVersion: String = Pragma.preSignable.fclVersion
     let roles: Role
@@ -56,11 +56,14 @@ struct PreSignable: Encodable {
     enum CodingKeys: String, CodingKey {
         case fType = "f_type"
         case fVsn = "f_vsn"
-        case roles, cadence, args, interaction
+        case roles
+        case cadence
+        case args
+        case interaction
         case voucher
     }
 
-    func encode(to encoder: Encoder) throws {
+    public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(fclType, forKey: .fType)
         try container.encode(fclVersion, forKey: .fVsn)

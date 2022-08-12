@@ -72,6 +72,7 @@ public struct Service: Decodable {
                 )
             }
         case .authn,
+             .localView,
              .authz,
              .preAuthz,
              .backChannel,
@@ -94,17 +95,18 @@ extension Service {
             throw FCLError.userNotFound
         case .authz:
             throw FCLError.userNotFound
-        case .preAuthz,
-                .userSignature,
-                .backChannel:
+        case .localView,
+             .preAuthz,
+             .userSignature,
+             .backChannel:
             guard let endpoint = endpoint else {
                 throw FCLError.serviceError
             }
             guard let requestURL = buildURL(url: endpoint, params: params) else {
                 throw FCLError.invalidRequest
             }
-            let request = try buildURLRequest(url: requestURL, body: body)
-            return request
+            let object = try body?.toDictionary() ?? [:]
+            return try RequstBuilder.buildURLRequest(url: requestURL, method: method, body: object)
         case .openId:
             throw FCLError.userNotFound
         case .accountProof:
@@ -122,8 +124,13 @@ extension Service {
 
         var queryItems: [URLQueryItem] = []
 
-        if let location = fcl.config.location?.value {
-            queryItems.append(URLQueryItem(name: paramLocation, value: location))
+        if let location = fcl.config.location {
+            switch location {
+            case let .domain(domain):
+                queryItems.append(URLQueryItem(name: paramLocation, value: domain.absoluteString))
+            case let .bloctoAppIdentifier(id):
+                queryItems.append(URLQueryItem(name: "appId", value: id))
+            }
         }
 
         for (name, value) in params {
@@ -136,45 +143,6 @@ extension Service {
 
         urlComponents.queryItems = queryItems
         return urlComponents.url
-    }
-
-    private func buildURLRequest(url: URL, body: Data? = nil) throws -> URLRequest {
-        var urlRequest = URLRequest(url: url)
-
-        if let origin = fcl.config.location {
-            switch origin {
-            case let .domain(url):
-                urlRequest.addValue(url.absoluteString, forHTTPHeaderField: "referer")
-            case let .bloctoAppIdentifier(string):
-                urlRequest.addValue(string, forHTTPHeaderField: "Blocto-Application-Identifier")
-            }
-        }
-        urlRequest.httpMethod = method?.httpMethod
-        switch method {
-        case .httpPost:
-            if let data = body {
-                var object = try data.toDictionary()
-                if let appDetail = fcl.config.appDetail {
-                    let appDetailDic = try appDetail.toDictionary()
-                    object = object.merging(appDetailDic, uniquingKeysWith: { $1 })
-                }
-                if fcl.config.openIdScopes.isEmpty == false {
-                    let openIdScopesDic = try fcl.config.openIdScopes.toDictionary()
-                    object = object.merging(openIdScopesDic, uniquingKeysWith: { $1 })
-                }
-                let clientInfoDic = try ClientInfo().toDictionary()
-                object = object.merging(clientInfoDic, uniquingKeysWith: { $1 })
-                let body = try? JSONSerialization.data(withJSONObject: object)
-                urlRequest.httpBody = body
-            }
-        case .httpGet,
-                .iframe,
-                .iframeRPC,
-                .data,
-                .none:
-            break
-        }
-        return urlRequest
     }
 
 }
@@ -193,7 +161,7 @@ extension Encodable {
 }
 
 extension Data {
-    
+
     func toDictionary() throws -> [String: Any] {
         let object = try JSONSerialization.jsonObject(with: self)
         guard let json = object as? [String: Any] else {
@@ -202,5 +170,5 @@ extension Data {
         }
         return json
     }
-    
+
 }

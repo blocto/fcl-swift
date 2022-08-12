@@ -6,6 +6,8 @@
 //
 
 import Foundation
+import FlowSDK
+import Cadence
 
 public protocol WalletProvider {
 
@@ -13,15 +15,20 @@ public protocol WalletProvider {
 
     func authn(accountProofData: FCLAccountProofData?) async throws
 
-    func authz() async throws -> String
-
     func getUserSignature(_ message: String) async throws -> [FCLCompositeSignature]
 
-    func preAuthz() async throws
+    func mutate(
+        cadence: String,
+        arguments: [Cadence.Argument],
+        limit: UInt64
+    ) async throws -> Identifier
+
+    func preAuthz(preSignable: PreSignable?) async throws -> AuthData
+
+//    func authz() async throws -> String
+
+//    func backChannelRPC() async throws
 
     // TODO: implementation
-//    func openId() async throws
-
-    func backChannelRPC() async throws
-
+    //    func openId() async throws
 }

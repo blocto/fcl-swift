@@ -165,7 +165,6 @@ struct Interaction: Encodable {
         }
 
         let outsideSigners = findOutsideSigners
-
         outsideSigners.forEach { address in
             if let account = accounts[address],
                let signature = account.signature {

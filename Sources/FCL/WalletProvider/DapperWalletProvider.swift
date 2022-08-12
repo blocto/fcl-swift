@@ -7,6 +7,7 @@
 
 import Foundation
 import FlowSDK
+import Cadence
 
 final class DapperWalletProvider: WalletProvider {
 
@@ -47,33 +48,33 @@ final class DapperWalletProvider: WalletProvider {
 
         try fcl.openWithWebAuthenticationSession(localService)
         let authnResponse = try await fcl.polling(service: updatesService)
-
-        user = try fcl.buildUser(authn: authnResponse)
+        fcl.currentUser = try fcl.buildUser(authn: authnResponse)
     }
 
-    func authz() async throws -> String {
-        // TODO: implementation
-        guard let user = user else { throw FCLError.userNotFound }
-        try fcl.serviceOfType(type: .authz)
-        return ""
-    }
+//    func authz() async throws -> String {
+//        // TODO: implementation
+//        guard let user = user else { throw FCLError.userNotFound }
+//        try fcl.serviceOfType(type: .authz)
+//        return ""
+//    }
 
     func getUserSignature(_ message: String) async throws -> [FCLCompositeSignature] {
-        // TODO: implementation
-        guard let user = user else { throw FCLError.userNotFound }
-        return []
+        throw FCLError.internal
     }
-
-    func preAuthz() async throws {
-        // TODO: implementation
-        guard let user = user else { throw FCLError.userNotFound }
-
+    
+    func mutate(
+        cadence: String,
+        arguments: [Cadence.Argument],
+        limit: UInt64
+    ) async throws -> Identifier {
+        throw FCLError.internal
+    }
+    
+    func preAuthz(preSignable: PreSignable?) async throws -> AuthData {
+        throw FCLError.internal
     }
 
     // TODO: implementation
 //    func openId() async throws
 
-    func backChannelRPC() async throws {
-        // TODO: implementation
-    }
 }

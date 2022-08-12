@@ -132,7 +132,10 @@ public class FCL: NSObject {
         let session = ASWebAuthenticationSession(
             url: url,
             callbackURLScheme: nil,
-            completionHandler: { _, _ in }
+            completionHandler: { [weak self] _, _ in
+                self?.webAuthSession?.cancel()
+                self?.webAuthSession = nil
+            }
         )
 
         session.presentationContextProvider = self
@@ -147,18 +150,25 @@ public class FCL: NSObject {
 
     func polling(service: Service, data: Data? = nil) async throws -> AuthResponse {
         let request = try service.getURLRequest(body: data)
-        let authnResponse: AuthResponse = try await requestSession.dataDecode(for: request)
+        return try await pollingRequest(request, type: service.type)
+    }
+
+    func pollingRequest(_ request: URLRequest, type: ServiceType) async throws -> AuthResponse {
+        let authnResponse: AuthResponse = try await requestSession.dataAuthnResponse(for: request)
         switch authnResponse.status {
         case .pending:
-            switch service.type {
+            switch type {
             case .authn:
-                guard let local = authnResponse.local,
-                      let webUIService = authnResponse.updates else {
+                guard let localView = authnResponse.local,
+                      let backChannel = authnResponse.updates else {
                     throw FCLError.serviceError
                 }
-                try openWithWebAuthenticationSession(local)
+                let openBrowserTask = Task { @MainActor in
+                    try openWithWebAuthenticationSession(localView)
+                }
+                _ = try await openBrowserTask.result.get()
                 try await Task.sleep(seconds: 1)
-                return try await polling(service: webUIService)
+                return try await polling(service: backChannel)
             case .authz:
                 guard let local = authnResponse.local,
                       let webUIService = authnResponse.authorizationUpdates else {
@@ -167,17 +177,25 @@ public class FCL: NSObject {
                 try openWithWebAuthenticationSession(local)
                 try await Task.sleep(seconds: 1)
                 return try await polling(service: webUIService)
-            case .preAuthz,
-                    .userSignature,
-                    .backChannel,
-                    .openId,
-                    .accountProof,
-                    .authnRefresh:
+            case .backChannel:
+                if webAuthSession == nil {
+                    throw FCLError.userCanceled
+                }
+                try await Task.sleep(seconds: 1)
+                return try await pollingRequest(request, type: type)
+            case .localView,
+                 .preAuthz,
+                 .userSignature,
+                 .openId,
+                 .accountProof,
+                 .authnRefresh:
                 throw FCLError.serviceError
             }
         case .approved, .declined:
-            webAuthSession?.cancel()
-            webAuthSession = nil
+            Task { @MainActor in
+                webAuthSession?.cancel()
+                webAuthSession = nil
+            }
             return authnResponse
         }
     }
@@ -197,7 +215,7 @@ public class FCL: NSObject {
 
 }
 
-// MARK: - ASWebAuthenticationPresentationContextProviding
+// MARK: ASWebAuthenticationPresentationContextProviding
 
 extension FCL: ASWebAuthenticationPresentationContextProviding {
 
@@ -217,7 +235,7 @@ public extension FCL {
         let resolvers: [Resolver] = [
             CadenceResolver(),
             AccountsResolver(),
-            RefBlockResolver()
+            RefBlockResolver(),
         ]
 
         let interaction = try await pipe(ix: ix, resolvers: resolvers)
@@ -261,7 +279,7 @@ extension FCL {
     func send(_ builds: [TransactionBuild]) async throws -> Identifier {
         var ix = prepare(ix: Interaction(), builder: builds)
 
-        // The line below to replace resolveComputeLimit in js.
+        // The line below to replace resolveComputeLimit in fcl.js.
         ix.message.computeLimit = fcl.config.computeLimit
 
         let resolvers: [Resolver] = [
@@ -285,13 +303,13 @@ extension FCL {
 
         builder.forEach { build in
             switch build {
+            case let .transaction(script):
+                newIX.tag = .transaction
+                newIX.message.cadence = script
             case let .arguments(args):
                 let fclArgs = args.toFCLArguments() // .compactMap { Flow.Argument(value: $0) }.toFCLArguments()
                 newIX.message.arguments = Array(fclArgs.map(\.0))
                 newIX.arguments = fclArgs.reduce(into: [:]) { $0[$1.0] = $1.1 }
-            case let .transaction(script):
-                newIX.tag = .transaction
-                newIX.message.cadence = script
             case let .computeLimit(gasLimit):
                 newIX.message.computeLimit = gasLimit
             }
@@ -307,7 +325,7 @@ extension FCL {
 public extension FCL {
 
     enum TransactionBuild {
-        case transaction(String)
+        case transaction(script: String)
         case arguments([Cadence.Argument])
         case computeLimit(UInt64)
 
@@ -398,12 +416,13 @@ extension FCL {
     ///   - authorizers: Each Authorizer of the transaction represents an Account
     ///       on Flow which consents to have it's state modified by this transaction
     /// - Returns: Transaction id
-    public func mutate(
-        @FCL.TransactionBuilder builder: () -> [FCL.TransactionBuild]
-    ) async throws -> Identifier {
-        // not check accessNode.api here cause we already define it in Network's endpoint.
-        try await send(builder())
-    }
+//    public func mutate(
+//        @FCL.TransactionBuilder builder: () -> [FCL.TransactionBuild]
+//    ) async throws -> Identifier {
+//        // not check accessNode.api here cause we already define it in Network's endpoint.
+//
+//        try await send(builder())
+//    }
 
     public func mutate(
         cadence: String,
@@ -414,21 +433,26 @@ extension FCL {
 //        authorizers: [Address] = []
     ) async throws -> Identifier {
         // not check accessNode.api here cause we already define it in Network's endpoint.
-        try await send([
-            .transaction(cadence),
-            .computeLimit(limit),
-            .arguments(arguments),
-        ])
+        guard let walletProvider = fcl.config.selectedWalletProvider else {
+            throw FCLError.walletProviderNotSpecified
+        }
+        return try await walletProvider.mutate(
+            cadence: cadence,
+            arguments: arguments,
+            limit: limit
+        )
     }
 }
 
 struct SignableUser: Encodable {
-    var kind: String?
     var address: Cadence.Address
-    var signature: String?
     var keyId: UInt32
-    var sequenceNum: UInt64?
     var role: Role
+
+    // Assigned in SignatureResolver
+    var signature: String?
+    // Assigned in SequenceNumberResolver
+    var sequenceNum: UInt64?
 
     var tempId: String {
         address.hexStringWithPrefix + "-" + String(keyId)
@@ -437,24 +461,22 @@ struct SignableUser: Encodable {
     var signingFunction: (Data) async throws -> AuthResponse
 
     enum CodingKeys: String, CodingKey {
-        case kind
-        case tempId
         case address = "addr"
         case keyId
-        case sequenceNum
-        case signature
         case role
+        case signature
+        case sequenceNum
+        case tempId
     }
 
     func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(kind, forKey: .kind)
-        try container.encode(tempId, forKey: .tempId)
         try container.encode(address, forKey: .address)
-        try container.encode(signature, forKey: .signature)
         try container.encode(keyId, forKey: .keyId)
-        try container.encode(sequenceNum, forKey: .sequenceNum)
         try container.encode(role, forKey: .role)
+        try container.encode(signature, forKey: .signature)
+        try container.encode(sequenceNum, forKey: .sequenceNum)
+        try container.encode(tempId, forKey: .tempId)
     }
 }
 

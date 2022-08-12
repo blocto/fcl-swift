@@ -26,40 +26,35 @@ final class AccountsResolver: Resolver {
               currentUser.loggedIn else {
             throw FCLError.unauthenticated
         }
-
-        guard let service = try fcl.serviceOfType(type: .preAuthz) else {
-            throw FCLError.preAuthzNotFound
+        
+        guard let walletProvider = fcl.config.selectedWalletProvider else {
+            throw FCLError.walletProviderNotSpecified
         }
-
+        
         let preSignable = ix.buildPreSignable(role: Role())
-        guard let data = try? JSONEncoder().encode(preSignable) else {
-            throw FCLError.encodeFailed
-        }
-
-        // for blocto pre-authz it will response approved once request.
-        let authnResponse = try await fcl.polling(service: service, data: data)
-
-        let signableUsers = buildSignableUsers(resp: authnResponse)
+        let authData = try await walletProvider.preAuthz(preSignable: preSignable)
+        
+        let signableUsers = buildSignableUsers(authData: authData)
         var accounts = [String: SignableUser]()
-
+        
         var newIX = ix
         newIX.authorizations.removeAll()
         signableUsers.forEach { user in
             let tempId = user.tempId
-
+            
             if accounts.keys.contains(tempId) {
                 accounts[tempId]?.role.merge(role: user.role)
             }
             accounts[tempId] = user
-
+            
             if user.role.proposer {
                 newIX.proposer = tempId
             }
-
+            
             if user.role.payer {
                 newIX.payer = tempId
             }
-
+            
             if user.role.authorizer {
                 newIX.authorizations.append(tempId)
             }
@@ -68,15 +63,15 @@ final class AccountsResolver: Resolver {
         return newIX
     }
 
-    func buildSignableUsers(resp: AuthResponse) -> [SignableUser] {
+    func buildSignableUsers(authData: AuthData) -> [SignableUser] {
         var axs = [(role: RoleType, service: Service)]()
-        if let proposer = resp.data?.proposer {
+        if let proposer = authData.proposer {
             axs.append((RoleType.proposer, proposer))
         }
-        for az in resp.data?.payer ?? [] {
+        for az in authData.payer ?? [] {
             axs.append((RoleType.payer, az))
         }
-        for az in resp.data?.authorization ?? [] {
+        for az in authData.authorization ?? [] {
             axs.append((RoleType.authorizer, az))
         }
 
