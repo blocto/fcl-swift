@@ -92,7 +92,8 @@ final class AccountsResolver: Resolver {
                     param: nil
                 )
             ) { data in
-                try await fcl.polling(service: service, data: data)
+                let request = try service.getURLRequest(body: data)
+                return try await fcl.pollingRequest(request, type: .authz)
             }
         }
     }

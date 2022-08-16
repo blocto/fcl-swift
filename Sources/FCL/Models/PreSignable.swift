@@ -41,7 +41,7 @@ public struct PreSignable: Encodable {
             refBlock: interaction.message.refBlock,
             computeLimit: interaction.message.computeLimit,
             arguments: interaction.message.arguments.compactMap { tempId in
-                interaction.arguments[tempId]
+                interaction.arguments[tempId]?.asArgument
             },
             proposalKey: interaction.createProposalKey(),
             payer: interaction.payer,

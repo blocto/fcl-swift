@@ -13,7 +13,7 @@ import AuthenticationServices
 public let fcl: FCL = FCL()
 
 func log(message: String) {
-    print("FCL: " + message)
+    print("🚀 FCL: " + message)
 }
 
 public class FCL: NSObject {
@@ -32,27 +32,18 @@ public class FCL: NSObject {
 
     override init() {
         super.init()
-
     }
 
     public func config(
         provider: WalletProvider
     ) {}
 
-    public func getAccount(address: String) async throws -> FlowSDK.Account {
-        throw FCLError.responseUnexpected
-    }
-
-    public func getLastestBlock() async throws -> FlowSDK.Block {
-        throw FCLError.responseUnexpected
-    }
-
     public func login() async throws -> Address {
-        throw FCLError.responseUnexpected
+        try await authanticate(accountProofData: nil)
     }
 
     public func logout() {
-        currentUser = nil
+        unauthenticate()
     }
 
     public func relogin() async throws -> Address {
@@ -60,21 +51,23 @@ public class FCL: NSObject {
         return try await login()
     }
 
-    // authn
+    // Authn
     public func authanticate(accountProofData: FCLAccountProofData?) async throws -> Address {
         guard let walletProvider = config.selectedWalletProvider else {
             throw FCLError.walletProviderNotSpecified
         }
-
+        delegate?.startLoading()
         try await walletProvider.authn(accountProofData: accountProofData)
-        guard let user = fcl.currentUser else {
+        guard let user = currentUser else {
+            delegate?.stopLoading()
             throw FCLError.userNotFound
         }
+        delegate?.stopLoading()
         return user.address
     }
 
     public func unauthenticate() {
-        fcl.currentUser = nil
+        currentUser = nil
     }
 
     public func reauthenticate(accountProofData: FCLAccountProofData?) async throws -> Address {
@@ -82,31 +75,20 @@ public class FCL: NSObject {
         return try await authanticate(accountProofData: accountProofData)
     }
 
-    // authz
-    public func authorization() {}
-
+    // User signature
     public func signUserMessage(message: String) async throws -> [FCLCompositeSignature] {
-        // TODO: incomplete
-        if let serviceType = try serviceOfType(type: .userSignature) {
-            let request = try serviceType.getURLRequest()
-        } else {
-            try await fcl.config.selectedWalletProvider?.getUserSignature(message) ?? []
+        guard let walletProvider = config.selectedWalletProvider else {
+            throw FCLError.walletProviderNotSpecified
         }
-        return []
-    }
-
-    public func query(
-        script: String,
-        arguments: [Cadence.Argument]
-    ) async throws -> Cadence.Argument {
-        try await flowAPIClient.executeScriptAtLatestBlock(
-            script: Data(script.utf8),
-            arguments: arguments
-        )
-    }
-
-    public func sendTransaction(_ transaction: Transaction) async throws -> String {
-        ""
+        delegate?.startLoading()
+        do {
+            let signatures = try await walletProvider.getUserSignature(message)
+            delegate?.stopLoading()
+            return signatures
+        } catch {
+            delegate?.stopLoading()
+            throw error
+        }
     }
 
     public func getCustodialFeePayerAddress() async throws -> Address {
@@ -129,6 +111,8 @@ public class FCL: NSObject {
             throw FCLError.urlNotFound
         }
 
+        log(message: "About to open ASWebAuthenticationSession with \(url.absoluteString)")
+
         let session = ASWebAuthenticationSession(
             url: url,
             callbackURLScheme: nil,
@@ -150,7 +134,10 @@ public class FCL: NSObject {
 
     func polling(service: Service, data: Data? = nil) async throws -> AuthResponse {
         let request = try service.getURLRequest(body: data)
-        return try await pollingRequest(request, type: service.type)
+        guard let type = service.type else {
+            throw FCLError.serviceTypeNotFound
+        }
+        return try await pollingRequest(request, type: type)
     }
 
     func pollingRequest(_ request: URLRequest, type: ServiceType) async throws -> AuthResponse {
@@ -158,7 +145,8 @@ public class FCL: NSObject {
         switch authnResponse.status {
         case .pending:
             switch type {
-            case .authn:
+            case .authn,
+                 .userSignature:
                 guard let localView = authnResponse.local,
                       let backChannel = authnResponse.updates else {
                     throw FCLError.serviceError
@@ -170,13 +158,17 @@ public class FCL: NSObject {
                 try await Task.sleep(seconds: 1)
                 return try await polling(service: backChannel)
             case .authz:
-                guard let local = authnResponse.local,
-                      let webUIService = authnResponse.authorizationUpdates else {
+                guard let localView = authnResponse.local,
+                      let backChannel = authnResponse.authorizationUpdates else {
                     throw FCLError.serviceError
                 }
-                try openWithWebAuthenticationSession(local)
+                let openBrowserTask = Task { @MainActor in
+                    try openWithWebAuthenticationSession(localView)
+                }
+                _ = try await openBrowserTask.result.get()
                 try await Task.sleep(seconds: 1)
-                return try await polling(service: webUIService)
+                let backChannelRequest = try backChannel.getURLRequest()
+                return try await pollingRequest(backChannelRequest, type: .backChannel)
             case .backChannel:
                 if webAuthSession == nil {
                     throw FCLError.userCanceled
@@ -185,7 +177,6 @@ public class FCL: NSObject {
                 return try await pollingRequest(request, type: type)
             case .localView,
                  .preAuthz,
-                 .userSignature,
                  .openId,
                  .accountProof,
                  .authnRefresh:
@@ -298,7 +289,7 @@ extension FCL {
         try await send(builder())
     }
 
-    internal func prepare(ix: Interaction, builder: [TransactionBuild]) -> Interaction {
+    func prepare(ix: Interaction, builder: [TransactionBuild]) -> Interaction {
         var newIX = ix
 
         builder.forEach { build in
@@ -330,9 +321,11 @@ public extension FCL {
         case computeLimit(UInt64)
 
         // TODO: support custom proposer and authorizer
-//        case proposer(Transaction.ProposalKey)
-//        case payer([TransactionFeePayer])
-//        case authorizers([])
+        /*
+         case proposer(Transaction.ProposalKey)
+         case payer([TransactionFeePayer])
+         case authorizers([])
+          */
     }
 
     @resultBuilder
@@ -370,24 +363,62 @@ public extension FCL {
 }
 
 extension FCL {
+
     /// Query the Flow Blockchain
     /// - Parameters:
     ///   - script: Cadence Script used to query Flow.
     ///   - arguments: Arguments passed to cadence script.
-    ///   - computeLimit: Compute Limit (gas limit) for Query.
     /// - Returns: Cadence response Value from Flow Blockchain contract.
     public func query(
         script: String,
-        arguments: [Cadence.Argument] = [],
-        computeLimit: UInt64 = 9999
+        arguments: [Cadence.Argument] = []
     ) async throws -> Cadence.Argument {
-
+        delegate?.startLoading()
         let items = fcl.config.addressReplacements
 
         let newScript = items.reduce(script) { result, replacement in
             result.replacingOccurrences(of: replacement.placeholder, with: replacement.replacement.hexStringWithPrefix)
         }
-        return try await fcl.flowAPIClient.executeScriptAtLatestBlock(script: Data(newScript.utf8), arguments: arguments)
+        do {
+            let argument = try await fcl.flowAPIClient.executeScriptAtLatestBlock(script: Data(newScript.utf8), arguments: arguments)
+            delegate?.stopLoading()
+            return argument
+        } catch {
+            delegate?.stopLoading()
+            throw error
+        }
+    }
+
+    /// As the current user Mutate the Flow Blockchain
+    /// - Parameters:
+    ///   - cadence: Cadence Transaction used to mutate Flow
+    ///   - arguments: Arguments passed to cadence transaction
+    ///   - limit: Compute Limit (gas limit) for transaction
+    /// - Returns: Transaction id
+    public func mutate(
+        cadence: String,
+        arguments: [Cadence.Argument] = [],
+        limit: UInt64 = 1000
+    ) async throws -> Identifier {
+        // not check accessNode.api here cause we already define it in Network's endpoint.
+        guard let walletProvider = fcl.config.selectedWalletProvider else {
+            throw FCLError.walletProviderNotSpecified
+        }
+        
+        delegate?.startLoading()
+        do {
+            // TODO: support additional authorizers.
+            let id = try await walletProvider.mutate(
+                cadence: cadence,
+                arguments: arguments,
+                limit: limit
+            )
+            delegate?.stopLoading()
+            return id
+        } catch {
+            delegate?.stopLoading()
+            throw error
+        }
     }
 
     func pipe(ix: Interaction, resolvers: [Resolver]) async throws -> Interaction {
@@ -403,104 +434,38 @@ extension FCL {
         return try await fcl.flowAPIClient.sendTransaction(transaction: tx)
     }
 
-    /// As the current user Mutate the Flow Blockchain
-    /// - Parameters:
-    ///   - cadence: Cadence Transaction used to mutate Flow
-    ///   - arguments: Arguments passed to cadence transaction
-    ///   - limit: Compute Limit (gas limit) for transaction
-    ///   - proposer: The Proposer of the transaction represents
-    ///       the Account on Flow for which one of it's keys
-    ///       will have its sequence number incremented by the transaction.
-    ///   - payer: The Payer of the transaction represents the Account on Flow
-    ///       for which will pay for the transaction
-    ///   - authorizers: Each Authorizer of the transaction represents an Account
-    ///       on Flow which consents to have it's state modified by this transaction
-    /// - Returns: Transaction id
-//    public func mutate(
-//        @FCL.TransactionBuilder builder: () -> [FCL.TransactionBuild]
-//    ) async throws -> Identifier {
-//        // not check accessNode.api here cause we already define it in Network's endpoint.
-//
-//        try await send(builder())
-//    }
-
-    public func mutate(
-        cadence: String,
-        arguments: [Cadence.Argument] = [],
-        limit: UInt64 = 100
-//        proposer: Transaction.ProposalKey?,
-//        payer: [Address] = [],
-//        authorizers: [Address] = []
-    ) async throws -> Identifier {
-        // not check accessNode.api here cause we already define it in Network's endpoint.
-        guard let walletProvider = fcl.config.selectedWalletProvider else {
-            throw FCLError.walletProviderNotSpecified
-        }
-        return try await walletProvider.mutate(
-            cadence: cadence,
-            arguments: arguments,
-            limit: limit
-        )
-    }
 }
 
-struct SignableUser: Encodable {
-    var address: Cadence.Address
-    var keyId: UInt32
-    var role: Role
+public extension FCL {
 
-    // Assigned in SignatureResolver
-    var signature: String?
-    // Assigned in SequenceNumberResolver
-    var sequenceNum: UInt64?
-
-    var tempId: String {
-        address.hexStringWithPrefix + "-" + String(keyId)
+    func getAccount(address: String) async throws -> FlowSDK.Account? {
+        try await flowAPIClient
+            .getAccountAtLatestBlock(address: Cadence.Address(hexString: address))
+    }
+    
+    func getBlock(blockId: String) async throws -> FlowSDK.Block? {
+        try await flowAPIClient
+            .getBlockByID(blockId: Identifier(hexString: blockId))
+    }
+    
+    func getLastestBlock(sealed: Bool = true) async throws -> FlowSDK.Block? {
+        try await flowAPIClient
+            .getLatestBlock(isSealed: sealed)
+    }
+    
+    func getBlockHeader(blockId: String) async throws -> FlowSDK.BlockHeader? {
+        try await flowAPIClient
+            .getBlockHeaderById(blockId: Identifier(hexString: blockId))
+    }
+    
+    func getTransactionStatus(transactionId: String) async throws -> FlowSDK.TransactionResult {
+        try await flowAPIClient
+            .getTransactionResult(id: Identifier(hexString: transactionId))
+    }
+    
+    func getTransaction(transactionId: String) async throws -> FlowSDK.Transaction? {
+        try await flowAPIClient
+            .getTransaction(id: Identifier(hexString: transactionId))
     }
 
-    var signingFunction: (Data) async throws -> AuthResponse
-
-    enum CodingKeys: String, CodingKey {
-        case address = "addr"
-        case keyId
-        case role
-        case signature
-        case sequenceNum
-        case tempId
-    }
-
-    func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(address, forKey: .address)
-        try container.encode(keyId, forKey: .keyId)
-        try container.encode(role, forKey: .role)
-        try container.encode(signature, forKey: .signature)
-        try container.encode(sequenceNum, forKey: .sequenceNum)
-        try container.encode(tempId, forKey: .tempId)
-    }
-}
-
-struct Singature: Encodable {
-    let address: String
-    let keyId: UInt32
-    let sig: String?
-}
-
-struct Role: Encodable {
-    var proposer: Bool = false
-    var authorizer: Bool = false
-    var payer: Bool = false
-    var param: Bool?
-
-    mutating func merge(role: Role) {
-        proposer = proposer || role.proposer
-        authorizer = authorizer || role.authorizer
-        payer = payer || role.payer
-    }
-}
-
-enum RoleType: String {
-    case proposer = "PROPOSER"
-    case payer = "PAYER"
-    case authorizer = "AUTHORIZER"
 }

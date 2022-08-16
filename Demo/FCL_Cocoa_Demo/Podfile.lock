@@ -6,7 +6,8 @@ PODS:
   - BloctoSDK/Core (0.2.2)
   - BloctoSDK/Flow (0.2.2):
     - BloctoSDK/Core
-  - Cadence (0.2.0):
+    - FlowSDK
+  - Cadence (0.4.0):
     - BigInt (~> 5.2.0)
     - CryptoSwift (~> 1.5.1)
   - CGRPCZlibp (1.8.2)
@@ -19,23 +20,18 @@ PODS:
   - CNIOLinux (2.40.0)
   - CNIOWindows (2.40.0)
   - CryptoSwift (1.5.1)
-  - FCL (0.1.0):
+  - FCL-SDK (0.1.0):
     - BloctoSDK
     - FlowSDK
     - SwiftyJSON
-  - FlowSDK (0.2.0):
-    - FlowSDK/FlowSDK (= 0.2.0)
-  - FlowSDK/Crypto (0.2.0):
-    - CryptoSwift (~> 1.5.1)
-    - secp256k1Swift (~> 0.7.4)
-  - FlowSDK/FlowSDK (0.2.0):
+  - FlowSDK (0.4.0):
+    - FlowSDK/FlowSDK (= 0.4.0)
+  - FlowSDK/FlowSDK (0.4.0):
     - BigInt (~> 5.2.0)
-    - Cadence (~> 0.2.0)
+    - Cadence (~> 0.4.0)
     - CryptoSwift (~> 1.5.1)
-    - FlowSDK/Crypto
-    - FlowSDK/Protobuf
-  - FlowSDK/Protobuf (0.2.0):
     - gRPC-Swiftp (~> 1.8.2)
+    - secp256k1Swift (~> 0.7.4)
   - gRPC-Swiftp (1.8.2):
     - CGRPCZlibp (= 1.8.2)
     - Logging (< 2.0.0, >= 1.4.0)
@@ -186,15 +182,15 @@ PODS:
     - SwiftNIOFoundationCompat (< 3, >= 2.32.0)
     - SwiftNIOPosix (< 3, >= 2.32.0)
     - SwiftNIOTLS (< 3, >= 2.32.0)
-  - SwiftProtobuf (1.19.0)
+  - SwiftProtobuf (1.19.1)
   - SwiftyJSON (5.0.1)
 
 DEPENDENCIES:
   - BigInt
-  - BloctoSDK/Flow (from `../../../blocto-ios-sdk`)
-  - Cadence (from `../../../flow-swift-sdk`)
-  - FCL (from `../../`)
-  - FlowSDK (from `../../../flow-swift-sdk`)
+  - BloctoSDK/Flow (from `https://github.com/portto/blocto-ios-sdk.git`, branch `feat/flow`)
+  - "Cadence (from `git@github.com:portto/flow-swift-sdk.git`)"
+  - FCL-SDK (from `../../`)
+  - "FlowSDK (from `git@github.com:portto/flow-swift-sdk.git`)"
   - RxCocoa
   - RxSwift
   - SnapKit
@@ -238,19 +234,31 @@ SPEC REPOS:
 
 EXTERNAL SOURCES:
   BloctoSDK:
-    :path: "../../../blocto-ios-sdk"
+    :branch: feat/flow
+    :git: https://github.com/portto/blocto-ios-sdk.git
   Cadence:
-    :path: "../../../flow-swift-sdk"
-  FCL:
+    :git: "git@github.com:portto/flow-swift-sdk.git"
+  FCL-SDK:
     :path: "../../"
   FlowSDK:
-    :path: "../../../flow-swift-sdk"
+    :git: "git@github.com:portto/flow-swift-sdk.git"
+
+CHECKOUT OPTIONS:
+  BloctoSDK:
+    :commit: f93a90166d7c4646fce09e312374ac1c816349d0
+    :git: https://github.com/portto/blocto-ios-sdk.git
+  Cadence:
+    :commit: 1467c999cd076e7607e3575364a52693613d19f8
+    :git: "git@github.com:portto/flow-swift-sdk.git"
+  FlowSDK:
+    :commit: 1467c999cd076e7607e3575364a52693613d19f8
+    :git: "git@github.com:portto/flow-swift-sdk.git"
 
 SPEC CHECKSUMS:
   _NIODataStructures: 3d45d8e70a1d17a15b1dc59d102c63dbc0525ffd
   BigInt: f668a80089607f521586bbe29513d708491ef2f7
-  BloctoSDK: 23d2914e1e7fa6774905b7d55c1f046ac9528b96
-  Cadence: f50b816003d13e342da4373ba0ac5d1cb91449ee
+  BloctoSDK: 510b6fe013ae1efc401b12cecb3e020126804a01
+  Cadence: 9de64e79320285ea8beecfae10327f5853f3b790
   CGRPCZlibp: 2f3e1e7a6d6cb481d4d1a26d3ec09aefacf09cbb
   CNIOAtomics: 8edf08644e5e6fa0f021c239be9e8beb1cd9ef18
   CNIOBoringSSL: 2c9c96c2e95f15e83fb8d26b9738d939cc39ae33
@@ -260,8 +268,8 @@ SPEC CHECKSUMS:
   CNIOLinux: 62e3505f50de558c393dc2f273dde71dcce518da
   CNIOWindows: 3047f2d8165848a3936a0a755fee27c6b5ee479b
   CryptoSwift: c4f2debceb38bf44c80659afe009f71e23e4a082
-  FCL: efc90af6f9d64622effce7c4340bfa5f5b15cc8b
-  FlowSDK: 8d46efd70bb64b1223883aae657adc01cd0f3332
+  FCL-SDK: e81299d80db6a2c9f5c4b1167ec9de95ec7fc541
+  FlowSDK: 2d7df11aa11c2eb0d53add61025d6c526f88421e
   gRPC-Swiftp: 1f5a05ce5b544bff3dce93223e72829daac26113
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
   RxCocoa: 94f817b71c07517321eb4f9ad299112ca8af743b
@@ -283,9 +291,9 @@ SPEC CHECKSUMS:
   SwiftNIOSSL: d153c5a6fc5b2301b0519b4c4d037a9414212da6
   SwiftNIOTLS: 598af547490133e9aac52aed0c23c4a90c31dcfc
   SwiftNIOTransportServices: 0b2b407819d82eb63af558c5396e33c945759503
-  SwiftProtobuf: 6ef3f0e422ef90d6605ca20b21a94f6c1324d6b3
+  SwiftProtobuf: 59d9ea2eb5f84b509f32d170a65f3348ae758f1e
   SwiftyJSON: 2f33a42c6fbc52764d96f13368585094bfd8aa5e
 
-PODFILE CHECKSUM: 356990a15c6b72a3b45ede44a3b7146462deb873
+PODFILE CHECKSUM: 1f362220e51518eea1aad9d669e6e30032353b4c
 
 COCOAPODS: 1.11.3

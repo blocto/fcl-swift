@@ -25,10 +25,8 @@ public protocol WalletProvider {
 
     func preAuthz(preSignable: PreSignable?) async throws -> AuthData
 
-//    func authz() async throws -> String
-
-//    func backChannelRPC() async throws
-
     // TODO: implementation
-    //    func openId() async throws
+    /*
+     func openId() async throws -> JSON {}
+     */
 }

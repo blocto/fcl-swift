@@ -12,7 +12,7 @@ struct Voucher: Encodable {
     let cadence: String?
     let refBlock: String?
     let computeLimit: UInt64
-    let arguments: [Argument]
+    let arguments: [Cadence.Argument]
     let proposalKey: ProposalKey
     var payer: String?
     let authorizers: [String]?

@@ -13,23 +13,26 @@ import SnapKit
 import BloctoSDK
 import FlowSDK
 import Cadence
-import FCL
+import FCL_SDK
+import AuthenticationServices
+
+var isProduction = false
+
+var bloctoSDKAppId: String {
+    if isProduction {
+        return ""
+    } else {
+        return "5d35c67e-7f37-4e4c-81ba-e7fafc92fd0a"
+    }
+}
 
 // swiftlint:disable type_body_length file_length
 final class FlowDemoViewController: UIViewController {
 
-    private var nonce = "75f8587e5bd5f9dcc9909d0dae1f0ac5814458b2ae129620502cb936fde7120a"
-
-    var flowAPIClient: Client {
-        if isProduction {
-            return Client(network: Network.mainnet)
-        } else {
-            return Client(network: Network.testnet)
-        }
-    }
+    private var nonce = "this is demo app"
 
     private lazy var bloctoFlowSDK = BloctoSDK.shared.flow
-    private var userSignatures: [FlowCompositeSignature] = []
+    private var userSignatures: [FCLCompositeSignature] = []
 
     private lazy var networkSegmentedControl: UISegmentedControl = {
         let segmentedControl = UISegmentedControl(items: ["devnet", "mainnet-beta"])
@@ -80,6 +83,13 @@ final class FlowDemoViewController: UIViewController {
         view.addSubview(setValueButton)
         view.addSubview(setValueResultLabel)
         view.addSubview(setValueExplorerButton)
+
+        view.addSubview(separator3)
+
+        view.addSubview(lookupTitleLabel)
+        view.addSubview(txIdInputTextField)
+        view.addSubview(lookupResultLabel)
+        view.addSubview(lookupButton)
 
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview().inset(30)
@@ -179,6 +189,32 @@ final class FlowDemoViewController: UIViewController {
 
         setValueButton.snp.makeConstraints {
             $0.top.equalTo(setValueResultLabel.snp.bottom).offset(20)
+            $0.leading.equalToSuperview().inset(20)
+        }
+
+        separator3.snp.makeConstraints {
+            $0.top.equalTo(setValueButton.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(20)
+        }
+
+        lookupTitleLabel.snp.makeConstraints {
+            $0.top.equalTo(separator3.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(20)
+        }
+
+        txIdInputTextField.snp.makeConstraints {
+            $0.top.equalTo(lookupTitleLabel.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.height.equalTo(35)
+        }
+
+        lookupResultLabel.snp.makeConstraints {
+            $0.top.equalTo(txIdInputTextField.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(20)
+        }
+
+        lookupButton.snp.makeConstraints {
+            $0.top.equalTo(lookupResultLabel.snp.bottom).offset(20)
             $0.bottom.equalToSuperview().inset(20)
             $0.leading.equalToSuperview().inset(20)
         }
@@ -336,6 +372,45 @@ final class FlowDemoViewController: UIViewController {
         return button
     }()
 
+    private lazy var separator3 = createSeparator()
+
+    private lazy var lookupTitleLabel: UILabel = createLabel(text: "Look up tx")
+
+    private lazy var txIdInputTextField: UITextField = {
+        let textField = UITextField()
+        textField.font = UIFont.systemFont(ofSize: 16)
+        textField.textColor = .black
+        textField.backgroundColor = .lightGray
+        textField.placeholder = "tx id"
+        textField.returnKeyType = .done
+        textField.delegate = self
+        textField.leftViewMode = .always
+        textField.layer.cornerRadius = 5
+        textField.clipsToBounds = true
+        let leftView = UIView()
+        leftView.snp.makeConstraints {
+            $0.size.equalTo(10)
+        }
+        textField.leftView = leftView
+        return textField
+    }()
+
+    private lazy var lookupResultLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 16)
+        label.textColor = .black
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        return label
+    }()
+
+    private lazy var lookupLoadingIndicator = createLoadingIndicator()
+
+    private lazy var lookupButton: UIButton = createButton(
+        text: "Look up",
+        indicator: lookupLoadingIndicator
+    )
+
     private lazy var disposeBag: DisposeBag = DisposeBag()
 
     override func viewDidLoad() {
@@ -353,6 +428,7 @@ final class FlowDemoViewController: UIViewController {
                 window: nil,
                 testnet: !isProduction
             )
+            fcl.delegate = self
             if isProduction {
                 fcl.config
                     .put(.network(.mainnet))
@@ -406,7 +482,7 @@ final class FlowDemoViewController: UIViewController {
                 }
                 BloctoSDK.shared.initialize(
                     with: bloctoSDKAppId,
-                    window: window,
+                    getWindow: { window },
                     logging: true,
                     testnet: !isProduction
                 )
@@ -422,39 +498,7 @@ final class FlowDemoViewController: UIViewController {
             .subscribe(onNext: { [weak self] _ in
                 guard let self = self else { return }
                 self.resetRequestAccountStatus()
-
-                /// 1. request account only
-                /*
-                 let requestAccountMethod = RequestAccountMethod(
-                 blockchain: .flow) { result in
-                 switch result {
-                 case let .success(address):
-                 let userAddress = address
-                 // receive userAddress here
-                 case let .failure(error):
-                 debugPrint(error)
-                 }
-                 }
-                 BloctoSDK.shared.send(method: requestAccountMethod)
-                 */
-
-                /// 2. Authanticate like FCL
-                let accountProofData = FCLAccountProofData(
-                    appId: bloctoSDKAppId,
-                    nonce: self.nonce
-                )
-                Task {
-                    do {
-                        let address = try await fcl.authanticate(accountProofData: accountProofData)
-                        self.requestAccountResultLabel.text = address.hexStringWithPrefix
-                        let hasAccountProof = fcl.currentUser?.accountProof != nil
-                        self.accountProofVerifyButton.isHidden = !hasAccountProof
-                        self.requestAccountCopyButton.isHidden = !hasAccountProof
-                        self.requestAccountExplorerButton.isHidden = !hasAccountProof
-                    } catch {
-                        self.handleRequestAccountError(error)
-                    }
-                }
+                self.authn()
             })
 
         _ = accountProofVerifyButton.rx.tap
@@ -549,6 +593,55 @@ final class FlowDemoViewController: UIViewController {
                       let hash = self.setValueResultLabel.text else { return }
                 self.routeToExplorer(with: .txhash(hash))
             })
+
+        _ = lookupButton.rx.tap
+            .throttle(
+                DispatchTimeInterval.milliseconds(500),
+                latest: false,
+                scheduler: MainScheduler.instance
+            )
+            .take(until: rx.deallocated)
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self,
+                      let hash = self.txIdInputTextField.text else { return }
+                self.lookup(txHash: hash)
+            })
+    }
+
+    private func authn() {
+        /// 1. request account only
+        /*
+         let requestAccountMethod = RequestAccountMethod(
+             blockchain: .flow) { result in
+             switch result {
+             case let .success(address):
+                 let userAddress = address
+                 // receive userAddress here
+             case let .failure(error):
+                 debugPrint(error)
+             }
+         }
+         BloctoSDK.shared.send(method: requestAccountMethod)
+         */
+
+        /// 2. Authanticate like FCL
+        let accountProofData = FCLAccountProofData(
+            appId: bloctoSDKAppId,
+            nonce: nonce
+        )
+        Task {
+            do {
+                let address = try await fcl.authanticate(accountProofData: accountProofData)
+                self.requestAccountResultLabel.text = address.hexStringWithPrefix
+                let hasAccountProof = fcl.currentUser?.accountProof != nil
+                self.requestAccountCopyButton.isHidden = false
+                self.requestAccountExplorerButton.isHidden = false
+                self.accountProofVerifyButton.isHidden = !hasAccountProof
+            } catch {
+                debugPrint(error)
+                self.handleRequestAccountError(error)
+            }
+        }
     }
 
     private func verifyAccountProof() {
@@ -586,7 +679,7 @@ final class FlowDemoViewController: UIViewController {
     }
 
     private func signMessage() {
-        guard let userWalletAddress = fcl.currentUser?.address.hexStringWithPrefix else {
+        guard fcl.currentUser?.address.hexStringWithPrefix != nil else {
             handleSignError(Error.message("User address not found. Please request account first."))
             return
         }
@@ -594,19 +687,15 @@ final class FlowDemoViewController: UIViewController {
             handleSignError(Error.message("message not found."))
             return
         }
-        bloctoFlowSDK.signMessage(
-            from: userWalletAddress,
-            message: message
-        ) { [weak self] result in
-            guard let self = self else { return }
-            self.resetSignStatus()
-            switch result {
-            case let .success(signatures):
-                self.userSignatures = signatures
-                self.signingResultLabel.text = signatures.map(\.signature).joined(separator: "\n")
-                self.signingVerifyButton.isHidden = false
-            case let .failure(error):
-                self.handleSignError(error)
+
+        Task { @MainActor in
+            do {
+                let signatures = try await fcl.signUserMessage(message: message)
+                userSignatures = signatures
+                signingResultLabel.text = signatures.map(\.signature).joined(separator: "\n")
+                signingVerifyButton.isHidden = false
+            } catch {
+                handleSignError(error)
             }
         }
     }
@@ -620,19 +709,12 @@ final class FlowDemoViewController: UIViewController {
         signingVerifyingIndicator.startAnimating()
 
         let bloctoContract = "0x5b250a8a85b44a67"
-        let sigs = userSignatures.map {
-            FCLCompositeSignature(
-                address: $0.address,
-                keyId: $0.keyId,
-                signature: $0.signature
-            )
-        }
 
         Task {
             do {
                 let valid = try await AppUtilities.verifyUserSignatures(
                     message: Data(message.utf8).bloctoSDK.hexString,
-                    signatures: sigs,
+                    signatures: userSignatures,
                     fclCryptoContract: Address(hexString: bloctoContract)
                 )
                 signingVerifyingIndicator.stopAnimating()
@@ -653,10 +735,7 @@ final class FlowDemoViewController: UIViewController {
     }
 
     private func sendTransaction() {
-        guard let userWalletAddress = fcl.currentUser?.address else {
-            handleSetValueError(Error.message("User address not found. Please request account first."))
-            return
-        }
+
         guard let inputValue = nomalTxInputTextField.text,
               inputValue.isEmpty == false else {
             handleSetValueError(Error.message("Input not found."))
@@ -665,15 +744,6 @@ final class FlowDemoViewController: UIViewController {
 
         Task { @MainActor in
             do {
-                guard let account = try await flowAPIClient.getAccountAtLatestBlock(address: userWalletAddress) else {
-                    handleSetValueError(Error.message("Account not found."))
-                    return
-                }
-
-                guard let block = try await flowAPIClient.getLatestBlock(isSealed: true) else {
-                    handleSetValueError(Error.message("Latest block not found."))
-                    return
-                }
 
                 let scriptString = #"""
                 import ValueDapp from 0x5a8143da8058740c
@@ -684,50 +754,39 @@ final class FlowDemoViewController: UIViewController {
                     }
                 }
                 """#
-                let script = Data(scriptString.utf8)
 
-                let argument = Cadence.Argument(.ufix64(123))
+                let argument = Cadence.Argument(.ufix64(345))
 
-                guard let sequenceNumber = account.keys.filter({ accountKey in
-                    accountKey.index == 0
-                }).first?.sequenceNumber else {
-                    handleSetValueError(Error.message("sequenceNumber not found."))
-                    return
-                }
-
-                let proposalKey = Transaction.ProposalKey(
-                    address: userWalletAddress,
-                    keyIndex: 0,
-                    sequenceNumber: sequenceNumber
-                )
-
-                let transaction = try Transaction(
-                    script: script,
+                let txHsh = try await fcl.mutate(
+                    cadence: scriptString,
                     arguments: [argument],
-                    referenceBlockId: block.blockHeader.id,
-                    gasLimit: 100,
-                    proposalKey: proposalKey,
-                    payer: Address(hexString: "f086a545ce3c552d"),
-                    authorizers: [userWalletAddress]
+                    limit: 1000
                 )
-
-                bloctoFlowSDK.sendTransaction(
-                    from: userWalletAddress,
-                    transaction: transaction
-                ) { [weak self] result in
-                    guard let self = self else { return }
-                    self.resetSetValueStatus()
-                    switch result {
-                    case let .success(txHsh):
-                        self.setValueResultLabel.text = txHsh
-                        self.setValueExplorerButton.isHidden = false
-                    case let .failure(error):
-                        self.handleSetValueError(error)
-                    }
-                }
-
+                resetSetValueStatus()
+                setValueResultLabel.text = txHsh.hexString
+                txIdInputTextField.text = txHsh.hexString
+                setValueExplorerButton.isHidden = false
             } catch {
-                handleSetValueError(Error.message("Account not found."))
+                resetSetValueStatus()
+                handleSetValueError(Error.message(error.localizedDescription))
+            }
+        }
+    }
+
+    private func lookup(txHash: String) {
+        lookupLoadingIndicator.startAnimating()
+        lookupResultLabel.text = nil
+        
+        Task {
+            do {
+                let result = try await fcl.getTransactionStatus(transactionId: txHash)
+                lookupLoadingIndicator.stopAnimating()
+                let displayString = "status: \(String(describing: result.status ?? .unknown))\nerror message: \(result.errorMessage ?? "no error")"
+                lookupResultLabel.text = displayString
+                debugPrint(result)
+            } catch {
+                lookupLoadingIndicator.stopAnimating()
+                lookupResultLabel.text = error.localizedDescription
             }
         }
     }
@@ -894,6 +953,22 @@ extension FlowDemoViewController {
                 return message
             }
         }
+    }
+
+}
+
+extension FlowDemoViewController: FCLDelegate {
+
+    func startLoading() {
+        print("start loading.")
+    }
+
+    func stopLoading() {
+        print("stop loading.")
+    }
+    
+    func webAuthenticationContextProvider() -> ASPresentationAnchor? {
+        view.window
     }
 
 }

@@ -45,6 +45,7 @@ enum RequstBuilder {
         case .httpGet,
              .iframe,
              .iframeRPC,
+             .browserIframe,
              .data,
              .none:
             break

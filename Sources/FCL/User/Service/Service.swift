@@ -1,6 +1,6 @@
 //
 //  Service.swift
-//
+//  FCL
 //
 //  Created by Andrew Wang on 2022/6/30.
 //
@@ -10,9 +10,9 @@ import SwiftyJSON
 import UIKit
 
 public struct Service: Decodable {
-    let fclType: String
-    let fclVersion: String
-    let type: ServiceType
+    let fclType: String?
+    let fclVersion: String?
+    let type: ServiceType?
     let method: ServiceMethod?
     let endpoint: URL?
     let uid: String?
@@ -38,9 +38,9 @@ public struct Service: Decodable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.fclType = try container.decode(String.self, forKey: .fclType)
-        self.fclVersion = try container.decode(String.self, forKey: .fclVersion)
-        self.type = try container.decode(ServiceType.self, forKey: .type)
+        self.fclType = try? container.decode(String.self, forKey: .fclType)
+        self.fclVersion = try? container.decode(String.self, forKey: .fclVersion)
+        self.type = try? container.decode(ServiceType.self, forKey: .type)
         self.method = try? container.decode(ServiceMethod.self, forKey: .method)
         self.endpoint = try? container.decode(URL.self, forKey: .endpoint)
         self.uid = try? container.decode(String.self, forKey: .uid)
@@ -83,6 +83,8 @@ public struct Service: Decodable {
             } else {
                 self.data = .notExist
             }
+        case .none:
+            self.data = .notExist
         }
     }
 }
@@ -92,13 +94,13 @@ extension Service {
     func getURLRequest(body: Data? = nil) throws -> URLRequest {
         switch type {
         case .authn:
-            throw FCLError.userNotFound
-        case .authz:
-            throw FCLError.userNotFound
+            throw FCLError.serviceNotImplemented
         case .localView,
              .preAuthz,
              .userSignature,
-             .backChannel:
+             .backChannel,
+             .authz,
+             .none:
             guard let endpoint = endpoint else {
                 throw FCLError.serviceError
             }
@@ -108,11 +110,11 @@ extension Service {
             let object = try body?.toDictionary() ?? [:]
             return try RequstBuilder.buildURLRequest(url: requestURL, method: method, body: object)
         case .openId:
-            throw FCLError.userNotFound
+            throw FCLError.serviceNotImplemented
         case .accountProof:
-            throw FCLError.userNotFound
+            throw FCLError.serviceNotImplemented
         case .authnRefresh:
-            throw FCLError.userNotFound
+            throw FCLError.serviceNotImplemented
         }
     }
 
@@ -123,15 +125,6 @@ extension Service {
         }
 
         var queryItems: [URLQueryItem] = []
-
-        if let location = fcl.config.location {
-            switch location {
-            case let .domain(domain):
-                queryItems.append(URLQueryItem(name: paramLocation, value: domain.absoluteString))
-            case let .bloctoAppIdentifier(id):
-                queryItems.append(URLQueryItem(name: "appId", value: id))
-            }
-        }
 
         for (name, value) in params {
             if name != paramLocation {

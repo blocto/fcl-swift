@@ -21,19 +21,12 @@ final class SignatureResolver: Resolver {
 
         let tx = try await ix.toFlowTransaction()
 
-        // TODO: remove this line if unused. we have already done in SequenceNumberResolver
-        ix.accounts[ix.proposer ?? ""]?.sequenceNum = tx.proposalKey.sequenceNumber
-
         let payloadSignatureMap = try await withThrowingTaskGroup(
             of: (id: String, signature: String).self,
             returning: [String: String].self,
             body: { taskGroup in
-//                let tx = try await ix.toFlowTransaction()
-//
-//                // TODO: remove this line if unused. we have already done in SequenceNumberResolver
-//                ix.accounts[ix.proposer ?? ""]?.sequenceNum = tx.proposalKey.sequenceNumber
 
-                let insidePayload = tx.payloadMessage().toHexString()
+                let insidePayload = tx.encodedPayload.toHexString()
 
                 let interaction = ix
                 for address in insideSigners {
@@ -63,10 +56,6 @@ final class SignatureResolver: Resolver {
             of: (id: String, signature: String).self,
             returning: [String: String].self,
             body: { taskGroup in
-//                let tx = try await ix.toFlowTransaction()
-//
-//                // TODO: remove this line if unused. we have already done in SequenceNumberResolver
-//                ix.accounts[ix.proposer ?? ""]?.sequenceNum = tx.proposalKey.sequenceNumber
 
                 let envelopeMessage = encodeEnvelopeMessage(
                     transaction: tx,
@@ -134,7 +123,7 @@ final class SignatureResolver: Resolver {
             }
         }
 
-        return tx.envelopeMessage().toHexString()
+        return tx.encodedEnvelope.toHexString()
     }
 
     func buildSignable(

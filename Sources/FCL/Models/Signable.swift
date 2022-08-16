@@ -10,8 +10,8 @@ import Cadence
 
 struct Signable: Encodable {
 
-    let fclType: String = Pragma.preSignable.fclType
-    let fclVersion: String = Pragma.preSignable.fclVersion
+    let fclType: String = Pragma.signable.fclType
+    let fclVersion: String = Pragma.signable.fclVersion
     let data = [String: String]()
     let message: String
     let keyId: UInt32
@@ -59,7 +59,7 @@ struct Signable: Encodable {
             refBlock: interaction.message.refBlock,
             computeLimit: interaction.message.computeLimit,
             arguments: interaction.message.arguments.compactMap { tempId in
-                interaction.arguments[tempId]
+                interaction.arguments[tempId]?.asArgument
             },
             proposalKey: interaction.createProposalKey(),
             payer: interaction.accounts[interaction.payer ?? ""]?.address.hexString,
@@ -80,7 +80,7 @@ struct Signable: Encodable {
         try container.encode(keyId, forKey: .keyId)
         try container.encode(roles, forKey: .roles)
         try container.encode(cadence, forKey: .cadence)
-        try container.encode(address, forKey: .address)
+        try container.encode(address.hexString, forKey: .address)
         try container.encode(args, forKey: .args)
         try container.encode(interaction, forKey: .interaction)
         try container.encode(voucher, forKey: .voucher)

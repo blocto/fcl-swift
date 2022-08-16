@@ -51,13 +51,6 @@ final class DapperWalletProvider: WalletProvider {
         fcl.currentUser = try fcl.buildUser(authn: authnResponse)
     }
 
-//    func authz() async throws -> String {
-//        // TODO: implementation
-//        guard let user = user else { throw FCLError.userNotFound }
-//        try fcl.serviceOfType(type: .authz)
-//        return ""
-//    }
-
     func getUserSignature(_ message: String) async throws -> [FCLCompositeSignature] {
         throw FCLError.internal
     }
@@ -73,8 +66,5 @@ final class DapperWalletProvider: WalletProvider {
     func preAuthz(preSignable: PreSignable?) async throws -> AuthData {
         throw FCLError.internal
     }
-
-    // TODO: implementation
-//    func openId() async throws
 
 }

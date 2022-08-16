@@ -132,10 +132,15 @@ public final class BloctoWalletProvider: WalletProvider {
             guard let userSignatureService = try fcl.serviceOfType(type: .userSignature) else {
                 throw FCLError.serviceNotFound
             }
-            // TODO: implementation
-            let response = try await fcl.polling(service: userSignatureService)
+
+            let encoder = JSONEncoder()
+            let encodeData = try encoder.encode(["message": Data(message.utf8).toHexString()])
+            let response = try await fcl.polling(
+                service: userSignatureService,
+                data: encodeData
+            )
+            return response.userSignatures
         }
-        return []
     }
 
     public func mutate(
@@ -215,7 +220,6 @@ public final class BloctoWalletProvider: WalletProvider {
     /// - Returns: Data includes proposer, payer, authorization.
     /// Only used if Blocto native app not install.
     public func preAuthz(preSignable: PreSignable?) async throws -> AuthData {
-        // TODO: implementation
         guard fcl.currentUser != nil else { throw FCLError.userNotFound }
         // blocto app not install
         guard let service = try fcl.serviceOfType(type: .preAuthz) else {
@@ -234,21 +238,6 @@ public final class BloctoWalletProvider: WalletProvider {
         }
         return authData
     }
-
-//    public func authz() async throws -> String {
-//        // TODO: implementation
-//        guard let user = fcl.currentUser else { throw FCLError.userNotFound }
-//
-//        //        BloctoSDK.
-//        return ""
-//    }
-
-    // TODO: implementation
-//    func openId() async throws -> JSON {}
-
-//    public func backChannelRPC() async throws {
-//        // TODO: implementation
-//    }
 
     private static func getKeyWindow() -> UIWindow? {
         UIApplication.shared.connectedScenes

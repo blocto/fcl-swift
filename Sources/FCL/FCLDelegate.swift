@@ -9,8 +9,8 @@ import Foundation
 import AuthenticationServices
 
 public protocol FCLDelegate {
-    func showLoading()
-    func hideLoading()
+    func startLoading()
+    func stopLoading()
     
-    func webAuthenticationContextProvider() -> ASPresentationAnchor
+    func webAuthenticationContextProvider() -> ASPresentationAnchor?
 }

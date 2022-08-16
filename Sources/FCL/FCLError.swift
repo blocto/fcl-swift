@@ -26,6 +26,7 @@ public enum FCLError: Swift.Error {
     case unauthenticated
     case encodeFailed
     case userCanceled
+    case serviceNotImplemented
 
     case userNotFound
     case presentableNotFound
@@ -39,4 +40,5 @@ public enum FCLError: Swift.Error {
     case authDataNotFound
     case latestBlockNotFound
     case keyNotFound
+    case serviceTypeNotFound
 }

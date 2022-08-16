@@ -18,6 +18,7 @@ struct AuthResponse: Decodable {
     let reason: String?
     let compositeSignature: AuthData? // authz
     let authorizationUpdates: Service? // authz
+    let userSignatures: [FCLCompositeSignature]
     
     enum CodingKeys: String, CodingKey {
         case fclType = "f_type"
@@ -44,6 +45,7 @@ struct AuthResponse: Decodable {
             local = locals?.first
         }
         data = try? container.decode(AuthData.self, forKey: .data)
+        userSignatures = (try? container.decode([FCLCompositeSignature].self, forKey: .data)) ?? []
         reason = try? container.decode(String.self, forKey: .reason)
         compositeSignature = try? container.decode(AuthData.self, forKey: .compositeSignature)
         authorizationUpdates = try? container.decode(Service.self, forKey: .authorizationUpdates)

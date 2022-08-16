@@ -15,7 +15,7 @@ public struct TransactionFeePayer: Equatable {
     public let keyIndex: Int
     
     public var tempId: String {
-        address.hexStringWithPrefix + "-" + String(keyIndex)
+        address.hexString + "-" + String(keyIndex)
     }
 
     public init(address: Address, keyIndex: Int) {

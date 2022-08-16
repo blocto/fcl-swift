@@ -3,15 +3,15 @@ platform :ios, '13.0'
 target 'FCL_Cocoa_Demo' do
   use_frameworks!
 
-  pod 'FCL', :path => '../../'
-  pod 'FlowSDK', :path => '../../../flow-swift-sdk' # :git => 'git@github.com:portto/flow-swift-sdk.git'
-  pod 'Cadence', :path => '../../../flow-swift-sdk' # :git => 'git@github.com:portto/flow-swift-sdk.git'
+  pod 'FCL-SDK', :path => '../../'
+  pod 'FlowSDK', :git => 'git@github.com:portto/flow-swift-sdk.git'
+  pod 'Cadence', :git => 'git@github.com:portto/flow-swift-sdk.git'
   pod 'SnapKit'
   pod 'RxSwift'
   pod 'RxCocoa'
   
   # should be removed
-  pod 'BloctoSDK/Flow', :path => '../../../blocto-ios-sdk'
+  pod 'BloctoSDK/Flow', :git => 'https://github.com/portto/blocto-ios-sdk.git', :branch => 'feat/flow'
   pod 'BigInt'
 
 end
