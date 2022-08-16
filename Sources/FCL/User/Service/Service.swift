@@ -1,6 +1,6 @@
 //
 //  Service.swift
-//
+//  FCL
 //
 //  Created by Andrew Wang on 2022/6/30.
 //
@@ -10,9 +10,9 @@ import SwiftyJSON
 import UIKit
 
 public struct Service: Decodable {
-    let fclType: String
-    let fclVersion: String
-    let type: ServiceType
+    let fclType: String?
+    let fclVersion: String?
+    let type: ServiceType?
     let method: ServiceMethod?
     let endpoint: URL?
     let uid: String?
@@ -21,45 +21,6 @@ public struct Service: Decodable {
     let provider: ServiceProvider?
     let params: [String: String]
     let data: ServiceDataType
-
-    func getRequest() throws -> URLRequest {
-        switch type {
-        case .authn:
-            throw FCLError.userNotFound
-        case .authz:
-            throw FCLError.userNotFound
-        case .preAuthz:
-            throw FCLError.userNotFound
-        case .userSignature:
-            guard let endpoint = endpoint else {
-                throw FCLError.serviceError
-            }
-            var request = URLRequest(url: endpoint)
-            request.httpMethod = method?.httpMethod
-            let newRequest = try ParameterEncoding.encode(
-                urlRequest: request,
-                parameters: params,
-                type: .jsonEncoding
-            )
-            return newRequest
-        case .backChannel:
-            guard let endpoint = endpoint,
-                  var components = URLComponents(url: endpoint, resolvingAgainstBaseURL: false) else {
-                throw FCLError.authenticateFailed
-            }
-            components.queryItems = params.map { URLQueryItem(name: $0.key, value: $0.value) }
-            guard let url = components.url else {
-                throw FCLError.urlNotFound
-            }
-            return URLRequest(url: url)
-        case .openId:
-            throw FCLError.userNotFound
-        case .accountProof:
-            throw FCLError.userNotFound
-        case .authnRefresh:
-            throw FCLError.userNotFound
-        }
-    }
 
     enum CodingKeys: String, CodingKey {
         case fclType = "f_type"
@@ -77,9 +38,9 @@ public struct Service: Decodable {
 
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.fclType = try container.decode(String.self, forKey: .fclType)
-        self.fclVersion = try container.decode(String.self, forKey: .fclVersion)
-        self.type = try container.decode(ServiceType.self, forKey: .type)
+        self.fclType = try? container.decode(String.self, forKey: .fclType)
+        self.fclVersion = try? container.decode(String.self, forKey: .fclVersion)
+        self.type = try? container.decode(ServiceType.self, forKey: .type)
         self.method = try? container.decode(ServiceMethod.self, forKey: .method)
         self.endpoint = try? container.decode(URL.self, forKey: .endpoint)
         self.uid = try? container.decode(String.self, forKey: .uid)
@@ -111,6 +72,7 @@ public struct Service: Decodable {
                 )
             }
         case .authn,
+             .localView,
              .authz,
              .preAuthz,
              .backChannel,
@@ -121,6 +83,85 @@ public struct Service: Decodable {
             } else {
                 self.data = .notExist
             }
+        case .none:
+            self.data = .notExist
         }
     }
+}
+
+extension Service {
+
+    func getURLRequest(body: Data? = nil) throws -> URLRequest {
+        switch type {
+        case .authn:
+            throw FCLError.serviceNotImplemented
+        case .localView,
+             .preAuthz,
+             .userSignature,
+             .backChannel,
+             .authz,
+             .none:
+            guard let endpoint = endpoint else {
+                throw FCLError.serviceError
+            }
+            guard let requestURL = buildURL(url: endpoint, params: params) else {
+                throw FCLError.invalidRequest
+            }
+            let object = try body?.toDictionary() ?? [:]
+            return try RequstBuilder.buildURLRequest(url: requestURL, method: method, body: object)
+        case .openId:
+            throw FCLError.serviceNotImplemented
+        case .accountProof:
+            throw FCLError.serviceNotImplemented
+        case .authnRefresh:
+            throw FCLError.serviceNotImplemented
+        }
+    }
+
+    private func buildURL(url: URL, params: [String: String] = [:]) -> URL? {
+        let paramLocation = "l6n"
+        guard var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
+            return nil
+        }
+
+        var queryItems: [URLQueryItem] = []
+
+        for (name, value) in params {
+            if name != paramLocation {
+                queryItems.append(
+                    URLQueryItem(name: name, value: value)
+                )
+            }
+        }
+
+        urlComponents.queryItems = queryItems
+        return urlComponents.url
+    }
+
+}
+
+extension Encodable {
+    /// Converting object to postable dictionary
+    func toDictionary(_ encoder: JSONEncoder = JSONEncoder()) throws -> [String: Any] {
+        let data = try encoder.encode(self)
+        let object = try JSONSerialization.jsonObject(with: data)
+        guard let json = object as? [String: Any] else {
+            let context = DecodingError.Context(codingPath: [], debugDescription: "Deserialized object is not a dictionary")
+            throw DecodingError.typeMismatch(type(of: object), context)
+        }
+        return json
+    }
+}
+
+extension Data {
+
+    func toDictionary() throws -> [String: Any] {
+        let object = try JSONSerialization.jsonObject(with: self)
+        guard let json = object as? [String: Any] else {
+            let context = DecodingError.Context(codingPath: [], debugDescription: "Deserialized data is not a dictionary")
+            throw DecodingError.typeMismatch(type(of: object), context)
+        }
+        return json
+    }
+
 }

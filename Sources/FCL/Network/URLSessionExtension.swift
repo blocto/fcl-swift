@@ -16,9 +16,9 @@ extension URLSession {
         return try Self.decoder.decode(Model.self, from: data)
     }
 
-    func dataAuthnResponse(for request: URLRequest) async throws -> AuthnResponse {
+    func dataAuthnResponse(for request: URLRequest) async throws -> AuthResponse {
         let data = try await data(for: request)
-        return try Self.decoder.decode(AuthnResponse.self, from: data)
+        return try Self.decoder.decode(AuthResponse.self, from: data)
     }
 
     func dataPollingWrappedResponse<Model: Decodable>(for request: URLRequest) async throws -> Model {

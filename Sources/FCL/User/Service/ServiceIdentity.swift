@@ -8,10 +8,10 @@
 import Foundation
 
 struct ServiceIdentity: Decodable {
-    public let fclType: String
-    public let fclVersion: String
+    public let fclType: String? // proposer, payer, authorization in PreAuthzResponse do not have this key.
+    public let fclVersion: String? // proposer, payer, authorization in PreAuthzResponse do not have this key.
     public let address: String
-    let keyId: Int
+    let keyId: UInt32
     
     enum CodingKeys: String, CodingKey {
         case fclType = "f_type"

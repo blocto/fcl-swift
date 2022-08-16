@@ -1,5 +1,5 @@
 Pod::Spec.new do |s|
-  s.name             = 'FCL'
+  s.name             = 'FCL-SDK'
   s.version          = '0.1.0'
   s.summary          = 'Flow Client Library Swift version.'
 
@@ -14,6 +14,7 @@ Pod::Spec.new do |s|
   
   s.source_files  = "Sources/**/*"
   s.dependency "FlowSDK"
+  s.dependency "Cadence"
   s.dependency "BloctoSDK"
   s.dependency "SwiftyJSON"
 

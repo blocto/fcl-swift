@@ -16,6 +16,7 @@ public enum ServiceType: String, Decodable {
     case openId = "open-id"
     case accountProof = "account-proof"
     case authnRefresh = "authn-refresh"
+    case localView = "local-view"
 }
 
 extension ServiceType: Equatable {}

@@ -24,14 +24,14 @@ public enum AppUtilities {
             includeDomainTag: false
         )
 
-        var indices: [Value] = []
-        var siganature: [Value] = []
+        var indices: [Cadence.Argument] = []
+        var siganature: [Cadence.Argument] = []
         for signature in accountProofData.signatures {
             indices.append(.int(BigInt(signature.keyId)))
             siganature.append(.string(signature.signature))
         }
 
-        let arguments: [Cadence.Value] = [
+        let arguments: [Cadence.Argument] = [
             .address(accountProofData.address),
             .string(verifyMessage),
             .array(indices),
@@ -46,7 +46,7 @@ public enum AppUtilities {
             script: verifyScript,
             arguments: arguments
         )
-        guard case let .bool(valid) = result else {
+        guard case let .bool(valid) = result.value else {
             throw FCLError.unexpectedResult
         }
         return valid
@@ -62,14 +62,14 @@ public enum AppUtilities {
             throw FCLError.compositeSignatureInvalid
         }
 
-        var indices: [Value] = []
-        var siganature: [Value] = []
+        var indices: [Cadence.Argument] = []
+        var siganature: [Cadence.Argument] = []
         for signature in signatures {
             indices.append(.int(BigInt(signature.keyId)))
             siganature.append(.string(signature.signature))
         }
 
-        let arguments: [Cadence.Value] = [
+        let arguments: [Cadence.Argument] = [
             .address(Address(hexString: address)),
             .string(message),
             .array(indices),
@@ -84,7 +84,7 @@ public enum AppUtilities {
             script: verifyScript,
             arguments: arguments
         )
-        guard case let .bool(valid) = result else {
+        guard case let .bool(valid) = result.value else {
             throw FCLError.unexpectedResult
         }
         return valid

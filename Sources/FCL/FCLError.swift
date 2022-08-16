@@ -11,15 +11,34 @@ public enum FCLError: Swift.Error {
     case `internal`
     case parameterEncodingFailed
     case authenticateFailed
-    case userNotFound
     case walletProviderNotSpecified
     case walletProviderInitFailed
-    case presentableNotFound
     case responseUnexpected
-    case urlNotFound
     case authnFailed(message: String)
     case currentNetworkNotSupported
     case unexpectedResult
     case serviceError
+    case invalidRequest
     case compositeSignatureInvalid
+    case invaildProposer
+    case fetchAccountFailure
+    case missingPayer
+    case unauthenticated
+    case encodeFailed
+    case userCanceled
+    case serviceNotImplemented
+
+    case userNotFound
+    case presentableNotFound
+    case urlNotFound
+    case serviceNotFound
+    case resolverNotFound
+    case accountNotFound
+    case preAuthzNotFound
+    case scriptNotFound
+    case valueNotFound
+    case authDataNotFound
+    case latestBlockNotFound
+    case keyNotFound
+    case serviceTypeNotFound
 }

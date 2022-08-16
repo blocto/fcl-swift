@@ -9,12 +9,12 @@ import Foundation
 
 public struct FCLCompositeSignature: Decodable {
 
-    let fclType: String
-    let fclVersion: String
-    let address: String
-    let keyId: Int
+    public let fclType: String
+    public let fclVersion: String
+    public let address: String
+    public let keyId: Int
     // hex string
-    let signature: String
+    public let signature: String
 
     enum CodingKeys: String, CodingKey {
         case fclType = "f_type"
