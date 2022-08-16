@@ -56,13 +56,10 @@ public class FCL: NSObject {
         guard let walletProvider = config.selectedWalletProvider else {
             throw FCLError.walletProviderNotSpecified
         }
-        delegate?.startLoading()
         try await walletProvider.authn(accountProofData: accountProofData)
         guard let user = currentUser else {
-            delegate?.stopLoading()
             throw FCLError.userNotFound
         }
-        delegate?.stopLoading()
         return user.address
     }
 
@@ -80,15 +77,7 @@ public class FCL: NSObject {
         guard let walletProvider = config.selectedWalletProvider else {
             throw FCLError.walletProviderNotSpecified
         }
-        delegate?.startLoading()
-        do {
-            let signatures = try await walletProvider.getUserSignature(message)
-            delegate?.stopLoading()
-            return signatures
-        } catch {
-            delegate?.stopLoading()
-            throw error
-        }
+        return try await walletProvider.getUserSignature(message)
     }
 
     public func getCustodialFeePayerAddress() async throws -> Address {
@@ -373,20 +362,16 @@ extension FCL {
         script: String,
         arguments: [Cadence.Argument] = []
     ) async throws -> Cadence.Argument {
-        delegate?.startLoading()
         let items = fcl.config.addressReplacements
 
         let newScript = items.reduce(script) { result, replacement in
             result.replacingOccurrences(of: replacement.placeholder, with: replacement.replacement.hexStringWithPrefix)
         }
-        do {
-            let argument = try await fcl.flowAPIClient.executeScriptAtLatestBlock(script: Data(newScript.utf8), arguments: arguments)
-            delegate?.stopLoading()
-            return argument
-        } catch {
-            delegate?.stopLoading()
-            throw error
-        }
+        return try await fcl.flowAPIClient
+            .executeScriptAtLatestBlock(
+                script: Data(newScript.utf8),
+                arguments: arguments
+            )
     }
 
     /// As the current user Mutate the Flow Blockchain
@@ -404,21 +389,13 @@ extension FCL {
         guard let walletProvider = fcl.config.selectedWalletProvider else {
             throw FCLError.walletProviderNotSpecified
         }
-        
-        delegate?.startLoading()
-        do {
-            // TODO: support additional authorizers.
-            let id = try await walletProvider.mutate(
-                cadence: cadence,
-                arguments: arguments,
-                limit: limit
-            )
-            delegate?.stopLoading()
-            return id
-        } catch {
-            delegate?.stopLoading()
-            throw error
-        }
+
+        // TODO: support additional authorizers.
+        return try await walletProvider.mutate(
+            cadence: cadence,
+            arguments: arguments,
+            limit: limit
+        )
     }
 
     func pipe(ix: Interaction, resolvers: [Resolver]) async throws -> Interaction {
@@ -442,27 +419,27 @@ public extension FCL {
         try await flowAPIClient
             .getAccountAtLatestBlock(address: Cadence.Address(hexString: address))
     }
-    
+
     func getBlock(blockId: String) async throws -> FlowSDK.Block? {
         try await flowAPIClient
             .getBlockByID(blockId: Identifier(hexString: blockId))
     }
-    
+
     func getLastestBlock(sealed: Bool = true) async throws -> FlowSDK.Block? {
         try await flowAPIClient
             .getLatestBlock(isSealed: sealed)
     }
-    
+
     func getBlockHeader(blockId: String) async throws -> FlowSDK.BlockHeader? {
         try await flowAPIClient
             .getBlockHeaderById(blockId: Identifier(hexString: blockId))
     }
-    
+
     func getTransactionStatus(transactionId: String) async throws -> FlowSDK.TransactionResult {
         try await flowAPIClient
             .getTransactionResult(id: Identifier(hexString: transactionId))
     }
-    
+
     func getTransaction(transactionId: String) async throws -> FlowSDK.Transaction? {
         try await flowAPIClient
             .getTransaction(id: Identifier(hexString: transactionId))

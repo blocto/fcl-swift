@@ -959,14 +959,6 @@ extension FlowDemoViewController {
 }
 
 extension FlowDemoViewController: FCLDelegate {
-
-    func startLoading() {
-        print("start loading.")
-    }
-
-    func stopLoading() {
-        print("stop loading.")
-    }
     
     func webAuthenticationContextProvider() -> ASPresentationAnchor? {
         view.window
