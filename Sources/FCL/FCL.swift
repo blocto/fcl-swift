@@ -226,7 +226,7 @@ public extension FCL {
         try await send(builder())
     }
 
-    internal func prepare(ix: Interaction, builder: [IntentBuild]) -> Interaction {
+    private func prepare(ix: Interaction, builder: [IntentBuild]) -> Interaction {
         var newIX = ix
 
         builder.forEach { build in
