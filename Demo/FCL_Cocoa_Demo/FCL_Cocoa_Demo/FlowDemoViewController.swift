@@ -33,6 +33,22 @@ final class FlowDemoViewController: UIViewController {
 
     private lazy var bloctoFlowSDK = BloctoSDK.shared.flow
     private var userSignatures: [FCLCompositeSignature] = []
+    
+    private var bloctoContract: String {
+        if isProduction {
+            return "0xdb6b70764af4ff68"
+        } else {
+            return "0x5b250a8a85b44a67"
+        }
+    }
+    
+    private var valueDappContract: String {
+        if isProduction {
+            return "0x8320311d63f3b336"
+        } else {
+            return "0x5a8143da8058740c"
+        }
+    }
 
     private lazy var networkSegmentedControl: UISegmentedControl = {
         let segmentedControl = UISegmentedControl(items: ["devnet", "mainnet-beta"])
@@ -487,6 +503,7 @@ final class FlowDemoViewController: UIViewController {
                     logging: true,
                     testnet: !isProduction
                 )
+                self.setupFCL()
             })
 
         _ = requestAccountButton.rx.tap
@@ -654,7 +671,6 @@ final class FlowDemoViewController: UIViewController {
 
         accountProofVerifyingIndicator.startAnimating()
 
-        let bloctoContract = "0x5b250a8a85b44a67"
         Task {
             do {
                 let valid = try await AppUtilities.verifyAccountProof(
@@ -709,8 +725,6 @@ final class FlowDemoViewController: UIViewController {
 
         signingVerifyingIndicator.startAnimating()
 
-        let bloctoContract = "0x5b250a8a85b44a67"
-
         Task {
             do {
                 let valid = try await AppUtilities.verifyUserSignatures(
@@ -746,15 +760,15 @@ final class FlowDemoViewController: UIViewController {
         Task { @MainActor in
             do {
 
-                let scriptString = #"""
-                import ValueDapp from 0x5a8143da8058740c
+                let scriptString = """
+                import ValueDapp from \(valueDappContract)
 
                 transaction(value: UFix64) {
                     prepare(authorizer: AuthAccount) {
                         ValueDapp.setValue(value)
                     }
                 }
-                """#
+                """
 
                 let argument = Cadence.Argument(.ufix64(345))
 
