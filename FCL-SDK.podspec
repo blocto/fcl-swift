@@ -14,6 +14,7 @@ Pod::Spec.new do |s|
   
   s.source_files  = "Sources/**/*"
   s.dependency "FlowSDK"
+  s.dependency "Cadence"
   s.dependency "BloctoSDK"
   s.dependency "SwiftyJSON"
 
