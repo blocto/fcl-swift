@@ -46,6 +46,7 @@ final class FlowDemoViewController: UIViewController {
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.backgroundColor = .white
+        scrollView.contentInset.bottom = 350
 
         scrollView.addSubview(contentView)
 
