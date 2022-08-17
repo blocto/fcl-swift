@@ -80,10 +80,6 @@ public class FCL: NSObject {
         return try await walletProvider.getUserSignature(message)
     }
 
-    public func getCustodialFeePayerAddress() async throws -> Address {
-        throw FCLError.responseUnexpected
-    }
-
     // MARK: Internal
 
     func serviceOfType(type: ServiceType) throws -> Service? {
@@ -383,7 +379,8 @@ extension FCL {
     public func mutate(
         cadence: String,
         arguments: [Cadence.Argument] = [],
-        limit: UInt64 = 1000
+        limit: UInt64 = 1000,
+        authorizers: [Cadence.Address]
     ) async throws -> Identifier {
         // not check accessNode.api here cause we already define it in Network's endpoint.
         guard let walletProvider = fcl.config.selectedWalletProvider else {
@@ -394,7 +391,8 @@ extension FCL {
         return try await walletProvider.mutate(
             cadence: cadence,
             arguments: arguments,
-            limit: limit
+            limit: limit,
+            authorizers: authorizers
         )
     }
 

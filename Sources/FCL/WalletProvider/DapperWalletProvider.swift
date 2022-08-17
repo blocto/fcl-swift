@@ -58,7 +58,8 @@ final class DapperWalletProvider: WalletProvider {
     func mutate(
         cadence: String,
         arguments: [Cadence.Argument],
-        limit: UInt64
+        limit: UInt64,
+        authorizers: [Cadence.Address]
     ) async throws -> Identifier {
         throw FCLError.internal
     }

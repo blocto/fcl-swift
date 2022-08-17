@@ -2,11 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>LSApplicationQueriesSchemes</key>
-    <array>
-        <string>blocto-staging</string>
-        <string>blocto</string>
-    </array>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -14,9 +9,22 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>blocto5d35c67e-7f37-4e4c-81ba-e7fafc92fd0a</string>
+				<string>blocto024d8dd5-260c-40b4-837e-b16c90326d24</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>blocto62a48d5a-3fd1-4f41-9b9d-5b20ba2482ec</string>
+			</array>
+		</dict>
+	</array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>blocto-staging</string>
+		<string>blocto</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>
 	<dict>

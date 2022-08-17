@@ -146,7 +146,8 @@ public final class BloctoWalletProvider: WalletProvider {
     public func mutate(
         cadence: String,
         arguments: [Cadence.Argument],
-        limit: UInt64
+        limit: UInt64,
+        authorizers: [Cadence.Address]
     ) async throws -> Identifier {
         if let bloctoAppSchemeURL = URL(string: bloctoAppScheme),
            await UIApplication.shared.canOpenURL(bloctoAppSchemeURL) {
@@ -185,7 +186,8 @@ public final class BloctoWalletProvider: WalletProvider {
                 arguments: arguments,
                 referenceBlockId: block.blockHeader.id,
                 proposalKey: proposalKey,
-                payer: Address(hexString: response["address"].stringValue)
+                payer: Address(hexString: response["address"].stringValue),
+                authorizers: authorizers
             )
             return try await withCheckedThrowingContinuation { [weak self] continuation in
                 guard let self = self else {

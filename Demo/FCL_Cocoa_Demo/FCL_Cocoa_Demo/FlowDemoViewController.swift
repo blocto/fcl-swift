@@ -20,9 +20,9 @@ var isProduction = false
 
 var bloctoSDKAppId: String {
     if isProduction {
-        return ""
+        return "62a48d5a-3fd1-4f41-9b9d-5b20ba2482ec"
     } else {
-        return "5d35c67e-7f37-4e4c-81ba-e7fafc92fd0a"
+        return "024d8dd5-260c-40b4-837e-b16c90326d24"
     }
 }
 
@@ -33,7 +33,7 @@ final class FlowDemoViewController: UIViewController {
 
     private lazy var bloctoFlowSDK = BloctoSDK.shared.flow
     private var userSignatures: [FCLCompositeSignature] = []
-    
+
     private var bloctoContract: String {
         if isProduction {
             return "0xdb6b70764af4ff68"
@@ -41,7 +41,7 @@ final class FlowDemoViewController: UIViewController {
             return "0x5b250a8a85b44a67"
         }
     }
-    
+
     private var valueDappContract: String {
         if isProduction {
             return "0x8320311d63f3b336"
@@ -102,6 +102,13 @@ final class FlowDemoViewController: UIViewController {
         view.addSubview(setValueExplorerButton)
 
         view.addSubview(separator3)
+
+        view.addSubview(getValueTitleLabel)
+        view.addSubview(getValueButton)
+        view.addSubview(getValueLoadingIndicator)
+        view.addSubview(getValueResultLabel)
+
+        view.addSubview(separator4)
 
         view.addSubview(lookupTitleLabel)
         view.addSubview(txIdInputTextField)
@@ -214,8 +221,28 @@ final class FlowDemoViewController: UIViewController {
             $0.leading.trailing.equalToSuperview().inset(20)
         }
 
-        lookupTitleLabel.snp.makeConstraints {
+        getValueTitleLabel.snp.makeConstraints {
             $0.top.equalTo(separator3.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(20)
+        }
+
+        getValueResultLabel.snp.makeConstraints {
+            $0.top.equalTo(getValueTitleLabel.snp.bottom).offset(20)
+            $0.leading.equalToSuperview().inset(20)
+        }
+
+        getValueButton.snp.makeConstraints {
+            $0.top.equalTo(getValueResultLabel.snp.bottom).offset(20)
+            $0.leading.equalToSuperview().inset(20)
+        }
+
+        separator4.snp.makeConstraints {
+            $0.top.equalTo(getValueButton.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(20)
+        }
+
+        lookupTitleLabel.snp.makeConstraints {
+            $0.top.equalTo(separator4.snp.bottom).offset(20)
             $0.leading.trailing.equalToSuperview().inset(20)
         }
 
@@ -351,7 +378,7 @@ final class FlowDemoViewController: UIViewController {
         textField.font = UIFont.systemFont(ofSize: 16)
         textField.textColor = .black
         textField.backgroundColor = .lightGray
-        textField.text = "5566"
+        textField.placeholder = "input value"
         textField.returnKeyType = .done
         textField.delegate = self
         textField.leftViewMode = .always
@@ -390,6 +417,26 @@ final class FlowDemoViewController: UIViewController {
     }()
 
     private lazy var separator3 = createSeparator()
+
+    private lazy var getValueTitleLabel: UILabel = createLabel(text: "Get a Value from Value Dapp")
+
+    private lazy var getValueButton: UIButton = createButton(
+        text: "Get Value",
+        indicator: getValueLoadingIndicator
+    )
+
+    private lazy var getValueLoadingIndicator = createLoadingIndicator()
+
+    private lazy var getValueResultLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 16)
+        label.textColor = .black
+        label.textAlignment = .left
+        label.numberOfLines = 0
+        return label
+    }()
+
+    private lazy var separator4 = createSeparator()
 
     private lazy var lookupTitleLabel: UILabel = createLabel(text: "Look up tx")
 
@@ -612,6 +659,18 @@ final class FlowDemoViewController: UIViewController {
                 self.routeToExplorer(with: .txhash(hash))
             })
 
+        _ = getValueButton.rx.tap
+            .throttle(
+                DispatchTimeInterval.milliseconds(500),
+                latest: false,
+                scheduler: MainScheduler.instance
+            )
+            .take(until: rx.deallocated)
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self else { return }
+                self.getValue()
+            })
+
         _ = lookupButton.rx.tap
             .throttle(
                 DispatchTimeInterval.milliseconds(500),
@@ -750,9 +809,14 @@ final class FlowDemoViewController: UIViewController {
     }
 
     private func sendTransaction() {
+        guard let userWalletAddress = fcl.currentUser?.address else {
+            handleSetValueError(Error.message("User address not found. Please request account first."))
+            return
+        }
 
         guard let inputValue = nomalTxInputTextField.text,
-              inputValue.isEmpty == false else {
+              inputValue.isEmpty == false,
+              let input = Decimal(string: inputValue) else {
             handleSetValueError(Error.message("Input not found."))
             return
         }
@@ -770,12 +834,13 @@ final class FlowDemoViewController: UIViewController {
                 }
                 """
 
-                let argument = Cadence.Argument(.ufix64(345))
+                let argument = Cadence.Argument(.ufix64(input))
 
                 let txHsh = try await fcl.mutate(
                     cadence: scriptString,
                     arguments: [argument],
-                    limit: 1000
+                    limit: 100,
+                    authorizers: [userWalletAddress]
                 )
                 resetSetValueStatus()
                 setValueResultLabel.text = txHsh.hexString
@@ -791,7 +856,7 @@ final class FlowDemoViewController: UIViewController {
     private func lookup(txHash: String) {
         lookupLoadingIndicator.startAnimating()
         lookupResultLabel.text = nil
-        
+
         Task {
             do {
                 let result = try await fcl.getTransactionStatus(transactionId: txHash)
@@ -803,6 +868,21 @@ final class FlowDemoViewController: UIViewController {
                 lookupLoadingIndicator.stopAnimating()
                 lookupResultLabel.text = error.localizedDescription
             }
+        }
+    }
+
+    private func getValue() {
+        let script = """
+        import ValueDapp from \(valueDappContract)
+
+        pub fun main(): UFix64 {
+            return ValueDapp.value
+        }
+        """
+
+        Task {
+            let argument = try await fcl.query(script: script)
+            getValueResultLabel.text = argument.value.description
         }
     }
 
@@ -972,8 +1052,10 @@ extension FlowDemoViewController {
 
 }
 
+// MARK: FCLDelegate
+
 extension FlowDemoViewController: FCLDelegate {
-    
+
     func webAuthenticationContextProvider() -> ASPresentationAnchor? {
         view.window
     }
