@@ -7,11 +7,5 @@ target 'FCL_Cocoa_Demo' do
   pod 'SnapKit'
   pod 'RxSwift'
   pod 'RxCocoa'
-  
-  # should be removed
-  pod 'FlowSDK', :git => 'git@github.com:portto/flow-swift-sdk.git'
-  pod 'Cadence', :git => 'git@github.com:portto/flow-swift-sdk.git'
-  pod 'BloctoSDK/Flow', :git => 'https://github.com/portto/blocto-ios-sdk.git'
-  pod 'BigInt'
 
 end
