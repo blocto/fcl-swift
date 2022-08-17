@@ -143,8 +143,9 @@ public class FCL: NSObject {
                 try await Task.sleep(seconds: 1)
                 return try await polling(service: backChannel)
             case .authz:
+                // blocto non custodial respond with updates.
                 guard let localView = authnResponse.local,
-                      let backChannel = authnResponse.authorizationUpdates else {
+                      let backChannel = authnResponse.authorizationUpdates ?? authnResponse.updates else {
                     throw FCLError.serviceError
                 }
                 let openBrowserTask = Task { @MainActor in
