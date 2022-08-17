@@ -4,7 +4,7 @@ PODS:
   - BloctoSDK/Core (0.3.0)
   - BloctoSDK/Flow (0.3.0):
     - BloctoSDK/Core
-    - FlowSDK
+    - FlowSDK (~> 0.4.0)
   - Cadence (0.4.0):
     - BigInt (~> 5.2.0)
     - CryptoSwift (~> 1.5.1)
@@ -183,11 +183,7 @@ PODS:
   - SwiftyJSON (5.0.1)
 
 DEPENDENCIES:
-  - BigInt
-  - BloctoSDK/Flow (from `https://github.com/portto/blocto-ios-sdk.git`)
-  - "Cadence (from `git@github.com:portto/flow-swift-sdk.git`)"
   - FCL-SDK (from `../../`)
-  - "FlowSDK (from `git@github.com:portto/flow-swift-sdk.git`)"
   - RxCocoa
   - RxSwift
   - SnapKit
@@ -196,6 +192,8 @@ SPEC REPOS:
   trunk:
     - _NIODataStructures
     - BigInt
+    - BloctoSDK
+    - Cadence
     - CGRPCZlibp
     - CNIOAtomics
     - CNIOBoringSSL
@@ -205,6 +203,7 @@ SPEC REPOS:
     - CNIOLinux
     - CNIOWindows
     - CryptoSwift
+    - FlowSDK
     - gRPC-Swiftp
     - Logging
     - RxCocoa
@@ -230,30 +229,13 @@ SPEC REPOS:
     - SwiftyJSON
 
 EXTERNAL SOURCES:
-  BloctoSDK:
-    :git: https://github.com/portto/blocto-ios-sdk.git
-  Cadence:
-    :git: "git@github.com:portto/flow-swift-sdk.git"
   FCL-SDK:
     :path: "../../"
-  FlowSDK:
-    :git: "git@github.com:portto/flow-swift-sdk.git"
-
-CHECKOUT OPTIONS:
-  BloctoSDK:
-    :commit: 0bf52b57b5a4a262b9dbc528f3d82f13ecf10ed3
-    :git: https://github.com/portto/blocto-ios-sdk.git
-  Cadence:
-    :commit: 1467c999cd076e7607e3575364a52693613d19f8
-    :git: "git@github.com:portto/flow-swift-sdk.git"
-  FlowSDK:
-    :commit: 1467c999cd076e7607e3575364a52693613d19f8
-    :git: "git@github.com:portto/flow-swift-sdk.git"
 
 SPEC CHECKSUMS:
   _NIODataStructures: 3d45d8e70a1d17a15b1dc59d102c63dbc0525ffd
   BigInt: f668a80089607f521586bbe29513d708491ef2f7
-  BloctoSDK: 8272747c9794699222d273c118e2ead9006b2fd0
+  BloctoSDK: 97263a6589534a54efde91ab9249ef2c20690c8e
   Cadence: 9de64e79320285ea8beecfae10327f5853f3b790
   CGRPCZlibp: 2f3e1e7a6d6cb481d4d1a26d3ec09aefacf09cbb
   CNIOAtomics: 8edf08644e5e6fa0f021c239be9e8beb1cd9ef18
@@ -290,6 +272,6 @@ SPEC CHECKSUMS:
   SwiftProtobuf: 59d9ea2eb5f84b509f32d170a65f3348ae758f1e
   SwiftyJSON: 2f33a42c6fbc52764d96f13368585094bfd8aa5e
 
-PODFILE CHECKSUM: 26b989f9340f02a31f6f9b23a5007badca8dce09
+PODFILE CHECKSUM: 875681e177fd8c65778ab275fcb912e859abf974
 
 COCOAPODS: 1.11.3
