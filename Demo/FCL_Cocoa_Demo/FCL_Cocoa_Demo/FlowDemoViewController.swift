@@ -20,9 +20,9 @@ var isProduction = false
 
 var bloctoSDKAppId: String {
     if isProduction {
-        return ""
+        return "62a48d5a-3fd1-4f41-9b9d-5b20ba2482ec"
     } else {
-        return "5d35c67e-7f37-4e4c-81ba-e7fafc92fd0a"
+        return "024d8dd5-260c-40b4-837e-b16c90326d24"
     }
 }
 
