@@ -768,7 +768,7 @@ final class FlowDemoViewController: UIViewController {
             do {
                 let signatures = try await fcl.signUserMessage(message: message)
                 userSignatures = signatures
-                signingResultLabel.text = signatures.map(\.signature).joined(separator: "\n")
+                signingResultLabel.text = signatures.map(\.signature).joined(separator: "\n\n")
                 signingVerifyButton.isHidden = false
             } catch {
                 handleSignError(error)
