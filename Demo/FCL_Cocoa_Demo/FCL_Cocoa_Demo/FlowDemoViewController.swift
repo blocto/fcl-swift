@@ -750,6 +750,10 @@ final class FlowDemoViewController: UIViewController {
     }
 
     private func sendTransaction() {
+        guard let userWalletAddress = fcl.currentUser?.address else {
+            handleSetValueError(Error.message("User address not found. Please request account first."))
+            return
+        }
 
         guard let inputValue = nomalTxInputTextField.text,
               inputValue.isEmpty == false else {
@@ -775,7 +779,8 @@ final class FlowDemoViewController: UIViewController {
                 let txHsh = try await fcl.mutate(
                     cadence: scriptString,
                     arguments: [argument],
-                    limit: 1000
+                    limit: 100,
+                    authorizers: [userWalletAddress]
                 )
                 resetSetValueStatus()
                 setValueResultLabel.text = txHsh.hexString
