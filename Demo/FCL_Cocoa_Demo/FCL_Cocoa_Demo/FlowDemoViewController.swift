@@ -29,7 +29,9 @@ var bloctoSDKAppId: String {
 // swiftlint:disable type_body_length file_length
 final class FlowDemoViewController: UIViewController {
 
-    private var nonce = "this is demo app"
+    private var accountProofAppName = "This is demo app."
+    // minimum 32-byte random nonce as a hex string.
+    private var nonce = "75f8587e5bd5f9dcc9909d0dae1f0ac5814458b2ae129620502cb936fde7120a"
 
     private lazy var bloctoFlowSDK = BloctoSDK.shared.flow
     private var userSignatures: [FCLCompositeSignature] = []
@@ -703,7 +705,7 @@ final class FlowDemoViewController: UIViewController {
 
         /// 2. Authanticate like FCL
         let accountProofData = FCLAccountProofData(
-            appId: bloctoSDKAppId,
+            appId: accountProofAppName,
             nonce: nonce
         )
         Task {
@@ -715,7 +717,6 @@ final class FlowDemoViewController: UIViewController {
                 self.requestAccountExplorerButton.isHidden = false
                 self.accountProofVerifyButton.isHidden = !hasAccountProof
             } catch {
-                debugPrint(error)
                 self.handleRequestAccountError(error)
             }
         }
@@ -733,7 +734,7 @@ final class FlowDemoViewController: UIViewController {
         Task {
             do {
                 let valid = try await AppUtilities.verifyAccountProof(
-                    appIdentifier: bloctoSDKAppId,
+                    appIdentifier: accountProofAppName,
                     accountProofData: accountProof,
                     fclCryptoContract: Address(hexString: bloctoContract)
                 )
@@ -749,6 +750,7 @@ final class FlowDemoViewController: UIViewController {
                 }
             } catch {
                 accountProofVerifyingIndicator.stopAnimating()
+                accountProofVerifyButton.setImage(UIImage(named: "error"), for: .normal)
                 debugPrint(error)
             }
         }
@@ -803,6 +805,7 @@ final class FlowDemoViewController: UIViewController {
                 }
             } catch {
                 signingVerifyingIndicator.stopAnimating()
+                signingVerifyButton.setImage(UIImage(named: "error"), for: .normal)
                 debugPrint(error)
             }
         }
