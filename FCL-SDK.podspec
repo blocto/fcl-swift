@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'FCL-SDK'
-  s.version          = '0.1.0'
+  s.version          = '0.1.1'
   s.summary          = 'Flow Client Library Swift version.'
 
   s.homepage         = 'https://github.com/portto/fcl-swift'
@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '13.0'
   
   s.source_files  = "Sources/**/*"
-  s.dependency "BloctoSDK/Flow", "~> 0.3.2"
+  s.dependency "BloctoSDK/Flow", "~> 0.3.3"
   s.dependency "SwiftyJSON"
 
 end
