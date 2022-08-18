@@ -20,7 +20,7 @@ public struct User: Decodable {
 
     public var accountProof: AccountProofSignatureData? {
         if let proof = accountProofData {
-            return proof
+            return proof.signatures.isEmpty ? nil : proof
         } else {
             do {
                 let accountProofService = try fcl.serviceOfType(type: .accountProof)
