@@ -172,21 +172,15 @@ public final class BloctoWalletProvider: WalletProvider {
                 keyIndex: cosignerKey.index,
                 sequenceNumber: cosignerKey.sequenceNumber
             )
-
-            guard let url = URL(string: bloctoApiBaseURLString + "/flow/feePayer") else {
-                throw FCLError.urlNotFound
-            }
-
-            let feePayerRequest = URLRequest(url: url)
-            let response: JSON = try await URLSession(configuration: .default)
-                .dataDecode(for: feePayerRequest)
+            
+            let feePayer = try await bloctoFlowSDK.getFeePayerAddress(isTestnet: isTestnet)
 
             let transaction = try FlowSDK.Transaction(
                 script: Data(cadence.utf8),
                 arguments: arguments,
                 referenceBlockId: block.blockHeader.id,
                 proposalKey: proposalKey,
-                payer: Address(hexString: response["address"].stringValue),
+                payer: feePayer,
                 authorizers: authorizers
             )
             return try await withCheckedThrowingContinuation { [weak self] continuation in

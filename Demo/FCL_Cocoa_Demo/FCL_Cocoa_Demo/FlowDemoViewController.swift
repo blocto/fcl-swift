@@ -974,6 +974,20 @@ final class FlowDemoViewController: UIViewController {
     private func handleGeneralError(label: UILabel, error: Swift.Error) {
         if let error = error as? BloctoSDKError {
             switch error {
+            case .callbackSelfNotfound:
+                label.text = "weak self not found."
+            case .encodeToURLFailed:
+                label.text = "url encode failed."
+            case .webSDKSessionFailed:
+                label.text = "webSDK session failed."
+            case .decodeFailed:
+                label.text = "decode failed."
+            case .responseUnexpected:
+                label.text = "api response unexpected."
+            case .urlNotFound:
+                label.text = "url not found."
+            case .feePayerNotFound:
+                label.text = "fee payer not found."
             case .appIdNotSet:
                 label.text = "app id not set."
             case .userRejected:
@@ -986,6 +1000,12 @@ final class FlowDemoViewController: UIViewController {
                 label.text = "user not matched."
             case .ethSignInvalidHexString:
                 label.text = "input text should be hex string with 0x prefix."
+            case .userCancel:
+                label.text = "user canceled."
+            case .redirectURLNotFound:
+                label.text = "redirect url not found."
+            case let .sessionError(code):
+                label.text = "ASWebAuthenticationSessionError \(code)"
             case let .other(code):
                 label.text = code
             }
