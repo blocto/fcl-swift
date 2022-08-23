@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/portto/blocto-ios-sdk.git",
       "state" : {
-        "revision" : "54b1f82498efb3cacd800bc872553664429e5e66",
-        "version" : "0.2.2"
+        "revision" : "dbdef36b8fd0832d62ab483406609dfc6a289a69",
+        "version" : "0.3.4"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/portto/flow-swift-sdk.git",
       "state" : {
-        "revision" : "fdac4e7c08db3fbdee5a22230bc3c004f47d2a3f",
-        "version" : "0.1.2"
+        "revision" : "1467c999cd076e7607e3575364a52693613d19f8",
+        "version" : "0.4.0"
       }
     },
     {
@@ -50,80 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/grpc/grpc-swift.git",
       "state" : {
-        "revision" : "d772b688d718c2eb29f99b535fc4d92ebba031c5",
-        "version" : "1.8.1"
-      }
-    },
-    {
-      "identity" : "logger",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/shibapm/Logger",
-      "state" : {
-        "revision" : "53c3ecca5abe8cf46697e33901ee774236d94cce",
-        "version" : "0.2.3"
-      }
-    },
-    {
-      "identity" : "moya",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Moya/Moya.git",
-      "state" : {
-        "revision" : "d27767c3624cc64a45bb371b267b89c92d70c670",
-        "version" : "14.0.1"
-      }
-    },
-    {
-      "identity" : "nimble",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Quick/Nimble.git",
-      "state" : {
-        "revision" : "7a46a5fc86cb917f69e3daf79fcb045283d8f008",
-        "version" : "8.1.2"
-      }
-    },
-    {
-      "identity" : "ohhttpstubs",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/AliSoftware/OHHTTPStubs.git",
-      "state" : {
-        "revision" : "12f19662426d0434d6c330c6974d53e2eb10ecd9",
-        "version" : "9.1.0"
-      }
-    },
-    {
-      "identity" : "packageconfig",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/shibapm/PackageConfig.git",
-      "state" : {
-        "revision" : "58523193c26fb821ed1720dcd8a21009055c7cdb",
-        "version" : "1.1.3"
-      }
-    },
-    {
-      "identity" : "quick",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Quick/Quick.git",
-      "state" : {
-        "revision" : "09b3becb37cb2163919a3842a4c5fa6ec7130792",
-        "version" : "2.2.1"
-      }
-    },
-    {
-      "identity" : "reactiveswift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Moya/ReactiveSwift.git",
-      "state" : {
-        "revision" : "f195d82bb30e412e70446e2b4a77e1b514099e88",
-        "version" : "6.1.0"
-      }
-    },
-    {
-      "identity" : "rocket",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/shibapm/Rocket",
-      "state" : {
-        "revision" : "9880a5beb7fcb9e61ddd5764edc1700b8c418deb",
-        "version" : "1.2.1"
+        "revision" : "d114c5ec34015bab663b3b7afaa7d6197656e47e",
+        "version" : "1.9.0"
       }
     },
     {
@@ -136,21 +64,12 @@
       }
     },
     {
-      "identity" : "rxswift",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/ReactiveX/RxSwift.git",
-      "state" : {
-        "revision" : "cec68169a048a079f461ba203fe85636548d7a89",
-        "version" : "5.1.3"
-      }
-    },
-    {
       "identity" : "secp256k1",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/portto/secp256k1.git",
       "state" : {
-        "revision" : "72b5f1b4ba20cd529f77b0893d20ee43b892cc3f",
-        "version" : "0.0.4"
+        "revision" : "6864a2560066cedede330c4b344689432a7300f7",
+        "version" : "0.0.5"
       }
     },
     {
@@ -158,8 +77,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/portto/secp256k1.swift",
       "state" : {
-        "revision" : "28e8dcbc123136cf89682e2754abc603d783d908",
-        "version" : "0.7.2"
+        "revision" : "23aa6bab1f60e513297d0d58a863418f68534e56",
+        "version" : "0.7.4"
       }
     },
     {
@@ -235,15 +154,6 @@
       }
     },
     {
-      "identity" : "swiftshell",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/kareman/SwiftShell",
-      "state" : {
-        "revision" : "a6014fe94c3dbff0ad500e8da4f251a5d336530b",
-        "version" : "5.1.0-beta.1"
-      }
-    },
-    {
       "identity" : "swiftyjson",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SwiftyJSON/SwiftyJSON.git",
@@ -259,15 +169,6 @@
       "state" : {
         "revision" : "f8fd111642bf2336b11ef9ea828510693106e954",
         "version" : "1.1.0"
-      }
-    },
-    {
-      "identity" : "yams",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/jpsim/Yams",
-      "state" : {
-        "revision" : "9ff1cc9327586db4e0c8f46f064b6a82ec1566fa",
-        "version" : "4.0.6"
       }
     }
   ],
