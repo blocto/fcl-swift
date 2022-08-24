@@ -12,7 +12,10 @@ import AuthenticationServices
 
 public let fcl: FCL = FCL()
 
-func log(message: String) {
+func log(
+    message: String
+) {
+    guard fcl.config.logging else { return }
     print("🚀 FCL: " + message)
 }
 
@@ -53,18 +56,35 @@ public class FCL: NSObject {
 
     // Authn
     public func authanticate(accountProofData: FCLAccountProofData?) async throws -> Address {
-        guard let walletProvider = config.selectedWalletProvider else {
-            throw FCLError.walletProviderNotSpecified
+        do {
+            var walletProvider: WalletProvider?
+            if let provider = config.selectedWalletProvider {
+                walletProvider = provider
+            } else {
+                if config.walletProviderCandidates.isEmpty == false {
+                    walletProvider = try await selectionProvider()
+                    fcl.config.selectedWalletProvider = walletProvider
+                } else {
+                    throw FCLError.walletProviderNotSpecified
+                }
+            }
+            guard let walletProvider = walletProvider else {
+                throw FCLError.walletProviderNotSpecified
+            }
+            try await walletProvider.authn(accountProofData: accountProofData)
+            guard let user = currentUser else {
+                throw FCLError.userNotFound
+            }
+            return user.address
+        } catch {
+            fcl.config.reset()
+            throw error
         }
-        try await walletProvider.authn(accountProofData: accountProofData)
-        guard let user = currentUser else {
-            throw FCLError.userNotFound
-        }
-        return user.address
     }
 
     public func unauthenticate() {
         currentUser = nil
+        config.reset()
     }
 
     public func reauthenticate(accountProofData: FCLAccountProofData?) async throws -> Address {
@@ -190,6 +210,46 @@ public class FCL: NSObject {
         )
     }
 
+    func getKeyWindow() -> UIWindow? {
+        UIApplication.shared.connectedScenes
+            .filter { $0.activationState == .foregroundActive }
+            .compactMap { $0 as? UIWindowScene }
+            .first?.windows
+            .filter(\.isKeyWindow).first
+    }
+
+    @MainActor
+    private func selectionProvider() async throws -> WalletProvider {
+        guard let keyWindow = getKeyWindow() else {
+            throw FCLError.walletProviderInitFailed
+        }
+        return try await withCheckedThrowingContinuation { continuation in
+            let selectionViewController = WalletProviderSelectionViewController(providers: fcl.config.walletProviderCandidates)
+            selectionViewController.presentationController?.delegate = selectionViewController
+            selectionViewController.onSelect = { [weak selectionViewController] provider in
+                selectionViewController?.dismiss(animated: true)
+                continuation.resume(returning: provider)
+            }
+            selectionViewController.onCancel = { [weak selectionViewController] in
+                selectionViewController?.dismiss(animated: true)
+                continuation.resume(throwing: FCLError.userCanceled)
+            }
+            guard let topViewController = topViewController(from: keyWindow) else {
+                continuation.resume(throwing: FCLError.walletProviderInitFailed)
+                return
+            }
+            topViewController.present(selectionViewController, animated: true)
+        }
+    }
+
+    private func topViewController(from window: UIWindow) -> UIViewController? {
+        var topController: UIViewController? = window.rootViewController
+        while let presentedViewController = window.rootViewController?.presentedViewController {
+            topController = presentedViewController
+        }
+        return topController
+    }
+
 }
 
 // MARK: ASWebAuthenticationPresentationContextProviding
@@ -198,53 +258,6 @@ extension FCL: ASWebAuthenticationPresentationContextProviding {
 
     public func presentationAnchor(for _: ASWebAuthenticationSession) -> ASPresentationAnchor {
         delegate?.webAuthenticationContextProvider() ?? ASPresentationAnchor()
-    }
-
-}
-
-// MARK: - Intent Build
-
-public extension FCL {
-
-    func send(_ builds: [IntentBuild]) async throws -> Identifier {
-        let ix = prepare(ix: Interaction(), builder: builds)
-
-        let resolvers: [Resolver] = [
-            CadenceResolver(),
-            AccountsResolver(),
-            RefBlockResolver(),
-        ]
-
-        let interaction = try await pipe(ix: ix, resolvers: resolvers)
-        return try await sendIX(ix: interaction)
-    }
-
-    func send(@FCL.IntentBuilder builder: () -> [IntentBuild]) async throws -> Identifier {
-        try await send(builder())
-    }
-
-    private func prepare(ix: Interaction, builder: [IntentBuild]) -> Interaction {
-        var newIX = ix
-
-        builder.forEach { build in
-            switch build {
-            case let .script(script, args):
-                newIX.tag = .script
-                newIX.message.cadence = script
-
-                let fclArgs = args.toFCLArguments() // .compactMap { Flow.Argument(value: $0) }.toFCLArguments()
-                newIX.message.arguments = Array(fclArgs.map(\.0))
-                newIX.arguments = fclArgs.reduce(into: [:]) { $0[$1.0] = $1.1 }
-            case .getAccount:
-                newIX.tag = .getAccount
-            case .getBlock:
-                newIX.tag = .getBlock
-            }
-        }
-
-        newIX.status = .ok
-
-        return newIX
     }
 
 }
@@ -323,25 +336,6 @@ public extension FCL {
         }
 
         public static func buildBlock(_ components: TransactionBuild...) -> [TransactionBuild] {
-            components
-        }
-    }
-
-    enum IntentBuild {
-        case script(cadence: String, arguments: [Cadence.Argument] = [])
-        case getAccount(String)
-        case getBlock(String)
-    }
-
-    @resultBuilder
-    enum IntentBuilder {
-        public static func buildBlock() -> [IntentBuild] { [] }
-
-        public static func buildArray(_ components: [[IntentBuild]]) -> [IntentBuild] {
-            components.flatMap { $0 }
-        }
-
-        public static func buildBlock(_ components: IntentBuild...) -> [IntentBuild] {
             components
         }
     }

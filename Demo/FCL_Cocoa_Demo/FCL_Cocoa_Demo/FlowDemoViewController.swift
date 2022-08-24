@@ -494,15 +494,26 @@ final class FlowDemoViewController: UIViewController {
                 window: nil,
                 testnet: !isProduction
             )
+            let dapperWalletProvider = DapperWalletProvider.default
             fcl.delegate = self
             if isProduction {
                 fcl.config
                     .put(.network(.mainnet))
-                    .put(.supportedWalletProviders([bloctoWalletProvider]))
+                    .put(.supportedWalletProviders(
+                        [
+                            bloctoWalletProvider,
+                            dapperWalletProvider,
+                        ]
+                    ))
             } else {
                 fcl.config
                     .put(.network(.testnet))
-                    .put(.supportedWalletProviders([bloctoWalletProvider]))
+                    .put(.supportedWalletProviders(
+                        [
+                            bloctoWalletProvider,
+                            dapperWalletProvider,
+                        ]
+                    ))
             }
         } catch {
             debugPrint(error)
@@ -564,6 +575,7 @@ final class FlowDemoViewController: UIViewController {
             .take(until: rx.deallocated)
             .subscribe(onNext: { [weak self] _ in
                 guard let self = self else { return }
+                fcl.unauthenticate()
                 self.resetRequestAccountStatus()
                 self.authn()
             })

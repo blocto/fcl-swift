@@ -119,7 +119,6 @@ extension Service {
     }
 
     private func buildURL(url: URL, params: [String: String] = [:]) -> URL? {
-        let paramLocation = "l6n"
         guard var urlComponents = URLComponents(url: url, resolvingAgainstBaseURL: false) else {
             return nil
         }
@@ -127,11 +126,9 @@ extension Service {
         var queryItems: [URLQueryItem] = []
 
         for (name, value) in params {
-            if name != paramLocation {
-                queryItems.append(
-                    URLQueryItem(name: name, value: value)
-                )
-            }
+            queryItems.append(
+                URLQueryItem(name: name, value: value)
+            )
         }
 
         urlComponents.queryItems = queryItems

@@ -9,29 +9,46 @@ import Foundation
 import FlowSDK
 import Cadence
 
-final class DapperWalletProvider: WalletProvider {
+public final class DapperWalletProvider: WalletProvider {
 
-    static let `default`: DapperWalletProvider = {
+    public static let `default`: DapperWalletProvider = {
         let info = ProviderInfo(
             title: "Dapper Wallet",
             desc: nil,
-            icon: URL(string: "https://meetdapper.com/logos/logo_dapper_new.png")
+            icon: URL(string: "https://i.imgur.com/L1dgOKn.png")
         )
         return DapperWalletProvider(providerInfo: info)
     }()
 
-    var providerInfo: ProviderInfo
+    public var providerInfo: ProviderInfo
     var user: User?
 
-    private var accessNodeApi: URL = URL(string: "https://dapper-http-post.vercel.app/api/authn")!
+    // mainnet only for now
+    private var accessNodeApiString: String {
+        switch fcl.config.network {
+        case .testnet:
+            return ""
+        case .mainnet:
+            return "https://dapper-http-post.vercel.app/api/authn"
+        case .canarynet,
+                .emulator:
+            return ""
+        }
+    }
 
     init(providerInfo: ProviderInfo) {
         self.providerInfo = providerInfo
     }
 
-    func authn(accountProofData: FCLAccountProofData?) async throws {
+    public func authn(accountProofData: FCLAccountProofData?) async throws {
         let session = URLSession(configuration: .default)
-        let request = URLRequest(url: accessNodeApi)
+        let urlComponent = URLComponents(string: accessNodeApiString)
+        guard let requestURL = urlComponent?.url else {
+            throw FCLError.urlNotFound
+        }
+        var request = URLRequest(url: requestURL)
+        request.httpMethod = "POST"
+
         let pollingResponse = try await session.dataAuthnResponse(for: request)
 
         guard let localService = pollingResponse.local else {
@@ -41,31 +58,34 @@ final class DapperWalletProvider: WalletProvider {
         guard let updatesService = pollingResponse.updates else {
             throw FCLError.authenticateFailed
         }
-        
+
         if accountProofData != nil {
             log(message: "Dapper not support native account proof for now.")
         }
 
-        try fcl.openWithWebAuthenticationSession(localService)
-        let authnResponse = try await fcl.polling(service: updatesService)
-        fcl.currentUser = try fcl.buildUser(authn: authnResponse)
+        let openBrowserTask = Task { @MainActor in
+            try fcl.openWithWebAuthenticationSession(localService)
+            let authnResponse = try await fcl.polling(service: updatesService)
+            fcl.currentUser = try fcl.buildUser(authn: authnResponse)
+        }
+        _ = try await openBrowserTask.result.get()
     }
 
-    func getUserSignature(_ message: String) async throws -> [FCLCompositeSignature] {
-        throw FCLError.internal
+    public func getUserSignature(_ message: String) async throws -> [FCLCompositeSignature] {
+        throw FCLError.unsupported
     }
-    
-    func mutate(
+
+    public func mutate(
         cadence: String,
         arguments: [Cadence.Argument],
         limit: UInt64,
         authorizers: [Cadence.Address]
     ) async throws -> Identifier {
-        throw FCLError.internal
+        throw FCLError.unsupported
     }
-    
-    func preAuthz(preSignable: PreSignable?) async throws -> AuthData {
-        throw FCLError.internal
+
+    public func preAuthz(preSignable: PreSignable?) async throws -> AuthData {
+        throw FCLError.unsupported
     }
 
 }

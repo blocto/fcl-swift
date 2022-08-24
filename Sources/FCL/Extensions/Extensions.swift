@@ -56,3 +56,41 @@ extension String {
     }
 
 }
+
+extension URLRequest {
+    
+    func toReadable() -> String {
+        var result = httpMethod ?? ""
+        result.append("\n\n")
+        let urlString = url?.absoluteString ?? ""
+        
+        result.append(urlString)
+        result.append("\n\n")
+        do {
+            if let header = allHTTPHeaderFields {
+                let headerData = try JSONSerialization.data(withJSONObject: header, options: .prettyPrinted)
+                result.append(String(data: headerData, encoding: .utf8) ?? "")
+                result.append("\n\n")
+            }
+            if let body = httpBody {
+                let object = try JSONSerialization.jsonObject(with: body, options: .fragmentsAllowed)
+                let bodyData = try JSONSerialization.data(withJSONObject: object, options: .prettyPrinted)
+                result.append(String(data: bodyData, encoding: .utf8) ?? "")
+                result.append("\n\n")
+            }
+        } catch {
+            debugPrint(error)
+        }
+        return result
+    }
+    
+}
+
+extension Data {
+    
+    func prettyData() throws -> Data {
+        let object = try JSONSerialization.jsonObject(with: self, options: .fragmentsAllowed)
+        return try JSONSerialization.data(withJSONObject: object, options: .prettyPrinted)
+    }
+    
+}

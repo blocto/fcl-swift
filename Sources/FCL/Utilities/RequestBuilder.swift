@@ -16,16 +16,20 @@ enum RequstBuilder {
     ) throws -> URLRequest {
         var urlRequest = URLRequest(url: url)
 
-        if let origin = fcl.config.location {
-            switch origin {
-            case let .domain(url):
-                urlRequest.addValue(url.absoluteString, forHTTPHeaderField: "referer")
-            case let .bloctoAppIdentifier(string):
-                urlRequest.addValue(string, forHTTPHeaderField: "Blocto-Application-Identifier")
-            }
+        if let bloctoWalletProvider = fcl.config.selectedWalletProvider as? BloctoWalletProvider {
+            urlRequest.addValue(bloctoWalletProvider.bloctoAppIdentifier, forHTTPHeaderField: "Blocto-Application-Identifier")
         }
-        urlRequest.httpMethod = method?.httpMethod
-        switch method {
+        var adjustMethod = method
+
+        /// Workaround
+        if fcl.config.selectedWalletProvider is DapperWalletProvider,
+           url.absoluteString.contains("https://dapper-http-post.vercel.app/api/authn-poll") {
+            /// Though POST https://dapper-http-post.vercel.app/api/authn?l6n=https://foo.com response back-channel-rpc using method HTTP/POST
+            /// Requesting using GET will only be accepted by dapper wallet.
+            adjustMethod = .httpGet
+        }
+        urlRequest.httpMethod = adjustMethod?.httpMethod
+        switch adjustMethod {
         case .httpPost:
             var object = body
             if let appDetail = fcl.config.appDetail {

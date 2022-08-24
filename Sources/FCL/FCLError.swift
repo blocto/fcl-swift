@@ -27,6 +27,7 @@ public enum FCLError: Swift.Error {
     case encodeFailed
     case userCanceled
     case serviceNotImplemented
+    case unsupported
 
     case userNotFound
     case presentableNotFound
