@@ -16,11 +16,12 @@ public final class BloctoWalletProvider: WalletProvider {
     var bloctoFlowSDK: BloctoFlowSDK
     public let providerInfo: ProviderInfo = ProviderInfo(
         title: "Blocto",
-        desc: nil,
+        desc: "Entrance to blockchain world.",
         icon: URL(string: "https://fcl-discovery.onflow.org/images/blocto.png")
     )
-    let bloctoAppIdentifier: String
     let isTestnet: Bool
+
+    private let bloctoAppIdentifier: String
 
     private var bloctoAppScheme: String {
         if isTestnet {
@@ -50,7 +51,7 @@ public final class BloctoWalletProvider: WalletProvider {
     /// - Parameters:
     ///   - bloctoAppIdentifier: identifier from app registered in blocto developer dashboard.
     ///        testnet dashboard: https://developers-staging.blocto.app/
-    ///        mannet dashboard: https://developers.blocto.app/
+    ///        mainnet dashboard: https://developers.blocto.app/
     ///   - window: used for presenting webView if no Blocto app installed. If pass nil then we will get the top ViewContoller from keyWindow.
     ///   - testnet: indicate flow network to use.
     public init(
@@ -60,7 +61,7 @@ public final class BloctoWalletProvider: WalletProvider {
     ) throws {
         self.bloctoAppIdentifier = bloctoAppIdentifier
         let getWindow = { () throws -> UIWindow in
-            guard let window = window ?? Self.getKeyWindow() else {
+            guard let window = window ?? fcl.getKeyWindow() else {
                 throw FCLError.walletProviderInitFailed
             }
             return window
@@ -172,7 +173,7 @@ public final class BloctoWalletProvider: WalletProvider {
                 keyIndex: cosignerKey.index,
                 sequenceNumber: cosignerKey.sequenceNumber
             )
-            
+
             let feePayer = try await bloctoFlowSDK.getFeePayerAddress(isTestnet: isTestnet)
 
             let transaction = try FlowSDK.Transaction(
@@ -235,21 +236,13 @@ public final class BloctoWalletProvider: WalletProvider {
         return authData
     }
 
-    private static func getKeyWindow() -> UIWindow? {
-        UIApplication.shared.connectedScenes
-            .filter { $0.activationState == .foregroundActive }
-            .compactMap { $0 as? UIWindowScene }
-            .first?.windows
-            .filter(\.isKeyWindow).first
+    public func modifyRequest(_ request: URLRequest) -> URLRequest {
+        var newRequest = request
+        newRequest.addValue(bloctoAppIdentifier, forHTTPHeaderField: "Blocto-Application-Identifier")
+        return newRequest
     }
 
-    private func topViewController(from window: UIWindow) -> UIViewController? {
-        var topController: UIViewController?
-        while let presentedViewController = window.rootViewController?.presentedViewController {
-            topController = presentedViewController
-        }
-        return topController
-    }
+    // MARK: - Private
 
     private func setupUserByBloctoSDK(_ accountProofData: FCLAccountProofData?) async throws {
         let (address, accountProof): (String, AccountProofSignatureData?) = try await withCheckedThrowingContinuation { continuation in

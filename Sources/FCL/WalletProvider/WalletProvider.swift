@@ -26,8 +26,18 @@ public protocol WalletProvider {
 
     func preAuthz(preSignable: PreSignable?) async throws -> AuthData
 
+    func modifyRequest(_ request: URLRequest) -> URLRequest
+
     // TODO: implementation
     /*
      func openId() async throws -> JSON {}
      */
+}
+
+extension WalletProvider {
+
+    func modifyRequest(_ request: URLRequest) -> URLRequest {
+        request
+    }
+
 }

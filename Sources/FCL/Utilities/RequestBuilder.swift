@@ -15,18 +15,15 @@ enum RequstBuilder {
         body: [String: Any] = [:]
     ) throws -> URLRequest {
         var urlRequest = URLRequest(url: url)
-
-        if let origin = fcl.config.location {
-            switch origin {
-            case let .domain(url):
-                urlRequest.addValue(url.absoluteString, forHTTPHeaderField: "referer")
-            case let .bloctoAppIdentifier(string):
-                urlRequest.addValue(string, forHTTPHeaderField: "Blocto-Application-Identifier")
-            }
-        }
         urlRequest.httpMethod = method?.httpMethod
-        switch method {
-        case .httpPost:
+
+        guard let selectedWalletProvider = fcl.config.selectedWalletProvider else {
+            throw FCLError.walletProviderNotSpecified
+        }
+        
+        var newRequest = selectedWalletProvider.modifyRequest(urlRequest)
+
+        if newRequest.httpMethod == ServiceMethod.httpPost.httpMethod {
             var object = body
             if let appDetail = fcl.config.appDetail {
                 let appDetailDic = try appDetail.toDictionary()
@@ -39,18 +36,11 @@ enum RequstBuilder {
             let clientInfoDic = try ClientInfo().toDictionary()
             object = object.merging(clientInfoDic, uniquingKeysWith: { $1 })
             let body = try? JSONSerialization.data(withJSONObject: object)
-            urlRequest.httpBody = body
-            urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            urlRequest.addValue("application/json", forHTTPHeaderField: "Accept")
-        case .httpGet,
-             .iframe,
-             .iframeRPC,
-             .browserIframe,
-             .data,
-             .none:
-            break
+            newRequest.httpBody = body
+            newRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            newRequest.addValue("application/json", forHTTPHeaderField: "Accept")
         }
-        return urlRequest
+        return newRequest
     }
 
 }

@@ -14,26 +14,6 @@ public enum WalletSelection {
     case discoveryWallets([WalletProvider])
 }
 
-public enum Origin {
-    /// Used for web to identify where request comes from
-    case domain(URL)
-
-    ///  Get from blocto developer dashboard
-    ///     - testnet dashboard: https://developers-staging.blocto.app/
-    ///     - mannet dashboard: https://developers.blocto.app/
-    ///  It will be automatically set if selectedWalletProvider set to BloctoWalletProvider
-    case bloctoAppIdentifier(String)
-
-    var value: String {
-        switch self {
-        case let .domain(url):
-            return url.absoluteString
-        case let .bloctoAppIdentifier(bloctoAppId):
-            return bloctoAppId
-        }
-    }
-}
-
 public enum Scope: String, Encodable {
     case email
     case name
@@ -47,24 +27,14 @@ public class Config {
 
     var walletProviderCandidates: [WalletProvider] = []
 
-    var selectedWalletProvider: WalletProvider? {
-        didSet {
-            if let provider = selectedWalletProvider as? BloctoWalletProvider {
-                put(
-                    .location(
-                        .bloctoAppIdentifier(provider.bloctoAppIdentifier)
-                    )
-                )
-            }
-        }
-    }
+    var selectedWalletProvider: WalletProvider?
 
     var addressReplacements: Set<AddressReplacement> = []
     
-    /// To Identify where service request comes from.
-    var location: Origin?
-    
     var computeLimit: UInt64 = defaultComputeLimit
+    
+    /// To switch on and off for logging message
+    var logging: Bool = true
     
     var openIdScopes: [Scope] = []
 
@@ -82,9 +52,9 @@ public class Config {
 
         case replace(placeHolder: String, with: Address)
 
-        case location(Origin)
-
         case computeLimit(UInt64)
+        
+        case logging(Bool)
 
         // User info
         /* TODO: implementation
@@ -113,16 +83,20 @@ public class Config {
         case let .replace(placeholder, replacement):
             let addressReplacement = AddressReplacement(placeholder: placeholder, replacement: replacement)
             addressReplacements.insert(addressReplacement)
-        case let .location(origin):
-            location = origin
         case let .computeLimit(limit):
             computeLimit = limit
+        case let .logging(enable):
+            logging = enable
         /* TODO: implementation
         case let .openId(scopes):
             openIdScopes = scopes
         */
         }
         return self
+    }
+    
+    public func reset() {
+        selectedWalletProvider = nil
     }
 
 }

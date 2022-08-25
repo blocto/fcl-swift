@@ -11,23 +11,11 @@ extension URLSession {
 
     static let decoder = JSONDecoder()
 
-    func dataDecode<Model: Decodable>(for request: URLRequest) async throws -> Model {
-        let data = try await data(for: request)
-        return try Self.decoder.decode(Model.self, from: data)
-    }
-
     func dataAuthnResponse(for request: URLRequest) async throws -> AuthResponse {
+        log(message: request.toReadable())
         let data = try await data(for: request)
+        log(message: String(data: try data.prettyData(), encoding: .utf8) ?? "")
         return try Self.decoder.decode(AuthResponse.self, from: data)
-    }
-
-    func dataPollingWrappedResponse<Model: Decodable>(for request: URLRequest) async throws -> Model {
-        let data = try await data(for: request)
-        let pollingWrappedResponse = try Self.decoder.decode(PollingWrappedResponse<Model>.self, from: data)
-        guard let data = pollingWrappedResponse.data else {
-            throw FCLError.responseUnexpected
-        }
-        return data
     }
 
     private func data(for request: URLRequest) async throws -> Data {
