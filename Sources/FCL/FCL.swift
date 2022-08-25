@@ -57,7 +57,7 @@ public class FCL: NSObject {
     // Authn
     public func authanticate(accountProofData: FCLAccountProofData?) async throws -> Address {
         do {
-            let walletProvider: WalletProvider?
+            let walletProvider: WalletProvider
             if let provider = config.selectedWalletProvider {
                 walletProvider = provider
             } else {
@@ -67,9 +67,6 @@ public class FCL: NSObject {
                 } else {
                     throw FCLError.walletProviderNotSpecified
                 }
-            }
-            guard let walletProvider = walletProvider else {
-                throw FCLError.walletProviderNotSpecified
             }
             try await walletProvider.authn(accountProofData: accountProofData)
             guard let user = currentUser else {

@@ -33,3 +33,11 @@ public protocol WalletProvider {
      func openId() async throws -> JSON {}
      */
 }
+
+extension WalletProvider {
+
+    func modifyRequest(_ request: URLRequest) -> URLRequest {
+        request
+    }
+
+}
