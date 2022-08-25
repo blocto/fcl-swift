@@ -31,7 +31,7 @@ public final class DapperWalletProvider: WalletProvider {
         case .mainnet:
             return "https://dapper-http-post.vercel.app/api/authn"
         case .canarynet,
-                .emulator:
+             .emulator:
             return ""
         }
     }
@@ -86,6 +86,20 @@ public final class DapperWalletProvider: WalletProvider {
 
     public func preAuthz(preSignable: PreSignable?) async throws -> AuthData {
         throw FCLError.unsupported
+    }
+
+    public func modifyRequest(_ request: URLRequest) -> URLRequest {
+        /// Workaround
+        if fcl.config.selectedWalletProvider is DapperWalletProvider,
+           let url = request.url,
+           url.absoluteString.contains("https://dapper-http-post.vercel.app/api/authn-poll") {
+            /// Though POST https://dapper-http-post.vercel.app/api/authn?l6n=https://foo.com response back-channel-rpc using method HTTP/POST
+            /// Requesting using GET will only be accepted by dapper wallet.
+            var newRequest = request
+            newRequest.httpMethod = ServiceMethod.httpGet.httpMethod
+            return newRequest
+        }
+        return request
     }
 
 }

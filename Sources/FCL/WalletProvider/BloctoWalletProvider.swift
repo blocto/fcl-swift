@@ -19,8 +19,9 @@ public final class BloctoWalletProvider: WalletProvider {
         desc: "Entrance to blockchain world.",
         icon: URL(string: "https://fcl-discovery.onflow.org/images/blocto.png")
     )
-    let bloctoAppIdentifier: String
     let isTestnet: Bool
+
+    private let bloctoAppIdentifier: String
 
     private var bloctoAppScheme: String {
         if isTestnet {
@@ -172,7 +173,7 @@ public final class BloctoWalletProvider: WalletProvider {
                 keyIndex: cosignerKey.index,
                 sequenceNumber: cosignerKey.sequenceNumber
             )
-            
+
             let feePayer = try await bloctoFlowSDK.getFeePayerAddress(isTestnet: isTestnet)
 
             let transaction = try FlowSDK.Transaction(
@@ -234,6 +235,14 @@ public final class BloctoWalletProvider: WalletProvider {
         }
         return authData
     }
+
+    public func modifyRequest(_ request: URLRequest) -> URLRequest {
+        var newRequest = request
+        newRequest.addValue(bloctoAppIdentifier, forHTTPHeaderField: "Blocto-Application-Identifier")
+        return newRequest
+    }
+
+    // MARK: - Private
 
     private func setupUserByBloctoSDK(_ accountProofData: FCLAccountProofData?) async throws {
         let (address, accountProof): (String, AccountProofSignatureData?) = try await withCheckedThrowingContinuation { continuation in

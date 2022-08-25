@@ -15,22 +15,15 @@ enum RequstBuilder {
         body: [String: Any] = [:]
     ) throws -> URLRequest {
         var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = method?.httpMethod
 
-        if let bloctoWalletProvider = fcl.config.selectedWalletProvider as? BloctoWalletProvider {
-            urlRequest.addValue(bloctoWalletProvider.bloctoAppIdentifier, forHTTPHeaderField: "Blocto-Application-Identifier")
+        guard let selectedWalletProvider = fcl.config.selectedWalletProvider else {
+            throw FCLError.walletProviderNotSpecified
         }
-        var adjustMethod = method
+        
+        var newRequest = selectedWalletProvider.modifyRequest(urlRequest)
 
-        /// Workaround
-        if fcl.config.selectedWalletProvider is DapperWalletProvider,
-           url.absoluteString.contains("https://dapper-http-post.vercel.app/api/authn-poll") {
-            /// Though POST https://dapper-http-post.vercel.app/api/authn?l6n=https://foo.com response back-channel-rpc using method HTTP/POST
-            /// Requesting using GET will only be accepted by dapper wallet.
-            adjustMethod = .httpGet
-        }
-        urlRequest.httpMethod = adjustMethod?.httpMethod
-        switch adjustMethod {
-        case .httpPost:
+        if newRequest.httpMethod == ServiceMethod.httpPost.httpMethod {
             var object = body
             if let appDetail = fcl.config.appDetail {
                 let appDetailDic = try appDetail.toDictionary()
@@ -43,18 +36,11 @@ enum RequstBuilder {
             let clientInfoDic = try ClientInfo().toDictionary()
             object = object.merging(clientInfoDic, uniquingKeysWith: { $1 })
             let body = try? JSONSerialization.data(withJSONObject: object)
-            urlRequest.httpBody = body
-            urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
-            urlRequest.addValue("application/json", forHTTPHeaderField: "Accept")
-        case .httpGet,
-             .iframe,
-             .iframeRPC,
-             .browserIframe,
-             .data,
-             .none:
-            break
+            newRequest.httpBody = body
+            newRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
+            newRequest.addValue("application/json", forHTTPHeaderField: "Accept")
         }
-        return urlRequest
+        return newRequest
     }
 
 }
