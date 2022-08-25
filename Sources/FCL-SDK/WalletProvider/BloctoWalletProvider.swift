@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 import FlowSDK
 import BloctoSDK
 import SwiftyJSON

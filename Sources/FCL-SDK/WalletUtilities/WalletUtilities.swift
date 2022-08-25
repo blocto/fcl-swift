@@ -5,6 +5,7 @@
 //  Created by Andrew Wang on 2022/7/11.
 //
 
+import Foundation
 import FlowSDK
 import Cadence
 

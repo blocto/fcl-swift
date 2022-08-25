@@ -4,14 +4,14 @@
 import PackageDescription
 
 let package = Package(
-    name: "FCL",
+    name: "FCL-SDK",
     platforms: [
         .iOS(.v13),
     ],
     products: [
         .library(
-            name: "FCL",
-            targets: ["FCL"]
+            name: "FCL_SDK",
+            targets: ["FCL-SDK"]
         ),
     ],
     dependencies: [
@@ -21,7 +21,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "FCL",
+            name: "FCL-SDK",
             dependencies: [
                 "SwiftyJSON",
                 .product(name: "FlowSDK", package: "flow-swift-sdk"),
@@ -30,7 +30,7 @@ let package = Package(
         ),
         .testTarget(
             name: "FCLTests",
-            dependencies: ["FCL"]
+            dependencies: ["FCL-SDK"]
         ),
     ]
 )

@@ -1,5 +1,5 @@
 import XCTest
-@testable import FCL
+@testable import FCL_SDK
 
 final class FCLTests: XCTestCase {
     func testExample() throws {
