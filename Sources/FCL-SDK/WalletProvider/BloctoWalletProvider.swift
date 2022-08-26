@@ -243,6 +243,19 @@ public final class BloctoWalletProvider: WalletProvider {
         return newRequest
     }
 
+    /// Entry of Universal Links
+    /// - Parameter userActivity: the same userActivity from UIApplicationDelegate
+    public func continueForLinks(_ userActivity: NSUserActivity) {
+        BloctoSDK.shared.continue(userActivity)
+    }
+
+    /// Entry of custom scheme
+    /// - Parameters:
+    ///   - url: custom scheme URL
+    public func application(open url: URL) {
+        BloctoSDK.shared.application(open: url)
+    }
+
     // MARK: - Private
 
     private func setupUserByBloctoSDK(_ accountProofData: FCLAccountProofData?) async throws {

@@ -28,6 +28,15 @@ public protocol WalletProvider {
 
     func modifyRequest(_ request: URLRequest) -> URLRequest
 
+    /// Entry of Universal Links
+    /// - Parameter userActivity: the same userActivity from UIApplicationDelegate
+    func continueForLinks(_ userActivity: NSUserActivity)
+
+    /// Entry of custom scheme
+    /// - Parameters:
+    ///   - url: custom scheme URL
+    func application(open url: URL)
+
     // TODO: implementation
     /*
      func openId() async throws -> JSON {}
@@ -39,5 +48,9 @@ extension WalletProvider {
     func modifyRequest(_ request: URLRequest) -> URLRequest {
         request
     }
+
+    public func continueForLinks(_ userActivity: NSUserActivity) {}
+
+    public func application(open url: URL) {}
 
 }

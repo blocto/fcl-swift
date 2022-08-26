@@ -14,7 +14,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     func scene(_ scene: UIScene, willConnectTo session: UISceneSession, options connectionOptions: UIScene.ConnectionOptions) {
         if let url = connectionOptions.userActivities.first?.webpageURL {
-            BloctoSDK.shared.application(open: url)
+            fcl.application(open: url)
         }
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(windowScene: windowScene)
@@ -31,15 +31,15 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     func sceneWillEnterForeground(_ scene: UIScene) {}
 
     func sceneDidEnterBackground(_ scene: UIScene) {}
-    
+
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         for context in URLContexts {
-            BloctoSDK.shared.application(open: context.url)
+            fcl.application(open: context.url)
         }
     }
 
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
-        BloctoSDK.shared.continue(userActivity)
+        fcl.continueForLinks(userActivity)
     }
 
 }
