@@ -199,6 +199,8 @@ Wallet providers on Flow have the flexibility to build their user interactions a
 
 FCL is agnostic to the communication channel and be configured to create both custodial and non-custodial wallets. This enables users to interact with wallet providers both native app install or not.
 
+Native app should be considered first to provide better user experience if installed, otherwise fallback to back channel communication.
+
 The communication channels involve responding to a set of pre-defined FCL messages to deliver the requested information to the dapp.  Implementing a FCL compatible wallet on Flow is as simple as filling in the responses with the appropriate data when FCL requests them.
 
 
@@ -213,7 +215,8 @@ It can be difficult to get users to discover new wallets on a chain.
 - Dapps can display and support all FCL compatible wallets who conform to `WalletProvider`.
 - Users don't need to sign up for new wallets - they can carry over their existing one to any dapp that uses FCL for authentication and authorization.
 - Wallet Discovery will be shown automatically when `login()` is being called only if more then one WalletProvider is specified.
-[image]()
+<img src="/docs-asset/wallet-discovery.png"/>
+
 ```swift
 import FCL_SDK
 
