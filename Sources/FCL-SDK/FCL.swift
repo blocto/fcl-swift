@@ -97,6 +97,16 @@ public class FCL: NSObject {
         return try await walletProvider.getUserSignature(message)
     }
 
+    // MARK: - Routing
+
+    public func continueForLinks(_ userActivity: NSUserActivity) {
+        config.selectedWalletProvider?.continueForLinks(userActivity)
+    }
+
+    public func application(open url: URL) {
+        config.selectedWalletProvider?.application(open: url)
+    }
+
     // MARK: Internal
 
     func serviceOfType(type: ServiceType) throws -> Service? {
