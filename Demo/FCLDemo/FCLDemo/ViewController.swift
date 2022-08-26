@@ -11,17 +11,46 @@ import RxSwift
 import RxCocoa
 import SnapKit
 import BloctoSDK
+import FlowSDK
 import Cadence
-import FCL
+import FCL_SDK
+import AuthenticationServices
+
+var isProduction = false
+
+var bloctoSDKAppId: String {
+    if isProduction {
+        return "62a48d5a-3fd1-4f41-9b9d-5b20ba2482ec"
+    } else {
+        return "024d8dd5-260c-40b4-837e-b16c90326d24"
+    }
+}
 
 // swiftlint:disable type_body_length file_length
 final class ViewController: UIViewController {
     
-    private var userWalletAddress: Address?
+    private var accountProofAppName = "This is demo app."
+    // minimum 32-byte random nonce as a hex string.
     private var nonce = "75f8587e5bd5f9dcc9909d0dae1f0ac5814458b2ae129620502cb936fde7120a"
     
     private lazy var bloctoFlowSDK = BloctoSDK.shared.flow
-    private var userSignatures: [CompositeSignature] = []
+    private var userSignatures: [FCLCompositeSignature] = []
+    
+    private var bloctoContract: String {
+        if isProduction {
+            return "0xdb6b70764af4ff68"
+        } else {
+            return "0x5b250a8a85b44a67"
+        }
+    }
+    
+    private var valueDappContract: String {
+        if isProduction {
+            return "0x8320311d63f3b336"
+        } else {
+            return "0x5a8143da8058740c"
+        }
+    }
     
     private lazy var networkSegmentedControl: UISegmentedControl = {
         let segmentedControl = UISegmentedControl(items: ["devnet", "mainnet-beta"])
@@ -35,6 +64,7 @@ final class ViewController: UIViewController {
     private lazy var scrollView: UIScrollView = {
         let scrollView = UIScrollView()
         scrollView.backgroundColor = .white
+        scrollView.contentInset.bottom = 350
         
         scrollView.addSubview(contentView)
         
@@ -64,6 +94,28 @@ final class ViewController: UIViewController {
         view.addSubview(signingVerifyingIndicator)
         view.addSubview(signButton)
         view.addSubview(signingLoadingIndicator)
+        
+        view.addSubview(separator2)
+        
+        view.addSubview(setValueTitleLabel)
+        view.addSubview(nomalTxInputTextField)
+        view.addSubview(setValueButton)
+        view.addSubview(setValueResultLabel)
+        view.addSubview(setValueExplorerButton)
+        
+        view.addSubview(separator3)
+        
+        view.addSubview(getValueTitleLabel)
+        view.addSubview(getValueButton)
+        view.addSubview(getValueLoadingIndicator)
+        view.addSubview(getValueResultLabel)
+        
+        view.addSubview(separator4)
+        
+        view.addSubview(lookupTitleLabel)
+        view.addSubview(txIdInputTextField)
+        view.addSubview(lookupResultLabel)
+        view.addSubview(lookupButton)
         
         titleLabel.snp.makeConstraints {
             $0.top.equalToSuperview().inset(30)
@@ -130,6 +182,85 @@ final class ViewController: UIViewController {
         
         signButton.snp.makeConstraints {
             $0.top.equalTo(signingResultLabel.snp.bottom).offset(20)
+            $0.leading.equalToSuperview().inset(20)
+        }
+        
+        separator2.snp.makeConstraints {
+            $0.top.equalTo(signButton.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(20)
+        }
+        
+        setValueTitleLabel.snp.makeConstraints {
+            $0.top.equalTo(separator2.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(20)
+        }
+        
+        nomalTxInputTextField.snp.makeConstraints {
+            $0.top.equalTo(setValueTitleLabel.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.height.equalTo(35)
+        }
+        
+        setValueResultLabel.snp.makeConstraints {
+            $0.top.equalTo(nomalTxInputTextField.snp.bottom).offset(20)
+            $0.leading.equalToSuperview().inset(20)
+        }
+        
+        setValueExplorerButton.snp.makeConstraints {
+            $0.centerY.equalTo(setValueResultLabel)
+            $0.size.equalTo(40)
+            $0.leading.equalTo(setValueResultLabel.snp.trailing).offset(20)
+            $0.trailing.equalToSuperview().inset(20)
+        }
+        
+        setValueButton.snp.makeConstraints {
+            $0.top.equalTo(setValueResultLabel.snp.bottom).offset(20)
+            $0.leading.equalToSuperview().inset(20)
+        }
+        
+        separator3.snp.makeConstraints {
+            $0.top.equalTo(setValueButton.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(20)
+        }
+        
+        getValueTitleLabel.snp.makeConstraints {
+            $0.top.equalTo(separator3.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(20)
+        }
+        
+        getValueResultLabel.snp.makeConstraints {
+            $0.top.equalTo(getValueTitleLabel.snp.bottom).offset(20)
+            $0.leading.equalToSuperview().inset(20)
+        }
+        
+        getValueButton.snp.makeConstraints {
+            $0.top.equalTo(getValueResultLabel.snp.bottom).offset(20)
+            $0.leading.equalToSuperview().inset(20)
+        }
+        
+        separator4.snp.makeConstraints {
+            $0.top.equalTo(getValueButton.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(20)
+        }
+        
+        lookupTitleLabel.snp.makeConstraints {
+            $0.top.equalTo(separator4.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(20)
+        }
+        
+        txIdInputTextField.snp.makeConstraints {
+            $0.top.equalTo(lookupTitleLabel.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(20)
+            $0.height.equalTo(35)
+        }
+        
+        lookupResultLabel.snp.makeConstraints {
+            $0.top.equalTo(txIdInputTextField.snp.bottom).offset(20)
+            $0.leading.trailing.equalToSuperview().inset(20)
+        }
+        
+        lookupButton.snp.makeConstraints {
+            $0.top.equalTo(lookupResultLabel.snp.bottom).offset(20)
             $0.bottom.equalToSuperview().inset(20)
             $0.leading.equalToSuperview().inset(20)
         }
@@ -240,6 +371,112 @@ final class ViewController: UIViewController {
     
     private lazy var signingLoadingIndicator = createLoadingIndicator()
     
+    private lazy var separator2 = createSeparator()
+    
+    private lazy var setValueTitleLabel: UILabel = createLabel(text: "Set a Value")
+    
+    private lazy var nomalTxInputTextField: UITextField = {
+        let textField = UITextField()
+        textField.font = UIFont.systemFont(ofSize: 16)
+        textField.textColor = .black
+        textField.backgroundColor = .lightGray
+        textField.placeholder = "input value"
+        textField.returnKeyType = .done
+        textField.delegate = self
+        textField.leftViewMode = .always
+        textField.layer.cornerRadius = 5
+        textField.clipsToBounds = true
+        let leftView = UIView()
+        leftView.snp.makeConstraints {
+            $0.size.equalTo(10)
+        }
+        textField.leftView = leftView
+        return textField
+    }()
+    
+    private lazy var setValueButton: UIButton = createButton(
+        text: "Send transaction",
+        indicator: setValueLoadingIndicator
+    )
+    
+    private lazy var setValueLoadingIndicator = createLoadingIndicator()
+    
+    private lazy var setValueResultLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 16)
+        label.textColor = .black
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        return label
+    }()
+    
+    private lazy var setValueExplorerButton: UIButton = {
+        let button: UIButton = UIButton()
+        button.setImage(UIImage(named: "ic28Earth"), for: .normal)
+        button.contentEdgeInsets = .init(top: 4, left: 4, bottom: 4, right: 4)
+        button.isHidden = true
+        return button
+    }()
+    
+    private lazy var separator3 = createSeparator()
+    
+    private lazy var getValueTitleLabel: UILabel = createLabel(text: "Get a Value from Value Dapp")
+    
+    private lazy var getValueButton: UIButton = createButton(
+        text: "Get Value",
+        indicator: getValueLoadingIndicator
+    )
+    
+    private lazy var getValueLoadingIndicator = createLoadingIndicator()
+    
+    private lazy var getValueResultLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 16)
+        label.textColor = .black
+        label.textAlignment = .left
+        label.numberOfLines = 0
+        return label
+    }()
+    
+    private lazy var separator4 = createSeparator()
+    
+    private lazy var lookupTitleLabel: UILabel = createLabel(text: "Look up tx")
+    
+    private lazy var txIdInputTextField: UITextField = {
+        let textField = UITextField()
+        textField.font = UIFont.systemFont(ofSize: 16)
+        textField.textColor = .black
+        textField.backgroundColor = .lightGray
+        textField.placeholder = "tx id"
+        textField.returnKeyType = .done
+        textField.delegate = self
+        textField.leftViewMode = .always
+        textField.layer.cornerRadius = 5
+        textField.clipsToBounds = true
+        let leftView = UIView()
+        leftView.snp.makeConstraints {
+            $0.size.equalTo(10)
+        }
+        textField.leftView = leftView
+        return textField
+    }()
+    
+    private lazy var lookupResultLabel: UILabel = {
+        let label = UILabel()
+        label.font = UIFont.systemFont(ofSize: 16)
+        label.textColor = .black
+        label.numberOfLines = 0
+        label.textAlignment = .center
+        return label
+    }()
+    
+    private lazy var lookupLoadingIndicator = createLoadingIndicator()
+    
+    private lazy var lookupButton: UIButton = createButton(
+        text: "Look up",
+        indicator: lookupLoadingIndicator
+    )
+    
     private lazy var disposeBag: DisposeBag = DisposeBag()
     
     override func viewDidLoad() {
@@ -257,14 +494,26 @@ final class ViewController: UIViewController {
                 window: nil,
                 testnet: !isProduction
             )
+            let dapperWalletProvider = DapperWalletProvider.default
+            fcl.delegate = self
             if isProduction {
                 fcl.config
                     .put(.network(.mainnet))
-                    .put(.supportedWalletProviders([bloctoWalletProvider]))
+                    .put(.supportedWalletProviders(
+                        [
+                            bloctoWalletProvider,
+                            dapperWalletProvider,
+                        ]
+                    ))
             } else {
                 fcl.config
                     .put(.network(.testnet))
-                    .put(.supportedWalletProviders([bloctoWalletProvider]))
+                    .put(.supportedWalletProviders(
+                        [
+                            bloctoWalletProvider,
+                            dapperWalletProvider,
+                        ]
+                    ))
             }
         } catch {
             debugPrint(error)
@@ -310,10 +559,11 @@ final class ViewController: UIViewController {
                 }
                 BloctoSDK.shared.initialize(
                     with: bloctoSDKAppId,
-                    window: window,
+                    getWindow: { window },
                     logging: true,
                     testnet: !isProduction
                 )
+                self.setupFCL()
             })
         
         _ = requestAccountButton.rx.tap
@@ -325,40 +575,9 @@ final class ViewController: UIViewController {
             .take(until: rx.deallocated)
             .subscribe(onNext: { [weak self] _ in
                 guard let self = self else { return }
+                fcl.unauthenticate()
                 self.resetRequestAccountStatus()
-                
-                /// 1. request account only
-                /*
-                 let requestAccountMethod = RequestAccountMethod(
-                 blockchain: .flow) { result in
-                 switch result {
-                 case let .success(address):
-                 let userAddress = address
-                 // receive userAddress here
-                 case let .failure(error):
-                 debugPrint(error)
-                 }
-                 }
-                 BloctoSDK.shared.send(method: requestAccountMethod)
-                 */
-                
-                /// 2. Authanticate like FCL
-                let accountProofData = FCLAccountProofData(
-                    appId: bloctoSDKAppId,
-                    nonce: self.nonce
-                )
-                Task {
-                    do {
-                        let address = try await fcl.authanticate(accountProofData: accountProofData)
-                        self.requestAccountResultLabel.text = address.hexStringWithPrefix
-                        let hasAccountProof = fcl.currentUser?.accountProof != nil
-                        self.accountProofVerifyButton.isHidden = !hasAccountProof
-                        self.requestAccountCopyButton.isHidden = !hasAccountProof
-                        self.requestAccountExplorerButton.isHidden = !hasAccountProof
-                    } catch {
-                        self.handleRequestAccountError(error)
-                    }
-                }
+                self.authn()
             })
         
         _ = accountProofVerifyButton.rx.tap
@@ -426,6 +645,93 @@ final class ViewController: UIViewController {
                 guard let self = self else { return }
                 self.verifySignature()
             })
+        
+        _ = setValueButton.rx.tap
+            .throttle(
+                DispatchTimeInterval.milliseconds(500),
+                latest: false,
+                scheduler: MainScheduler.instance
+            )
+            .take(until: rx.deallocated)
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self else { return }
+                self.resetSetValueStatus()
+                self.setValueLoadingIndicator.startAnimating()
+                self.sendTransaction()
+            })
+        
+        _ = setValueExplorerButton.rx.tap
+            .throttle(
+                DispatchTimeInterval.milliseconds(500),
+                latest: false,
+                scheduler: MainScheduler.instance
+            )
+            .take(until: rx.deallocated)
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self,
+                      let hash = self.setValueResultLabel.text else { return }
+                self.routeToExplorer(with: .txhash(hash))
+            })
+        
+        _ = getValueButton.rx.tap
+            .throttle(
+                DispatchTimeInterval.milliseconds(500),
+                latest: false,
+                scheduler: MainScheduler.instance
+            )
+            .take(until: rx.deallocated)
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self else { return }
+                self.getValue()
+            })
+        
+        _ = lookupButton.rx.tap
+            .throttle(
+                DispatchTimeInterval.milliseconds(500),
+                latest: false,
+                scheduler: MainScheduler.instance
+            )
+            .take(until: rx.deallocated)
+            .subscribe(onNext: { [weak self] _ in
+                guard let self = self,
+                      let hash = self.txIdInputTextField.text else { return }
+                self.lookup(txHash: hash)
+            })
+    }
+    
+    private func authn() {
+        /// 1. request account only
+        /*
+         let requestAccountMethod = RequestAccountMethod(
+         blockchain: .flow) { result in
+         switch result {
+         case let .success(address):
+         let userAddress = address
+         // receive userAddress here
+         case let .failure(error):
+         debugPrint(error)
+         }
+         }
+         BloctoSDK.shared.send(method: requestAccountMethod)
+         */
+        
+        /// 2. Authanticate like FCL
+        let accountProofData = FCLAccountProofData(
+            appId: accountProofAppName,
+            nonce: nonce
+        )
+        Task {
+            do {
+                let address = try await fcl.authanticate(accountProofData: accountProofData)
+                self.requestAccountResultLabel.text = address.hexStringWithPrefix
+                let hasAccountProof = fcl.currentUser?.accountProof != nil
+                self.requestAccountCopyButton.isHidden = false
+                self.requestAccountExplorerButton.isHidden = false
+                self.accountProofVerifyButton.isHidden = !hasAccountProof
+            } catch {
+                self.handleRequestAccountError(error)
+            }
+        }
     }
     
     private func verifyAccountProof() {
@@ -437,11 +743,10 @@ final class ViewController: UIViewController {
         
         accountProofVerifyingIndicator.startAnimating()
         
-        let bloctoContract = "0x5b250a8a85b44a67"
         Task {
             do {
                 let valid = try await AppUtilities.verifyAccountProof(
-                    appIdentifier: bloctoSDKAppId,
+                    appIdentifier: accountProofAppName,
                     accountProofData: accountProof,
                     fclCryptoContract: Address(hexString: bloctoContract)
                 )
@@ -457,13 +762,14 @@ final class ViewController: UIViewController {
                 }
             } catch {
                 accountProofVerifyingIndicator.stopAnimating()
+                accountProofVerifyButton.setImage(UIImage(named: "error"), for: .normal)
                 debugPrint(error)
             }
         }
     }
     
     private func signMessage() {
-        guard let userWalletAddress = fcl.currentUser?.address.hexStringWithPrefix else {
+        guard fcl.currentUser?.address.hexStringWithPrefix != nil else {
             handleSignError(Error.message("User address not found. Please request account first."))
             return
         }
@@ -471,19 +777,15 @@ final class ViewController: UIViewController {
             handleSignError(Error.message("message not found."))
             return
         }
-        bloctoFlowSDK.signMessage(
-            from: userWalletAddress,
-            message: message
-        ) { [weak self] result in
-            guard let self = self else { return }
-            self.resetSignStatus()
-            switch result {
-            case let .success(signatures):
-                self.userSignatures = signatures
-                self.signingResultLabel.text = signatures.map(\.signature).joined(separator: "\n")
-                self.signingVerifyButton.isHidden = false
-            case let .failure(error):
-                self.handleSignError(error)
+        
+        Task { @MainActor in
+            do {
+                let signatures = try await fcl.signUserMessage(message: message)
+                userSignatures = signatures
+                signingResultLabel.text = signatures.map(\.signature).joined(separator: "\n\n")
+                signingVerifyButton.isHidden = false
+            } catch {
+                handleSignError(error)
             }
         }
     }
@@ -496,20 +798,11 @@ final class ViewController: UIViewController {
         
         signingVerifyingIndicator.startAnimating()
         
-        let bloctoContract = "0x5b250a8a85b44a67"
-        let sigs = userSignatures.map {
-            FCLCompositeSignature(
-                address: $0.address,
-                keyId: $0.keyId,
-                signature: $0.signature
-            )
-        }
-        
         Task {
             do {
                 let valid = try await AppUtilities.verifyUserSignatures(
                     message: Data(message.utf8).bloctoSDK.hexString,
-                    signatures: sigs,
+                    signatures: userSignatures,
                     fclCryptoContract: Address(hexString: bloctoContract)
                 )
                 signingVerifyingIndicator.stopAnimating()
@@ -524,8 +817,87 @@ final class ViewController: UIViewController {
                 }
             } catch {
                 signingVerifyingIndicator.stopAnimating()
+                signingVerifyButton.setImage(UIImage(named: "error"), for: .normal)
                 debugPrint(error)
             }
+        }
+    }
+    
+    private func sendTransaction() {
+        guard let userWalletAddress = fcl.currentUser?.address else {
+            handleSetValueError(Error.message("User address not found. Please request account first."))
+            return
+        }
+        
+        guard let inputValue = nomalTxInputTextField.text,
+              inputValue.isEmpty == false,
+              let input = Decimal(string: inputValue) else {
+            handleSetValueError(Error.message("Input not found."))
+            return
+        }
+        
+        Task { @MainActor in
+            do {
+                
+                let scriptString = """
+                import ValueDapp from \(valueDappContract)
+                
+                transaction(value: UFix64) {
+                    prepare(authorizer: AuthAccount) {
+                        ValueDapp.setValue(value)
+                    }
+                }
+                """
+                
+                let argument = Cadence.Argument(.ufix64(input))
+                
+                let txHsh = try await fcl.mutate(
+                    cadence: scriptString,
+                    arguments: [argument],
+                    limit: 100,
+                    authorizers: [userWalletAddress]
+                )
+                resetSetValueStatus()
+                setValueResultLabel.text = txHsh.hexString
+                txIdInputTextField.text = txHsh.hexString
+                setValueExplorerButton.isHidden = false
+            } catch {
+                resetSetValueStatus()
+                handleSetValueError(Error.message(error.localizedDescription))
+            }
+        }
+    }
+    
+    private func lookup(txHash: String) {
+        lookupLoadingIndicator.startAnimating()
+        lookupResultLabel.text = nil
+        
+        Task {
+            do {
+                let result = try await fcl.getTransactionStatus(transactionId: txHash)
+                lookupLoadingIndicator.stopAnimating()
+                let displayString = "status: \(String(describing: result.status ?? .unknown))\nerror message: \(result.errorMessage ?? "no error")"
+                lookupResultLabel.text = displayString
+                debugPrint(result)
+            } catch {
+                lookupLoadingIndicator.stopAnimating()
+                lookupResultLabel.text = error.localizedDescription
+            }
+        }
+    }
+    
+    private func getValue() {
+        let script = """
+        import ValueDapp from \(valueDappContract)
+        
+        pub fun main(): UFix64 {
+            return ValueDapp.value
+        }
+        """
+        
+        Task {
+            let argument = try await fcl.query(script: script)
+            getValueResultLabel.text = argument.value.description
         }
     }
     
@@ -589,6 +961,13 @@ final class ViewController: UIViewController {
         signingLoadingIndicator.stopAnimating()
     }
     
+    private func resetSetValueStatus() {
+        setValueResultLabel.text = nil
+        setValueResultLabel.textColor = .black
+        setValueLoadingIndicator.stopAnimating()
+        setValueExplorerButton.isHidden = true
+    }
+    
     private func handleRequestAccountError(_ error: Swift.Error) {
         handleGeneralError(label: requestAccountResultLabel, error: error)
         requestAccountLoadingIndicator.stopAnimating()
@@ -599,9 +978,28 @@ final class ViewController: UIViewController {
         signingLoadingIndicator.stopAnimating()
     }
     
+    private func handleSetValueError(_ error: Swift.Error) {
+        handleGeneralError(label: setValueResultLabel, error: error)
+        setValueLoadingIndicator.stopAnimating()
+    }
+    
     private func handleGeneralError(label: UILabel, error: Swift.Error) {
         if let error = error as? BloctoSDKError {
             switch error {
+            case .callbackSelfNotfound:
+                label.text = "weak self not found."
+            case .encodeToURLFailed:
+                label.text = "url encode failed."
+            case .webSDKSessionFailed:
+                label.text = "webSDK session failed."
+            case .decodeFailed:
+                label.text = "decode failed."
+            case .responseUnexpected:
+                label.text = "api response unexpected."
+            case .urlNotFound:
+                label.text = "url not found."
+            case .feePayerNotFound:
+                label.text = "fee payer not found."
             case .appIdNotSet:
                 label.text = "app id not set."
             case .userRejected:
@@ -614,6 +1012,12 @@ final class ViewController: UIViewController {
                 label.text = "user not matched."
             case .ethSignInvalidHexString:
                 label.text = "input text should be hex string with 0x prefix."
+            case .userCancel:
+                label.text = "user canceled."
+            case .redirectURLNotFound:
+                label.text = "redirect url not found."
+            case let .sessionError(code):
+                label.text = "ASWebAuthenticationSessionError \(code)"
             case let .other(code):
                 label.text = code
             }
@@ -653,9 +1057,9 @@ final class ViewController: UIViewController {
     
 }
 
-// MARK: - UITextFieldDelegate
+// MARK: UITextFieldDelegate
 
-extension FlowDemoViewController: UITextFieldDelegate {
+extension ViewController: UITextFieldDelegate {
     
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
@@ -664,11 +1068,11 @@ extension FlowDemoViewController: UITextFieldDelegate {
     
 }
 
-// MARK: - SFSafariViewControllerDelegate
+// MARK: SFSafariViewControllerDelegate
 
-extension FlowDemoViewController: SFSafariViewControllerDelegate {}
+extension ViewController: SFSafariViewControllerDelegate {}
 
-extension FlowDemoViewController {
+extension ViewController {
     
     enum Error: Swift.Error {
         case message(String)
@@ -679,6 +1083,16 @@ extension FlowDemoViewController {
                 return message
             }
         }
+    }
+    
+}
+
+// MARK: FCLDelegate
+
+extension ViewController: FCLDelegate {
+    
+    func webAuthenticationContextProvider() -> ASPresentationAnchor? {
+        view.window
     }
     
 }

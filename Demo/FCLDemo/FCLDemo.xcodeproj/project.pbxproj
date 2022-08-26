@@ -7,6 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		6D5D91B928B78EA800185DE8 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = 6D5D91B828B78EA800185DE8 /* RxCocoa */; };
+		6D5D91BB28B78EA800185DE8 /* RxSwift in Frameworks */ = {isa = PBXBuildFile; productRef = 6D5D91BA28B78EA800185DE8 /* RxSwift */; };
+		6D5D91BE28B78EDC00185DE8 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = 6D5D91BD28B78EDC00185DE8 /* SnapKit */; };
+		6D5D91C128B78F2E00185DE8 /* BloctoSDK in Frameworks */ = {isa = PBXBuildFile; productRef = 6D5D91C028B78F2E00185DE8 /* BloctoSDK */; };
+		6D5D91C428B7E70A00185DE8 /* FCL_SDK in Frameworks */ = {isa = PBXBuildFile; productRef = 6D5D91C328B7E70A00185DE8 /* FCL_SDK */; };
 		6DA77391286C363B000F7100 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA77390286C363B000F7100 /* AppDelegate.swift */; };
 		6DA77393286C363B000F7100 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA77392286C363B000F7100 /* SceneDelegate.swift */; };
 		6DA77395286C363B000F7100 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6DA77394286C363B000F7100 /* ViewController.swift */; };
@@ -16,6 +21,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		6D5D91C228B7E5D900185DE8 /* FCL */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FCL; path = ../..; sourceTree = "<group>"; };
 		6DA7738D286C363B000F7100 /* FCLDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FCLDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		6DA77390286C363B000F7100 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		6DA77392286C363B000F7100 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -24,7 +30,6 @@
 		6DA77399286C363C000F7100 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		6DA7739C286C363C000F7100 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		6DA7739E286C363C000F7100 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		6DA773A8286C3886000F7100 /* FCL */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = FCL; path = ../..; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -32,16 +37,29 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				6D5D91BE28B78EDC00185DE8 /* SnapKit in Frameworks */,
+				6D5D91BB28B78EA800185DE8 /* RxSwift in Frameworks */,
+				6D5D91C428B7E70A00185DE8 /* FCL_SDK in Frameworks */,
+				6D5D91C128B78F2E00185DE8 /* BloctoSDK in Frameworks */,
+				6D5D91B928B78EA800185DE8 /* RxCocoa in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		6D5D91B528B78DA900185DE8 /* Packages */ = {
+			isa = PBXGroup;
+			children = (
+				6D5D91C228B7E5D900185DE8 /* FCL */,
+			);
+			name = Packages;
+			sourceTree = "<group>";
+		};
 		6DA77384286C363B000F7100 = {
 			isa = PBXGroup;
 			children = (
-				6DA773A8286C3886000F7100 /* FCL */,
+				6D5D91B528B78DA900185DE8 /* Packages */,
 				6DA7738F286C363B000F7100 /* FCLDemo */,
 				6DA7738E286C363B000F7100 /* Products */,
 				6DA773A9286C38CA000F7100 /* Frameworks */,
@@ -94,6 +112,11 @@
 			);
 			name = FCLDemo;
 			packageProductDependencies = (
+				6D5D91B828B78EA800185DE8 /* RxCocoa */,
+				6D5D91BA28B78EA800185DE8 /* RxSwift */,
+				6D5D91BD28B78EDC00185DE8 /* SnapKit */,
+				6D5D91C028B78F2E00185DE8 /* BloctoSDK */,
+				6D5D91C328B7E70A00185DE8 /* FCL_SDK */,
 			);
 			productName = FCLDemo;
 			productReference = 6DA7738D286C363B000F7100 /* FCLDemo.app */;
@@ -123,6 +146,11 @@
 				Base,
 			);
 			mainGroup = 6DA77384286C363B000F7100;
+			packageReferences = (
+				6D5D91B728B78EA800185DE8 /* XCRemoteSwiftPackageReference "RxSwift" */,
+				6D5D91BC28B78EDC00185DE8 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				6D5D91BF28B78F2E00185DE8 /* XCRemoteSwiftPackageReference "blocto-ios-sdk" */,
+			);
 			productRefGroup = 6DA7738E286C363B000F7100 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -300,6 +328,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Y268PJ59QK;
+				ENABLE_TESTING_SEARCH_PATHS = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FCLDemo/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -329,6 +358,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = Y268PJ59QK;
+				ENABLE_TESTING_SEARCH_PATHS = NO;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = FCLDemo/Info.plist;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
@@ -372,6 +402,60 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		6D5D91B728B78EA800185DE8 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ReactiveX/RxSwift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.0.0;
+			};
+		};
+		6D5D91BC28B78EDC00185DE8 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+		6D5D91BF28B78F2E00185DE8 /* XCRemoteSwiftPackageReference "blocto-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/portto/blocto-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.3.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		6D5D91B828B78EA800185DE8 /* RxCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6D5D91B728B78EA800185DE8 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxCocoa;
+		};
+		6D5D91BA28B78EA800185DE8 /* RxSwift */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6D5D91B728B78EA800185DE8 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxSwift;
+		};
+		6D5D91BD28B78EDC00185DE8 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6D5D91BC28B78EDC00185DE8 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		6D5D91C028B78F2E00185DE8 /* BloctoSDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 6D5D91BF28B78F2E00185DE8 /* XCRemoteSwiftPackageReference "blocto-ios-sdk" */;
+			productName = BloctoSDK;
+		};
+		6D5D91C328B7E70A00185DE8 /* FCL_SDK */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = FCL_SDK;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 6DA77385286C363B000F7100 /* Project object */;
 }
