@@ -101,6 +101,10 @@ Task {
 
 ### User Signatures
 
+Cryptographic signatures are a key part of the blockchain. They are used to prove ownership of an address without exposing its private key. While primarily used for signing transactions, cryptographic signatures can also be used to sign arbitrary messages.
+
+FCL has a feature that lets you send arbitrary data to a configured wallet/service where the user may approve signing it with their private key/s.
+
 We can retrive user signatures only after user had logged in, otherwise error will be thrown.
 
 ```swift
@@ -185,6 +189,14 @@ let address = try await fcl.authanticate(accountProofData: accountProofData)
 
 - [User signature](#User-Signatures): provide specific message for user to sign and generate one or more signatures.
 
+### Verifying User Signatures
+
+What makes message signatures more interesting is that we can use Flow blockchain to verify the signatures. Cadence has a built-in function called verify that will verify a signature against a Flow account given the account address.
+
+FCL includes a utility function, verifyUserSignatures, for verifying one or more signatures against an account's public key on the Flow blockchain.
+
+You can use both in tandem to prove a user is in control of a private key or keys. This enables cryptographically-secure login flow using a message-signing-based authentication mechanism with a user’s public address as their identifier.
+
 To verify above ownership, there are two utility functions define accordingly in [AppUtilities](https://github.com/portto/fcl-swift/blob/main/Sources/FCL-SDK/AppUtilities/AppUtilities.swift).
 
 ---
@@ -224,7 +236,7 @@ The communication channels involve responding to a set of pre-defined FCL messag
 ### Wallet Selection
 - Dapps can display and support all FCL compatible wallets who conform to `WalletProvider`.
 - Users don't need to sign up for new wallets - they can carry over their existing one to any dapp that uses FCL for authentication and authorization.
-- Wallet selection panel will be shown automatically when `login()` is being called only if more then one WalletProvider is put in `supportedWalletProviders`.
+- Wallet selection panel will be shown automatically when `login()` is being called only if more then one wallet provider is put in `supportedWalletProviders`.
 <img src="/docs-asset/wallet-discovery.png"/>
 
 ```swift
@@ -256,10 +268,10 @@ Task {
 
 ### Building your own wallet provider
 
-- Declare a wallet provider type and conform the protocol [WalletProvider](./Sources/FCL-SDK/WalletProvider/WalletProvider.swift) 
-- If building a wallet involve back channel communication, Read the [wallet guide](https://github.com/onflow/fcl-js/blob/master/packages/fcl/src/wallet-provider-spec/draft-v3.md) first to build the concept of the implementation.
+- Declare a wallet provider type and conform the protocol [WalletProvider](./Sources/FCL-SDK/WalletProvider/WalletProvider.swift).
+- If building a wallet involve back channel communication, Read the [wallet guide](https://github.com/onflow/fcl-js/blob/master/packages/fcl/src/wallet-provider-spec/draft-v3.md) first to build the concept of the implementation and use method from `WalletProvider` to fulfill your business logic.
 
-Every walllet provider can use below property from `WalletProvider` to customize icon, title and description. Those info will be shown [here](#wallet-selection)
+Every walllet provider can use below property from `WalletProvider` to customize icon, title and description. Those info will be shown [here](#wallet-selection).
 ```
 var providerInfo: ProviderInfo { get }
 ```
@@ -276,4 +288,4 @@ Explore all of Flow [docs and tools](https://docs.onflow.org).
 
 ## Support
 
-Notice an problem or want to request a feature? [Add an issue](https://github.com/portto/fcl-swift/issues) or [Make a pull request](https://github.com/portto/fcl-swift/compare).
+Notice a problem or want to request a feature? [Add an issue](https://github.com/portto/fcl-swift/issues) or [Make a pull request](https://github.com/portto/fcl-swift/compare).
