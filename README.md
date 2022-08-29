@@ -236,7 +236,7 @@ The communication channels involve responding to a set of pre-defined FCL messag
 ### Wallet Selection
 - dApps can display and support all FCL compatible wallets who conform to `WalletProvider`.
 - Users don't need to sign up for new wallets - they can carry over their existing one to any dApps that use FCL for authentication and authorization.
-- Wallet selection panel will be shown automatically when `login()` is being called only if there are more than one wallet provider is put in `supportedWalletProviders`.
+- Wallet selection panel will be shown automatically when `login()` is being called only if there are more than one wallet provider in `supportedWalletProviders`.
 <img src="/docs-asset/wallet-discovery.png"/>
 
 ```swift
