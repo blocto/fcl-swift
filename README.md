@@ -6,7 +6,7 @@
 
 ## What is FCL?
 
-The Flow Client Library (FCL) is used to interact with user wallets and the Flow blockchain. When using FCL for authentication, dapps are able to support all FCL-compatible wallets on Flow and their users without any custom integrations or changes needed to the dapp code.
+The Flow Client Library (FCL) is used to interact with user wallets and the Flow blockchain. When using FCL for authentication, dApps are able to support all FCL-compatible wallets on Flow and their users without any custom integrations or changes needed to the dApp code.
 
 For more description, please refer to [fcl.js](https://github.com/onflow/fcl-js)
 
@@ -67,10 +67,10 @@ let package = Package(
 import FCL_SDK
 ```
 ---
-## FCL for Dapps
+## FCL for dApps
 ### Configuration
 
-Initialize `WalletProvider` instance e.g. `BloctoWalletProvider`, `DapperWalletProvider`. And simply specify `network` and put those walletProvider into config option `supportedWalletProviders` then you are good to go.
+Initialize `WalletProvider` instance e.g. `BloctoWalletProvider`, `DapperWalletProvider`. And simply specify `network` and put those wallet providers into config option `supportedWalletProviders` then you are good to go.
 
 ```swift
 import FCL_SDK
@@ -103,7 +103,7 @@ Task {
 
 Cryptographic signatures are a key part of the blockchain. They are used to prove ownership of an address without exposing its private key. While primarily used for signing transactions, cryptographic signatures can also be used to sign arbitrary messages.
 
-FCL has a feature that lets you send arbitrary data to a configured wallet/service where the user may approve signing it with their private key/s.
+FCL has a feature that let you send arbitrary data to a configured wallet/service where the user may approve signing it with their private keys.
 
 We can retrive user signatures only after user had logged in, otherwise error will be thrown.
 
@@ -226,7 +226,7 @@ FCL is agnostic to the communication channel and be configured to create both cu
 
 Native app should be considered first to provide better user experience if installed, otherwise fallback to back channel communication.
 
-The communication channels involve responding to a set of pre-defined FCL messages to deliver the requested information to the dapp.  Implementing a FCL compatible wallet on Flow is as simple as filling in the responses with the appropriate data when FCL requests them.
+The communication channels involve responding to a set of pre-defined FCL messages to deliver the requested information to the dApp.  Implementing a FCL compatible wallet on Flow is as simple as filling in the responses with the appropriate data when FCL requests them.
 
 
 ### Current Wallet Providers
@@ -234,9 +234,9 @@ The communication channels involve responding to a set of pre-defined FCL messag
 - [Dapper Wallet](https://www.meetdapper.com/) (support only authn for now)
 
 ### Wallet Selection
-- Dapps can display and support all FCL compatible wallets who conform to `WalletProvider`.
-- Users don't need to sign up for new wallets - they can carry over their existing one to any dapp that uses FCL for authentication and authorization.
-- Wallet selection panel will be shown automatically when `login()` is being called only if more then one wallet provider is put in `supportedWalletProviders`.
+- dApps can display and support all FCL compatible wallets who conform to `WalletProvider`.
+- Users don't need to sign up for new wallets - they can carry over their existing one to any dApps that use FCL for authentication and authorization.
+- Wallet selection panel will be shown automatically when `login()` is being called only if there are more than one wallet provider is put in `supportedWalletProviders`.
 <img src="/docs-asset/wallet-discovery.png"/>
 
 ```swift
@@ -269,7 +269,7 @@ Task {
 ### Building your own wallet provider
 
 - Declare a wallet provider type and conform the protocol [WalletProvider](./Sources/FCL-SDK/WalletProvider/WalletProvider.swift).
-- If building a wallet involve back channel communication, Read the [wallet guide](https://github.com/onflow/fcl-js/blob/master/packages/fcl/src/wallet-provider-spec/draft-v3.md) first to build the concept of the implementation and use method from `WalletProvider` to fulfill your business logic.
+- If building a wallet involve back channel communication, read the [wallet guide](https://github.com/onflow/fcl-js/blob/master/packages/fcl/src/wallet-provider-spec/draft-v3.md) first to build the concept of the implementation and use method from `WalletProvider` to fulfill your business logic.
 
 Every walllet provider can use below property from `WalletProvider` to customize icon, title and description. Those info will be shown [here](#wallet-selection).
 ```
