@@ -64,12 +64,7 @@ public struct Service: Decodable {
             if let accountProof = try? container.decode(ServiceAccountProof.self, forKey: .data) {
                 self.data = .accountProof(accountProof)
             } else {
-                throw DecodingError.dataCorrupted(
-                    DecodingError.Context(
-                        codingPath: decoder.codingPath,
-                        debugDescription: "account proof data structure not valid or not exist."
-                    )
-                )
+                self.data = .notExist
             }
         case .authn,
              .localView,
