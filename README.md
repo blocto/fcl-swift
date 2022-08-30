@@ -105,7 +105,7 @@ Cryptographic signatures are a key part of the blockchain. They are used to prov
 
 FCL has a feature that let you send arbitrary data to a configured wallet/service where the user may approve signing it with their private keys.
 
-We can retrive user signatures only after user had logged in, otherwise error will be thrown.
+We can retrieve user signatures only after user had logged in, otherwise error will be thrown.
 
 ```swift
 Task {

@@ -55,10 +55,12 @@ public final class BloctoWalletProvider: WalletProvider {
     ///        mainnet dashboard: https://developers.blocto.app/
     ///   - window: used for presenting webView if no Blocto app installed. If pass nil then we will get the top ViewContoller from keyWindow.
     ///   - testnet: indicate flow network to use.
+    ///   - logging: Enabling log message, default is true.
     public init(
         bloctoAppIdentifier: String,
         window: UIWindow?,
-        testnet: Bool
+        testnet: Bool,
+        logging: Bool = true
     ) throws {
         self.bloctoAppIdentifier = bloctoAppIdentifier
         let getWindow = { () throws -> UIWindow in
@@ -71,7 +73,7 @@ public final class BloctoWalletProvider: WalletProvider {
         BloctoSDK.shared.initialize(
             with: bloctoAppIdentifier,
             getWindow: getWindow,
-            logging: true,
+            logging: logging,
             testnet: testnet
         )
         self.bloctoFlowSDK = BloctoSDK.shared.flow

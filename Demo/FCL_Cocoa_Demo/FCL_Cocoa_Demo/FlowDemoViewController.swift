@@ -491,7 +491,7 @@ final class FlowDemoViewController: UIViewController {
         do {
             let bloctoWalletProvider = try BloctoWalletProvider(
                 bloctoAppIdentifier: bloctoSDKAppId,
-                window: nil,
+                window: view.window,
                 testnet: !isProduction
             )
             let dapperWalletProvider = DapperWalletProvider.default
@@ -557,12 +557,6 @@ final class FlowDemoViewController: UIViewController {
                 default:
                     break
                 }
-                BloctoSDK.shared.initialize(
-                    with: bloctoSDKAppId,
-                    getWindow: { window },
-                    logging: true,
-                    testnet: !isProduction
-                )
                 self.setupFCL()
             })
 
@@ -702,18 +696,19 @@ final class FlowDemoViewController: UIViewController {
     private func authn() {
         /// 1. request account only
         /*
-         let requestAccountMethod = RequestAccountMethod(
-             blockchain: .flow) { result in
-             switch result {
-             case let .success(address):
-                 let userAddress = address
-                 // receive userAddress here
-             case let .failure(error):
-                 debugPrint(error)
-             }
-         }
-         BloctoSDK.shared.send(method: requestAccountMethod)
-         */
+        Task {
+            do {
+                let address = try await fcl.login()
+                self.requestAccountResultLabel.text = address.hexStringWithPrefix
+                let hasAccountProof = fcl.currentUser?.accountProof != nil
+                self.requestAccountCopyButton.isHidden = false
+                self.requestAccountExplorerButton.isHidden = false
+                self.accountProofVerifyButton.isHidden = !hasAccountProof
+            } catch {
+                self.handleRequestAccountError(error)
+            }
+        }
+        */
 
         /// 2. Authanticate like FCL
         let accountProofData = FCLAccountProofData(
