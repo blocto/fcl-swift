@@ -24,14 +24,14 @@ For more description, please refer to [fcl.js](https://github.com/onflow/fcl-js)
 FCL-SDK is available through [CocoaPods](https://cocoapods.org). You can include specific subspec to install, simply add the following line to your Podfile:
 
 ```ruby
-pod 'FCL-SDK', '~> 0.1.2'
+pod 'FCL-SDK', '~> 0.1.3'
 ```
 
 ### Swift Package Manager
 
 
 ```swift
-.package(url: "https://github.com/portto/fcl-swift", .upToNextMinor(from: "0.1.2"))
+.package(url: "https://github.com/portto/fcl-swift", .upToNextMinor(from: "0.1.3"))
 ```
 
 Here's an example PackageDescription:
@@ -49,7 +49,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/portto/fcl-swift", .upToNextMinor(from: "0.1.2"))
+        .package(url: "https://github.com/portto/fcl-swift", .upToNextMinor(from: "0.1.3"))
     ],
     targets: [
         .target(
