@@ -10,6 +10,8 @@ The Flow Client Library (FCL) is used to interact with user wallets and the Flow
 
 For more description, please refer to [fcl.js](https://github.com/onflow/fcl-js)
 
+This repo is inspired by [fcl-js](https://github.com/onflow/fcl-js) and [fcl-swift](https://github.com/Outblock/fcl-swift)
+
 ---
 ## Getting Started
 
@@ -230,7 +232,7 @@ The communication channels involve responding to a set of pre-defined FCL messag
 
 
 ### Current Wallet Providers
-- [Blocto](https://blocto.portto.io/en/) (fully supported)
+- [Blocto](https://blocto.portto.io/en/) (fully supported) [Docs](https://docs.blocto.app/blocto-sdk/ios-sdk/flow)
 - [Dapper Wallet](https://www.meetdapper.com/) (support only authn for now)
 
 ### Wallet Selection
