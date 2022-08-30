@@ -6,7 +6,7 @@
 //
 
 import UIKit
-import BloctoSDK
+import FCL_SDK
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -21,23 +21,13 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         window?.rootViewController = FlowDemoViewController()
         window?.makeKeyAndVisible()
     }
-
-    func sceneDidDisconnect(_ scene: UIScene) {}
-
-    func sceneDidBecomeActive(_ scene: UIScene) {}
-
-    func sceneWillResignActive(_ scene: UIScene) {}
-
-    func sceneWillEnterForeground(_ scene: UIScene) {}
-
-    func sceneDidEnterBackground(_ scene: UIScene) {}
-
+    
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         for context in URLContexts {
             fcl.application(open: context.url)
         }
     }
-
+    
     func scene(_ scene: UIScene, continue userActivity: NSUserActivity) {
         fcl.continueForLinks(userActivity)
     }
