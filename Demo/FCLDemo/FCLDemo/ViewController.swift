@@ -491,7 +491,7 @@ final class ViewController: UIViewController {
         do {
             let bloctoWalletProvider = try BloctoWalletProvider(
                 bloctoAppIdentifier: bloctoSDKAppId,
-                window: nil,
+                window: view.window,
                 testnet: !isProduction
             )
             let dapperWalletProvider = DapperWalletProvider.default
@@ -546,7 +546,6 @@ final class ViewController: UIViewController {
             .take(until: rx.deallocated)
             .subscribe(onNext: { [weak self] index in
                 guard let self = self else { return }
-                guard let window = self.view.window else { return }
                 self.resetRequestAccountStatus()
                 self.resetSignStatus()
                 switch index {
@@ -557,12 +556,6 @@ final class ViewController: UIViewController {
                 default:
                     break
                 }
-                BloctoSDK.shared.initialize(
-                    with: bloctoSDKAppId,
-                    getWindow: { window },
-                    logging: true,
-                    testnet: !isProduction
-                )
                 self.setupFCL()
             })
 
@@ -705,6 +698,7 @@ final class ViewController: UIViewController {
          Task {
              do {
                  let address = try await fcl.login()
+                 debugPrint(address)
                  self.requestAccountResultLabel.text = address.hexStringWithPrefix
                  let hasAccountProof = fcl.currentUser?.accountProof != nil
                  self.requestAccountCopyButton.isHidden = false

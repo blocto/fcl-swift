@@ -491,7 +491,7 @@ final class FlowDemoViewController: UIViewController {
         do {
             let bloctoWalletProvider = try BloctoWalletProvider(
                 bloctoAppIdentifier: bloctoSDKAppId,
-                window: nil,
+                window: view.window,
                 testnet: !isProduction
             )
             let dapperWalletProvider = DapperWalletProvider.default
@@ -557,12 +557,6 @@ final class FlowDemoViewController: UIViewController {
                 default:
                     break
                 }
-                BloctoSDK.shared.initialize(
-                    with: bloctoSDKAppId,
-                    getWindow: { window },
-                    logging: true,
-                    testnet: !isProduction
-                )
                 self.setupFCL()
             })
 
