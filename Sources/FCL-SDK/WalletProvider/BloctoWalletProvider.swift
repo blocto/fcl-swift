@@ -20,7 +20,7 @@ public final class BloctoWalletProvider: WalletProvider {
         desc: "Entrance to blockchain world.",
         icon: URL(string: "https://fcl-discovery.onflow.org/images/blocto.png")
     )
-    let isTestnet: Bool
+    var isTestnet: Bool
 
     private let bloctoAppIdentifier: String
 
@@ -77,6 +77,13 @@ public final class BloctoWalletProvider: WalletProvider {
             testnet: testnet
         )
         self.bloctoFlowSDK = BloctoSDK.shared.flow
+    }
+
+    /// Get called when config network changed
+    /// - Parameter network: Flow network
+    public func updateNetwork(_ network: Network) {
+        isTestnet = network != .mainnet
+        BloctoSDK.shared.updateNetwork(isTestnet: isTestnet)
     }
 
     /// Ask user to authanticate and get flow address along with account proof if provide accountProofData
@@ -290,7 +297,7 @@ public final class BloctoWalletProvider: WalletProvider {
                         continuation.resume(returning: (address, nil))
                     }
                 case let .failure(error):
-                    continuation.resume(throwing: FCLError.authnFailed(message: error.localizedDescription))
+                    continuation.resume(throwing: FCLError.authnFailed(message: String(describing: error)))
                 }
             }
         }

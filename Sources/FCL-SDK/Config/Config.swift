@@ -21,7 +21,7 @@ public enum Scope: String, Encodable {
 
 public class Config {
 
-    var network: Network = .emulator
+    var network: Network = .testnet
 
     var appDetail: AppDetail?
 
@@ -68,6 +68,9 @@ public class Config {
         switch option {
         case let .network(network):
             self.network = network
+            walletProviderCandidates.forEach {
+                $0.updateNetwork(network)
+            }
         case .env:
             break
         case let .appDetail(appDetail):
@@ -79,6 +82,9 @@ public class Config {
             if walletProviders.count == 1,
                let firstProvider = walletProviders.first {
                 selectedWalletProvider = firstProvider
+            }
+            walletProviderCandidates.forEach {
+                $0.updateNetwork(network)
             }
         case let .replace(placeholder, replacement):
             let addressReplacement = AddressReplacement(placeholder: placeholder, replacement: replacement)

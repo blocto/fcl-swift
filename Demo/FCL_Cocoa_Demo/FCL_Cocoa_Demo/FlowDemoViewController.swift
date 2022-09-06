@@ -858,7 +858,7 @@ final class FlowDemoViewController: UIViewController {
                 setValueExplorerButton.isHidden = false
             } catch {
                 resetSetValueStatus()
-                handleSetValueError(Error.message(error.localizedDescription))
+                handleSetValueError(Error.message(String(describing: error)))
             }
         }
     }
@@ -876,7 +876,7 @@ final class FlowDemoViewController: UIViewController {
                 debugPrint(result)
             } catch {
                 lookupLoadingIndicator.stopAnimating()
-                lookupResultLabel.text = error.localizedDescription
+                lookupResultLabel.text = String(describing: error)
             }
         }
     }
@@ -1021,7 +1021,7 @@ final class FlowDemoViewController: UIViewController {
             label.text = error.message
         } else {
             debugPrint(error)
-            label.text = error.localizedDescription
+            label.text = String(describing: error)
         }
         label.textColor = .red
     }

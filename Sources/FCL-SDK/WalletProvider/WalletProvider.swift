@@ -13,6 +13,10 @@ public protocol WalletProvider {
     
     /// Info to describe wallet provider
     var providerInfo: ProviderInfo { get }
+
+    /// Method called by user changing network of Flow blockchain.
+    /// - Parameter network: Flow network
+    func updateNetwork(_ network: Network)
     
     /// Authentication of Flow blockchain account address. if valid account proof data provided,
     /// - Parameter accountProofData: Pre-defined struct used to sign for account proot.

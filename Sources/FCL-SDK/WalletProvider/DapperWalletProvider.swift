@@ -39,6 +39,8 @@ public final class DapperWalletProvider: WalletProvider {
     init(providerInfo: ProviderInfo) {
         self.providerInfo = providerInfo
     }
+    
+    public func updateNetwork(_ network: Network) {}
 
     public func authn(accountProofData: FCLAccountProofData?) async throws {
         let session = URLSession(configuration: .default)

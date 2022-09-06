@@ -103,7 +103,7 @@ final class WalletProviderSelectionViewController: UIViewController {
             URLSession(configuration: .default)
                 .dataTask(with: request) { data, _, error in
                     if let error = error {
-                        log(message: error.localizedDescription)
+                        log(message: String(describing: error))
                         return
                     }
                     guard let data = data else {
