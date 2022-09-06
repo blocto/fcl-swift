@@ -892,7 +892,8 @@ final class ViewController: UIViewController {
 
         Task {
             let argument = try await fcl.query(script: script)
-            getValueResultLabel.text = argument.value.description
+            let value: Decimal = try argument.value.toSwiftValue()
+            getValueResultLabel.text = value.description
         }
     }
 
