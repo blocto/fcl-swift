@@ -69,30 +69,14 @@ class ViewModel: ObservableObject {
     }
 
     init() {
-        do {
-            let bloctoWalletProvider = try BloctoWalletProvider(
-                bloctoAppIdentifier: bloctoSDKAppId,
-                window: nil,
-                testnet: !isProduction
-            )
-            let dapperWalletProvider = DapperWalletProvider.default
-            fcl.config
-                .put(.network(network))
-                .put(.supportedWalletProviders(
-                    [
-                        bloctoWalletProvider,
-                        dapperWalletProvider,
-                    ]
-                ))
-        } catch {
-            self.errorMessage = String(describing: error)
-            debugPrint(error)
-        }
+        setupFCL()
     }
 
     func updateNetwork() {
+        isProduction = network == .mainnet
         fcl.config
             .put(.network(network))
+        setupFCL()
     }
 
     func authn(usingAccountProof: Bool) {
@@ -126,16 +110,16 @@ class ViewModel: ObservableObject {
             }
         }
     }
-    
+
     func verifyAccountProof() {
         verifyAccountProofErrorMessage = nil
         accountProofValid = nil
-        
+
         guard let accountProof = fcl.currentUser?.accountProof else {
             verifyAccountProofErrorMessage = "no account proof."
             return
         }
-        
+
         Task { @MainActor in
             do {
                 let valid = try await AppUtilities.verifyAccountProof(
@@ -199,6 +183,7 @@ class ViewModel: ObservableObject {
     }
 
     func getValue() {
+        onChainValue = nil
         getValueErrorMessage = nil
 
         let script = """
@@ -220,6 +205,7 @@ class ViewModel: ObservableObject {
     }
 
     func setValue(inputValue: String) {
+        txHash = nil
         setValueErrorMessage = nil
 
         guard let userWalletAddress = fcl.currentUser?.address else {
@@ -248,29 +234,23 @@ class ViewModel: ObservableObject {
 
                 let argument = Cadence.Argument(.ufix64(input))
 
-                let txHsh = try await fcl.mutate(
+                let txHash = try await fcl.mutate(
                     cadence: scriptString,
                     arguments: [argument],
                     limit: 100,
                     authorizers: [userWalletAddress]
                 )
-                txHash = txHsh.hexString
-//                resetSetValueStatus()
-//                setValueResultLabel.text = txHsh.hexString
-//                txIdInputTextField.text = txHsh.hexString
-//                setValueExplorerButton.isHidden = false
+                self.txHash = txHash.hexString
             } catch {
                 setValueErrorMessage = String(describing: error)
-//                resetSetValueStatus()
-//                handleSetValueError(Error.message(String(describing: error)))
             }
         }
     }
-    
+
     func lookup(txHash: String) {
         transactionStatus = nil
         transactionStatusErrorMessage = nil
-        
+
         Task { @MainActor in
             do {
                 let result = try await fcl.getTransactionStatus(transactionId: txHash)
@@ -278,6 +258,28 @@ class ViewModel: ObservableObject {
             } catch {
                 transactionStatusErrorMessage = String(describing: error)
             }
+        }
+    }
+
+    private func setupFCL() {
+        do {
+            let bloctoWalletProvider = try BloctoWalletProvider(
+                bloctoAppIdentifier: bloctoSDKAppId,
+                window: nil,
+                testnet: !isProduction
+            )
+            let dapperWalletProvider = DapperWalletProvider.default
+            fcl.config
+                .put(.network(network))
+                .put(.supportedWalletProviders(
+                    [
+                        bloctoWalletProvider,
+                        dapperWalletProvider,
+                    ]
+                ))
+        } catch {
+            errorMessage = String(describing: error)
+            debugPrint(error)
         }
     }
 }
