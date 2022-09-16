@@ -184,7 +184,7 @@ public final class BloctoWalletProvider: WalletProvider {
                 sequenceNumber: cosignerKey.sequenceNumber
             )
 
-            let feePayer = try await bloctoFlowSDK.getFeePayerAddress(isTestnet: isTestnet)
+            let feePayer = try await bloctoFlowSDK.getFeePayerAddress()
 
             let transaction = try FlowSDK.Transaction(
                 script: Data(cadence.utf8),

@@ -17,7 +17,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/portto/flow-swift-sdk.git", .upToNextMajor(from: "0.4.0")),
         .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", from: "4.0.0"),
-        .package(url: "https://github.com/portto/blocto-ios-sdk.git", .upToNextMinor(from: "0.3.6")),
+        .package(url: "https://github.com/portto/blocto-ios-sdk.git", .upToNextMinor(from: "0.3.7")),
     ],
     targets: [
         .target(

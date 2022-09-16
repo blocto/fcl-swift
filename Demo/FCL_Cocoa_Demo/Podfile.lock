@@ -1,9 +1,9 @@
 PODS:
   - _NIODataStructures (2.40.0)
   - BigInt (5.2.0)
-  - BloctoSDK/Core (0.3.6)
-  - BloctoSDK/Flow (0.3.6):
-    - BloctoSDK/Core (~> 0.3.6)
+  - BloctoSDK/Core (0.3.7)
+  - BloctoSDK/Flow (0.3.7):
+    - BloctoSDK/Core (~> 0.3.7)
     - FlowSDK (~> 0.4.0)
   - Cadence (0.4.0):
     - BigInt (~> 5.2.0)
@@ -236,13 +236,13 @@ EXTERNAL SOURCES:
 
 CHECKOUT OPTIONS:
   BloctoSDK:
-    :commit: 7db20586d1957f18d0f79574c6df349246f5fad8
+    :commit: 7d35725a65d7fafbcdc056b40c9a69b82eb9939c
     :git: https://github.com/portto/blocto-ios-sdk.git
 
 SPEC CHECKSUMS:
   _NIODataStructures: 3d45d8e70a1d17a15b1dc59d102c63dbc0525ffd
   BigInt: f668a80089607f521586bbe29513d708491ef2f7
-  BloctoSDK: 6453384f3f9dfad4bdeb5347aa3d1e7ef2e5f735
+  BloctoSDK: 3621b2e3aae06fcc5e54765d0d7ecb47e1b2683b
   Cadence: 9de64e79320285ea8beecfae10327f5853f3b790
   CGRPCZlibp: 2f3e1e7a6d6cb481d4d1a26d3ec09aefacf09cbb
   CNIOAtomics: 8edf08644e5e6fa0f021c239be9e8beb1cd9ef18

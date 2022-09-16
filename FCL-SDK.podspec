@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '13.0'
   
   s.source_files  = "Sources/**/*"
-  s.dependency "BloctoSDK/Flow", "~> 0.3.6"
+  s.dependency "BloctoSDK/Flow", "~> 0.3.7"
   s.dependency "SwiftyJSON"
 
 end
