@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/portto/blocto-ios-sdk.git",
       "state" : {
-        "revision" : "80ea9213490e8bf9599d02f10f54fe032775b2de",
-        "version" : "0.3.7"
+        "revision" : "1443ba05fc6dbb66128d2297945ec9a955a4afef",
+        "version" : "0.3.8"
       }
     },
     {
