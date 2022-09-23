@@ -223,7 +223,7 @@ class ViewModel: ObservableObject {
             do {
 
                 let scriptString = """
-                import ValueDapp from \(valueDappContract)
+                import ValueDapp from VALUE_DAPP_CONTRACT
 
                 transaction(value: UFix64) {
                     prepare(authorizer: AuthAccount) {
@@ -277,6 +277,7 @@ class ViewModel: ObservableObject {
                         dapperWalletProvider,
                     ]
                 ))
+                .put(.replace(placeHolder: "VALUE_DAPP_CONTRACT", with: Address(hexString: valueDappContract)))
         } catch {
             errorMessage = String(describing: error)
             debugPrint(error)

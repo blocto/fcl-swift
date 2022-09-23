@@ -388,10 +388,15 @@ extension FCL {
         guard let walletProvider = fcl.config.selectedWalletProvider else {
             throw FCLError.walletProviderNotSpecified
         }
+        
+        let items = fcl.config.addressReplacements
+        let newCadence = items.reduce(cadence) { result, replacement in
+            result.replacingOccurrences(of: replacement.placeholder, with: replacement.replacement.hexStringWithPrefix)
+        }
 
         // TODO: support additional authorizers.
         return try await walletProvider.mutate(
-            cadence: cadence,
+            cadence: newCadence,
             arguments: arguments,
             limit: limit,
             authorizers: authorizers
