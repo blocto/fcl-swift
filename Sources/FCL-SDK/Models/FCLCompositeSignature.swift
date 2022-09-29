@@ -7,7 +7,13 @@
 
 import Foundation
 
-public struct FCLCompositeSignature: Decodable {
+public protocol CompositeSignatureVerifiable {
+    var address: String { get }
+    var keyId: Int { get }
+    var signature: String { get }
+}
+
+public struct FCLCompositeSignature: CompositeSignatureVerifiable, Decodable {
 
     public let fclType: String
     public let fclVersion: String
