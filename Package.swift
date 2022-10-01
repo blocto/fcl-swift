@@ -7,7 +7,7 @@ let package = Package(
     name: "FCL-SDK",
     platforms: [
         .iOS(.v13),
-        .macOS(.v12),
+        .macOS(.v10_15)
     ],
     products: [
         .library(
@@ -18,7 +18,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/portto/flow-swift-sdk.git", .upToNextMajor(from: "0.4.0")),
         .package(url: "https://github.com/SwiftyJSON/SwiftyJSON.git", from: "4.0.0"),
-        .package(url: "https://github.com/portto/blocto-ios-sdk.git", .upToNextMinor(from: "0.3.8")),
+        .package(url: "https://github.com/portto/blocto-ios-sdk.git", branch: "feat/support-macos"),
     ],
     targets: [
         .target(

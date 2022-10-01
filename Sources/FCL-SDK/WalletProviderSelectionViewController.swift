@@ -6,6 +6,7 @@
 //
 
 import Foundation
+#if canImport(UIKit)
 import UIKit
 
 final class WalletProviderSelectionViewController: UIViewController {
@@ -187,3 +188,4 @@ extension WalletProviderSelectionViewController: UIAdaptivePresentationControlle
     }
     
 }
+#endif
