@@ -156,10 +156,10 @@
     {
       "identity" : "swiftyjson",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SwiftyJSON/SwiftyJSON.git",
+      "location" : "https://github.com/andrew54068/SwiftyJSON",
       "state" : {
-        "revision" : "2b6054efa051565954e1d2b9da831680026cd768",
-        "version" : "4.3.0"
+        "branch" : "fix/linux",
+        "revision" : "2df349f10abf37be9907735f911afb62b10ea7c2"
       }
     },
     {

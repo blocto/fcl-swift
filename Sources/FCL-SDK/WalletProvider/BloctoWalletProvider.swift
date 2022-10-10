@@ -5,7 +5,7 @@
 //  Created by Andrew Wang on 2022/7/5.
 //
 
-#if canImport(UIKit) && os(OSX)
+#if canImport(UIKit)
 import Foundation
 import UIKit
 import FlowSDK
