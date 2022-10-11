@@ -16,7 +16,7 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/portto/flow-swift-sdk.git", .upToNextMajor(from: "0.4.0")),
+        .package(url: "https://github.com/portto/flow-swift-sdk.git", branch: "feat/linux"),
         .package(url: "https://github.com/andrew54068/SwiftyJSON", branch: "fix/linux"),
         .package(url: "https://github.com/portto/blocto-ios-sdk.git", branch: "feat/support-macos"),
     ],
