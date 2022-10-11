@@ -42,7 +42,7 @@
       "location" : "https://github.com/portto/flow-swift-sdk.git",
       "state" : {
         "branch" : "feat/linux",
-        "revision" : "61b975a7844f2c1fdb69a931564ee49977a45f66"
+        "revision" : "19cebf9700e25e5f9d7a67d5efc18e1b855c30dd"
       }
     },
     {
@@ -79,6 +79,15 @@
       "state" : {
         "revision" : "9f430df4ce564d900e41da37821d555b2e644b62",
         "version" : "0.0.4"
+      }
+    },
+    {
+      "identity" : "swift-crypto",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-crypto.git",
+      "state" : {
+        "revision" : "d9825fa541df64b1a7b182178d61b9a82730d01f",
+        "version" : "2.1.0"
       }
     },
     {
