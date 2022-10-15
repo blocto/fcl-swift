@@ -1,11 +1,11 @@
 PODS:
   - _NIODataStructures (2.40.0)
   - BigInt (5.2.0)
-  - BloctoSDK/Core (0.3.8)
-  - BloctoSDK/Flow (0.3.8):
-    - BloctoSDK/Core (~> 0.3.8)
-    - FlowSDK (~> 0.4.0)
-  - Cadence (0.4.0):
+  - BloctoSDK/Core (0.4.0)
+  - BloctoSDK/Flow (0.4.0):
+    - BloctoSDK/Core (~> 0.4.0)
+    - FlowSDK (~> 0.4.2)
+  - Cadence (0.4.2):
     - BigInt (~> 5.2.0)
     - CryptoSwift (~> 1.5.1)
   - CGRPCZlibp (1.8.2)
@@ -18,14 +18,14 @@ PODS:
   - CNIOLinux (2.40.0)
   - CNIOWindows (2.40.0)
   - CryptoSwift (1.5.1)
-  - FCL-SDK (0.1.5):
-    - BloctoSDK/Flow (~> 0.3.8)
+  - FCL-SDK (0.1.6):
+    - BloctoSDK/Flow (~> 0.4.0)
     - SwiftyJSON
-  - FlowSDK (0.4.0):
-    - FlowSDK/FlowSDK (= 0.4.0)
-  - FlowSDK/FlowSDK (0.4.0):
+  - FlowSDK (0.4.2):
+    - FlowSDK/FlowSDK (= 0.4.2)
+  - FlowSDK/FlowSDK (0.4.2):
     - BigInt (~> 5.2.0)
-    - Cadence (~> 0.4.0)
+    - Cadence (~> 0.4.2)
     - CryptoSwift (~> 1.5.1)
     - gRPC-Swiftp (~> 1.8.2)
     - secp256k1Swift (~> 0.7.4)
@@ -179,11 +179,10 @@ PODS:
     - SwiftNIOFoundationCompat (< 3, >= 2.32.0)
     - SwiftNIOPosix (< 3, >= 2.32.0)
     - SwiftNIOTLS (< 3, >= 2.32.0)
-  - SwiftProtobuf (1.20.1)
+  - SwiftProtobuf (1.20.2)
   - SwiftyJSON (5.0.1)
 
 DEPENDENCIES:
-  - BloctoSDK/Flow (from `https://github.com/portto/blocto-ios-sdk.git`)
   - FCL-SDK (from `../../`)
   - RxCocoa
   - RxSwift
@@ -193,6 +192,7 @@ SPEC REPOS:
   trunk:
     - _NIODataStructures
     - BigInt
+    - BloctoSDK
     - Cadence
     - CGRPCZlibp
     - CNIOAtomics
@@ -229,21 +229,14 @@ SPEC REPOS:
     - SwiftyJSON
 
 EXTERNAL SOURCES:
-  BloctoSDK:
-    :git: https://github.com/portto/blocto-ios-sdk.git
   FCL-SDK:
     :path: "../../"
-
-CHECKOUT OPTIONS:
-  BloctoSDK:
-    :commit: 1443ba05fc6dbb66128d2297945ec9a955a4afef
-    :git: https://github.com/portto/blocto-ios-sdk.git
 
 SPEC CHECKSUMS:
   _NIODataStructures: 3d45d8e70a1d17a15b1dc59d102c63dbc0525ffd
   BigInt: f668a80089607f521586bbe29513d708491ef2f7
-  BloctoSDK: 7f90569f1bf28eed4bee64ade0aaea51f95acf24
-  Cadence: 9de64e79320285ea8beecfae10327f5853f3b790
+  BloctoSDK: c7325a8a955cd6d1c77da3861b3017143ef6d43f
+  Cadence: 2aa3c6d84e3de70a5decf50a0c19658af2707d6a
   CGRPCZlibp: 2f3e1e7a6d6cb481d4d1a26d3ec09aefacf09cbb
   CNIOAtomics: 8edf08644e5e6fa0f021c239be9e8beb1cd9ef18
   CNIOBoringSSL: 2c9c96c2e95f15e83fb8d26b9738d939cc39ae33
@@ -253,8 +246,8 @@ SPEC CHECKSUMS:
   CNIOLinux: 62e3505f50de558c393dc2f273dde71dcce518da
   CNIOWindows: 3047f2d8165848a3936a0a755fee27c6b5ee479b
   CryptoSwift: c4f2debceb38bf44c80659afe009f71e23e4a082
-  FCL-SDK: 1c25e8b31f8c68bacaf3e55321d5fcb69358b566
-  FlowSDK: 2d7df11aa11c2eb0d53add61025d6c526f88421e
+  FCL-SDK: 0258bba745c9a676b9554e01ad3f0910d88ac056
+  FlowSDK: 84883187f3f6797438b59474ebeac40be4a96a86
   gRPC-Swiftp: 1f5a05ce5b544bff3dce93223e72829daac26113
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
   RxCocoa: 94f817b71c07517321eb4f9ad299112ca8af743b
@@ -276,9 +269,9 @@ SPEC CHECKSUMS:
   SwiftNIOSSL: d153c5a6fc5b2301b0519b4c4d037a9414212da6
   SwiftNIOTLS: 598af547490133e9aac52aed0c23c4a90c31dcfc
   SwiftNIOTransportServices: 0b2b407819d82eb63af558c5396e33c945759503
-  SwiftProtobuf: e40a7684079620e84ba522dbaeab0cddb0ec7ffd
+  SwiftProtobuf: 9f458aaa7844a2fc0b910053e66578bc4e2da9c1
   SwiftyJSON: 2f33a42c6fbc52764d96f13368585094bfd8aa5e
 
-PODFILE CHECKSUM: 0e48ec0aedfa925ede7e047968c385b7f1119e11
+PODFILE CHECKSUM: 84609972c6a1b04f5ffd7c04e38ae26066a44f09
 
 COCOAPODS: 1.11.3

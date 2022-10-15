@@ -492,12 +492,12 @@ final class FlowDemoViewController: UIViewController {
             let bloctoWalletProvider = try BloctoWalletProvider(
                 bloctoAppIdentifier: bloctoSDKAppId,
                 window: view.window,
-                testnet: !isProduction
+                network: isProduction ? .mainnet : .testnet
             )
             let dapperWalletProvider = DapperWalletProvider.default
             fcl.delegate = self
             if isProduction {
-                fcl.config
+                try fcl.config
                     .put(.network(.mainnet))
                     .put(.supportedWalletProviders(
                         [
@@ -506,7 +506,7 @@ final class FlowDemoViewController: UIViewController {
                         ]
                     ))
             } else {
-                fcl.config
+                try fcl.config
                     .put(.network(.testnet))
                     .put(.supportedWalletProviders(
                         [

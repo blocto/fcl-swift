@@ -4,7 +4,6 @@ target 'FCL_Cocoa_Demo' do
   use_frameworks!
 
   pod 'FCL-SDK', :path => '../../'
-  pod 'BloctoSDK/Flow', :git => 'https://github.com/portto/blocto-ios-sdk.git'
   pod 'SnapKit'
   pod 'RxSwift'
   pod 'RxCocoa'

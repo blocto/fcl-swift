@@ -33,7 +33,6 @@ struct ContentView: View {
                         }.onChange(of: viewModel.network) { newValue in
                             debugPrint(newValue)
                             viewModel.updateNetwork()
-                            isProduction = viewModel.network == Network.mainnet
                         }
                         .pickerStyle(SegmentedPickerStyle())
                     }
@@ -56,7 +55,7 @@ struct ContentView: View {
 
                     // explorer
                     if let address = viewModel.address {
-                        if let url = ExplorerURLType.address(address.hexStringWithPrefix).url() {
+                        if let url = ExplorerURLType.address(address.hexStringWithPrefix).url(network: viewModel.network) {
                             Button {
                                 showSafari = true
                             } label: {
@@ -195,7 +194,7 @@ struct ContentView: View {
                             ? Text(viewModel.transactionStatus ?? "")
                             : Text(viewModel.transactionStatusErrorMessage ?? "").foregroundColor(.red)
 
-                        if let url = ExplorerURLType.txHash(txHash).url() {
+                        if let url = ExplorerURLType.txHash(txHash).url(network: viewModel.network) {
                             Button {
                                 showSafari = true
                             } label: {

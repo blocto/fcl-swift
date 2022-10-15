@@ -20,31 +20,35 @@ public final class BloctoWalletProvider: WalletProvider {
         desc: "Entrance to blockchain world.",
         icon: URL(string: "https://fcl-discovery.onflow.org/images/blocto.png")
     )
-    var isTestnet: Bool
+    private(set) var network: Network
+    private(set) var environment: BloctoEnvironment
 
     private let bloctoAppIdentifier: String
 
     private var bloctoAppScheme: String {
-        if isTestnet {
-            return "blocto-staging://"
-        } else {
+        switch environment {
+        case .prod:
             return "blocto://"
+        case .dev:
+            return "blocto-staging://"
         }
     }
 
     private var bloctoApiBaseURLString: String {
-        if isTestnet {
-            return "https://api-staging.blocto.app"
-        } else {
+        switch environment {
+        case .prod:
             return "https://api.blocto.app"
+        case .dev:
+            return "https://api-staging.blocto.app"
         }
     }
 
     private var webAuthnURL: URL? {
-        if isTestnet {
-            return URL(string: "https://flow-wallet-testnet.blocto.app/api/flow/authn")
-        } else {
+        switch environment {
+        case .prod:
             return URL(string: "https://flow-wallet.blocto.app/api/flow/authn")
+        case .dev:
+            return URL(string: "https://flow-wallet-testnet.blocto.app/api/flow/authn")
         }
     }
 
@@ -59,7 +63,7 @@ public final class BloctoWalletProvider: WalletProvider {
     public init(
         bloctoAppIdentifier: String,
         window: UIWindow?,
-        testnet: Bool,
+        network: Network,
         logging: Bool = true
     ) throws {
         self.bloctoAppIdentifier = bloctoAppIdentifier
@@ -69,21 +73,31 @@ public final class BloctoWalletProvider: WalletProvider {
             }
             return window
         }
-        self.isTestnet = testnet
+        self.network = network
+        if let environment = Self.getBloctoEnvironment(by: network) {
+            self.environment = environment
+        } else {
+            throw FCLError.currentNetworkNotSupported
+        }
         BloctoSDK.shared.initialize(
             with: bloctoAppIdentifier,
             getWindow: getWindow,
             logging: logging,
-            testnet: testnet
+            environment: environment
         )
         self.bloctoFlowSDK = BloctoSDK.shared.flow
     }
 
     /// Get called when config network changed
     /// - Parameter network: Flow network
-    public func updateNetwork(_ network: Network) {
-        isTestnet = network != .mainnet
-        BloctoSDK.shared.updateNetwork(isTestnet: isTestnet)
+    public func updateNetwork(_ network: Network) throws {
+        self.network = network
+        if let environment = Self.getBloctoEnvironment(by: network) {
+            self.environment = environment
+        } else {
+            throw FCLError.currentNetworkNotSupported
+        }
+        BloctoSDK.shared.updateEnvironment(environment)
     }
 
     /// Ask user to authanticate and get flow address along with account proof if provide accountProofData
@@ -309,6 +323,19 @@ public final class BloctoWalletProvider: WalletProvider {
             expiresAt: 0,
             services: []
         )
+    }
+
+    private static func getBloctoEnvironment(by network: Network) -> BloctoEnvironment? {
+        switch network {
+        case .mainnet:
+            return .prod
+        case .testnet:
+            return .dev
+        case .canarynet:
+            return nil
+        case .emulator:
+            return nil
+        }
     }
 
 }
