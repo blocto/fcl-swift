@@ -18,7 +18,7 @@ PODS:
   - CNIOLinux (2.40.0)
   - CNIOWindows (2.40.0)
   - CryptoSwift (1.5.1)
-  - FCL-SDK (0.1.6):
+  - FCL-SDK (0.2.0):
     - BloctoSDK/Flow (~> 0.4.0)
     - SwiftyJSON
   - FlowSDK (0.4.2):
@@ -246,7 +246,7 @@ SPEC CHECKSUMS:
   CNIOLinux: 62e3505f50de558c393dc2f273dde71dcce518da
   CNIOWindows: 3047f2d8165848a3936a0a755fee27c6b5ee479b
   CryptoSwift: c4f2debceb38bf44c80659afe009f71e23e4a082
-  FCL-SDK: 0258bba745c9a676b9554e01ad3f0910d88ac056
+  FCL-SDK: 23d318693101ff7aba63e95f1fcd2021be9923b0
   FlowSDK: 84883187f3f6797438b59474ebeac40be4a96a86
   gRPC-Swiftp: 1f5a05ce5b544bff3dce93223e72829daac26113
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
