@@ -12,8 +12,6 @@ import FlowSDK
 import Cadence
 import BloctoSDK
 
-var isProduction = false
-
 class ViewModel: ObservableObject {
 
     @Published var network: Network = .testnet
@@ -45,26 +43,38 @@ class ViewModel: ObservableObject {
     private var nonce = "75f8587e5bd5f9dcc9909d0dae1f0ac5814458b2ae129620502cb936fde7120a"
 
     var bloctoSDKAppId: String {
-        if isProduction {
+        switch network {
+        case .mainnet:
             return "cda350c8-1085-46e5-9d37-35b7eb9701db"
-        } else {
+        case .testnet:
             return "2bc07c67-85ab-4a9a-b170-b1e04f85bbb8"
+        case .canarynet,
+             .emulator:
+            return ""
         }
     }
 
     private var bloctoContract: String {
-        if isProduction {
+        switch network {
+        case .mainnet:
             return "0xdb6b70764af4ff68"
-        } else {
+        case .testnet:
             return "0x5b250a8a85b44a67"
+        case .canarynet,
+             .emulator:
+            return ""
         }
     }
 
     private var valueDappContract: String {
-        if isProduction {
+        switch network {
+        case .mainnet:
             return "0x8320311d63f3b336"
-        } else {
+        case .testnet:
             return "0x5a8143da8058740c"
+        case .canarynet,
+             .emulator:
+            return ""
         }
     }
 
@@ -73,8 +83,7 @@ class ViewModel: ObservableObject {
     }
 
     func updateNetwork() {
-        isProduction = network == .mainnet
-        fcl.config
+        _ = try? fcl.config
             .put(.network(network))
         setupFCL()
     }
@@ -266,10 +275,10 @@ class ViewModel: ObservableObject {
             let bloctoWalletProvider = try BloctoWalletProvider(
                 bloctoAppIdentifier: bloctoSDKAppId,
                 window: nil,
-                testnet: !isProduction
+                network: network
             )
             let dapperWalletProvider = DapperWalletProvider.default
-            fcl.config
+            try fcl.config
                 .put(.network(network))
                 .put(.supportedWalletProviders(
                     [

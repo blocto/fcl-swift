@@ -16,7 +16,7 @@ public protocol WalletProvider {
 
     /// Method called by user changing network of Flow blockchain.
     /// - Parameter network: Flow network
-    func updateNetwork(_ network: Network)
+    func updateNetwork(_ network: Network) throws
     
     /// Authentication of Flow blockchain account address. if valid account proof data provided,
     /// - Parameter accountProofData: Pre-defined struct used to sign for account proot.

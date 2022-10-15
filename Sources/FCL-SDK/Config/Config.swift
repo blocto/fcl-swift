@@ -64,12 +64,12 @@ public class Config {
     }
 
     @discardableResult
-    public func put(_ option: Option) -> Self {
+    public func put(_ option: Option) throws -> Self {
         switch option {
         case let .network(network):
             self.network = network
-            walletProviderCandidates.forEach {
-                $0.updateNetwork(network)
+            try walletProviderCandidates.forEach {
+                try $0.updateNetwork(network)
             }
         case .env:
             break
@@ -83,8 +83,8 @@ public class Config {
                let firstProvider = walletProviders.first {
                 selectedWalletProvider = firstProvider
             }
-            walletProviderCandidates.forEach {
-                $0.updateNetwork(network)
+            try walletProviderCandidates.forEach {
+                try $0.updateNetwork(network)
             }
         case let .replace(placeholder, replacement):
             let addressReplacement = AddressReplacement(placeholder: placeholder, replacement: replacement)

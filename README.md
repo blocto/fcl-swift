@@ -63,6 +63,12 @@ let package = Package(
     ]
 )
 ```
+
+### Platform
+
+We only support iOS platform now. Please switch your XCode build target to iOS device.
+<img src="./docs-asset/xcode-build-target.png"/>
+
 ### Importing
 
 ```swift
@@ -81,7 +87,7 @@ do {
     let bloctoWalletProvider = try BloctoWalletProvider(
         bloctoAppIdentifier: bloctoSDKAppId,
         window: nil,
-        testnet: !isProduction
+        network: .testnet
     )
     fcl.config
         .put(.network(.testnet))
@@ -239,7 +245,7 @@ The communication channels involve responding to a set of pre-defined FCL messag
 - dApps can display and support all FCL compatible wallets who conform to `WalletProvider`.
 - Users don't need to sign up for new wallets - they can carry over their existing one to any dApps that use FCL for authentication and authorization.
 - Wallet selection panel will be shown automatically when `login()` is being called only if there are more than one wallet provider in `supportedWalletProviders`.
-<img src="/docs-asset/wallet-discovery.png"/>
+<img src="./docs-asset/wallet-discovery.png"/>
 
 ```swift
 import FCL_SDK
@@ -248,7 +254,7 @@ do {
     let bloctoWalletProvider = try BloctoWalletProvider(
         bloctoAppIdentifier: bloctoSDKAppId,
         window: nil,
-        testnet: !isProduction
+        network: .testnet
     )
     let dapperWalletProvider = DapperWalletProvider.default
     fcl.config
