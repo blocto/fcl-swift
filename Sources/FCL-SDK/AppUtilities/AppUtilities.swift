@@ -14,7 +14,7 @@ public enum AppUtilities {
 
     public static func verifyAccountProof(
         appIdentifier: String,
-        accountProofData: AccountProofSignatureData,
+        accountProofData: AccountProofVerifiable,
         fclCryptoContract: Address?
     ) async throws -> Bool {
         let verifyMessage = WalletUtilities.encodeAccountProof(
@@ -54,7 +54,7 @@ public enum AppUtilities {
 
     public static func verifyUserSignatures(
         message: String,
-        signatures: [FCLCompositeSignature],
+        signatures: [CompositeSignatureVerifiable],
         fclCryptoContract: Address?
     ) async throws -> Bool {
 
