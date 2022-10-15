@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/portto/blocto-ios-sdk.git",
       "state" : {
-        "revision" : "1443ba05fc6dbb66128d2297945ec9a955a4afef",
-        "version" : "0.3.8"
+        "branch" : "feat/support-macos",
+        "revision" : "7ed2ebdf2da7fb9b4fbc67a7dc353471039c5156"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/portto/flow-swift-sdk.git",
       "state" : {
-        "revision" : "1467c999cd076e7607e3575364a52693613d19f8",
-        "version" : "0.4.0"
+        "branch" : "feat/linux",
+        "revision" : "f5883c85893eb38eb210fa3e71e2aa2f1ebdad43"
       }
     },
     {
@@ -64,21 +64,12 @@
       }
     },
     {
-      "identity" : "secp256k1",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/portto/secp256k1.git",
-      "state" : {
-        "revision" : "6864a2560066cedede330c4b344689432a7300f7",
-        "version" : "0.0.5"
-      }
-    },
-    {
       "identity" : "secp256k1.swift",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/portto/secp256k1.swift",
+      "location" : "https://github.com/GigaBitcoin/secp256k1.swift.git",
       "state" : {
-        "revision" : "23aa6bab1f60e513297d0d58a863418f68534e56",
-        "version" : "0.7.4"
+        "revision" : "39dd39248e769ea88253a0ce300399b402a64529",
+        "version" : "0.9.2"
       }
     },
     {
@@ -88,6 +79,15 @@
       "state" : {
         "revision" : "9f430df4ce564d900e41da37821d555b2e644b62",
         "version" : "0.0.4"
+      }
+    },
+    {
+      "identity" : "swift-crypto",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/apple/swift-crypto.git",
+      "state" : {
+        "revision" : "d9825fa541df64b1a7b182178d61b9a82730d01f",
+        "version" : "2.1.0"
       }
     },
     {
@@ -156,10 +156,10 @@
     {
       "identity" : "swiftyjson",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SwiftyJSON/SwiftyJSON.git",
+      "location" : "https://github.com/andrew54068/SwiftyJSON",
       "state" : {
-        "revision" : "2b6054efa051565954e1d2b9da831680026cd768",
-        "version" : "4.3.0"
+        "branch" : "fix/linux",
+        "revision" : "2df349f10abf37be9907735f911afb62b10ea7c2"
       }
     },
     {

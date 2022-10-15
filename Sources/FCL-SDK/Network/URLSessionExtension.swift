@@ -5,7 +5,7 @@
 //  Created by Andrew Wang on 2022/7/6.
 //
 
-import UIKit
+import Foundation
 
 extension URLSession {
 

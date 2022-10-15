@@ -21,11 +21,17 @@ public struct FCLAccountProofData {
 
 }
 
-public struct AccountProofSignatureData {
+public protocol AccountProofVerifiable {
+    var address: Address { get }
+    var nonce: String { get }
+    var signatures: [CompositeSignatureVerifiable] { get }
+}
 
-    let address: Address
-    let nonce: String
-    let signatures: [FCLCompositeSignature]
+public struct AccountProofSignatureData: AccountProofVerifiable {
+
+    public let address: Address
+    public let nonce: String
+    public let signatures: [CompositeSignatureVerifiable]
 
     public init(
         address: Address,

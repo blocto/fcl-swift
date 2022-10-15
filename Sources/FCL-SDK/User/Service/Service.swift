@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftyJSON
-import UIKit
 
 public struct Service: Decodable {
     let fclType: String?

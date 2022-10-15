@@ -57,6 +57,7 @@ public class FCL: NSObject {
     // Authn
     public func authanticate(accountProofData: FCLAccountProofData?) async throws -> Address {
         do {
+            #if canImport(UIKit)
             let walletProvider: WalletProvider
             if let provider = config.selectedWalletProvider {
                 walletProvider = provider
@@ -64,11 +65,13 @@ public class FCL: NSObject {
                 if config.walletProviderCandidates.isEmpty == false {
                     walletProvider = try await selectionProvider()
                     fcl.config.selectedWalletProvider = walletProvider
+
                 } else {
                     throw FCLError.walletProviderNotSpecified
                 }
             }
             try await walletProvider.authn(accountProofData: accountProofData)
+            #endif
             guard let user = currentUser else {
                 throw FCLError.userNotFound
             }
@@ -217,6 +220,7 @@ public class FCL: NSObject {
         )
     }
 
+    #if canImport(UIKit)
     func getKeyWindow() -> UIWindow? {
         UIApplication.shared.connectedScenes
             .filter { $0.activationState == .foregroundActive }
@@ -256,7 +260,7 @@ public class FCL: NSObject {
         }
         return topController
     }
-
+    #endif
 }
 
 // MARK: ASWebAuthenticationPresentationContextProviding
@@ -388,7 +392,7 @@ extension FCL {
         guard let walletProvider = fcl.config.selectedWalletProvider else {
             throw FCLError.walletProviderNotSpecified
         }
-        
+
         let items = fcl.config.addressReplacements
         let newCadence = items.reduce(cadence) { result, replacement in
             result.replacingOccurrences(of: replacement.placeholder, with: replacement.replacement.hexStringWithPrefix)
