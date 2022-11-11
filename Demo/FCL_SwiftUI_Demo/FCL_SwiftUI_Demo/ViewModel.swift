@@ -293,7 +293,3 @@ class ViewModel: ObservableObject {
         }
     }
 }
-
-enum BError: Error {
-    case a
-}
