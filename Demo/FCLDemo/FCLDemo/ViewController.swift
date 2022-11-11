@@ -738,7 +738,7 @@ final class ViewController: UIViewController {
 
         accountProofVerifyingIndicator.startAnimating()
 
-        Task {
+        Task { @MainActor in
             do {
                 let valid = try await AppUtilities.verifyAccountProof(
                     appIdentifier: accountProofAppName,
@@ -793,7 +793,7 @@ final class ViewController: UIViewController {
 
         signingVerifyingIndicator.startAnimating()
 
-        Task {
+        Task { @MainActor in
             do {
                 let valid = try await AppUtilities.verifyUserSignatures(
                     message: Data(message.utf8).bloctoSDK.hexString,
@@ -867,7 +867,7 @@ final class ViewController: UIViewController {
         lookupLoadingIndicator.startAnimating()
         lookupResultLabel.text = nil
 
-        Task {
+        Task { @MainActor in
             do {
                 let result = try await fcl.getTransactionStatus(transactionId: txHash)
                 lookupLoadingIndicator.stopAnimating()
@@ -890,7 +890,7 @@ final class ViewController: UIViewController {
         }
         """
 
-        Task {
+        Task { @MainActor in
             let argument = try await fcl.query(script: script)
             let value: Decimal = try argument.value.toSwiftValue()
             getValueResultLabel.text = value.description

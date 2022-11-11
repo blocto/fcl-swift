@@ -23,7 +23,7 @@
 	</array>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
-		<string>blocto-staging</string>
+		<string>blocto-dev</string>
 		<string>blocto</string>
 	</array>
 	<key>UIApplicationSceneManifest</key>

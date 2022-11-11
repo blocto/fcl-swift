@@ -30,7 +30,7 @@ public final class BloctoWalletProvider: WalletProvider {
         case .prod:
             return "blocto://"
         case .dev:
-            return "blocto-staging://"
+            return "blocto-dev://"
         }
     }
 
@@ -39,7 +39,7 @@ public final class BloctoWalletProvider: WalletProvider {
         case .prod:
             return "https://api.blocto.app"
         case .dev:
-            return "https://api-staging.blocto.app"
+            return "https://api-dev.blocto.app"
         }
     }
 
@@ -58,7 +58,7 @@ public final class BloctoWalletProvider: WalletProvider {
     ///        testnet dashboard: https://developers-staging.blocto.app/
     ///        mainnet dashboard: https://developers.blocto.app/
     ///   - window: used for presenting webView if no Blocto app installed. If pass nil then we will get the top ViewContoller from keyWindow.
-    ///   - testnet: indicate flow network to use.
+    ///   - network: indicate flow network to use.
     ///   - logging: Enabling log message, default is true.
     public init(
         bloctoAppIdentifier: String,

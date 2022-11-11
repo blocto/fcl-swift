@@ -1,9 +1,9 @@
 PODS:
   - _NIODataStructures (2.40.0)
   - BigInt (5.2.0)
-  - BloctoSDK/Core (0.4.0)
-  - BloctoSDK/Flow (0.4.0):
-    - BloctoSDK/Core (~> 0.4.0)
+  - BloctoSDK/Core (0.4.2)
+  - BloctoSDK/Flow (0.4.2):
+    - BloctoSDK/Core (~> 0.4.2)
     - FlowSDK (~> 0.4.2)
   - Cadence (0.4.2):
     - BigInt (~> 5.2.0)
@@ -18,8 +18,8 @@ PODS:
   - CNIOLinux (2.40.0)
   - CNIOWindows (2.40.0)
   - CryptoSwift (1.5.1)
-  - FCL-SDK (0.2.0):
-    - BloctoSDK/Flow (~> 0.4.0)
+  - FCL-SDK (0.2.1):
+    - BloctoSDK/Flow (~> 0.4.2)
     - SwiftyJSON
   - FlowSDK (0.4.2):
     - FlowSDK/FlowSDK (= 0.4.2)
@@ -179,7 +179,7 @@ PODS:
     - SwiftNIOFoundationCompat (< 3, >= 2.32.0)
     - SwiftNIOPosix (< 3, >= 2.32.0)
     - SwiftNIOTLS (< 3, >= 2.32.0)
-  - SwiftProtobuf (1.20.2)
+  - SwiftProtobuf (1.20.3)
   - SwiftyJSON (5.0.1)
 
 DEPENDENCIES:
@@ -235,7 +235,7 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   _NIODataStructures: 3d45d8e70a1d17a15b1dc59d102c63dbc0525ffd
   BigInt: f668a80089607f521586bbe29513d708491ef2f7
-  BloctoSDK: c7325a8a955cd6d1c77da3861b3017143ef6d43f
+  BloctoSDK: 341d7e5e42d22ecc793f5846fb3443ce5edf59e6
   Cadence: 2aa3c6d84e3de70a5decf50a0c19658af2707d6a
   CGRPCZlibp: 2f3e1e7a6d6cb481d4d1a26d3ec09aefacf09cbb
   CNIOAtomics: 8edf08644e5e6fa0f021c239be9e8beb1cd9ef18
@@ -246,7 +246,7 @@ SPEC CHECKSUMS:
   CNIOLinux: 62e3505f50de558c393dc2f273dde71dcce518da
   CNIOWindows: 3047f2d8165848a3936a0a755fee27c6b5ee479b
   CryptoSwift: c4f2debceb38bf44c80659afe009f71e23e4a082
-  FCL-SDK: 23d318693101ff7aba63e95f1fcd2021be9923b0
+  FCL-SDK: 50af02092e99b25a277ff680a2b1112a7179f4d0
   FlowSDK: 84883187f3f6797438b59474ebeac40be4a96a86
   gRPC-Swiftp: 1f5a05ce5b544bff3dce93223e72829daac26113
   Logging: beeb016c9c80cf77042d62e83495816847ef108b
@@ -269,7 +269,7 @@ SPEC CHECKSUMS:
   SwiftNIOSSL: d153c5a6fc5b2301b0519b4c4d037a9414212da6
   SwiftNIOTLS: 598af547490133e9aac52aed0c23c4a90c31dcfc
   SwiftNIOTransportServices: 0b2b407819d82eb63af558c5396e33c945759503
-  SwiftProtobuf: 9f458aaa7844a2fc0b910053e66578bc4e2da9c1
+  SwiftProtobuf: b02b5075dcf60c9f5f403000b3b0c202a11b6ae1
   SwiftyJSON: 2f33a42c6fbc52764d96f13368585094bfd8aa5e
 
 PODFILE CHECKSUM: 84609972c6a1b04f5ffd7c04e38ae26066a44f09
