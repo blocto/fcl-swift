@@ -18,7 +18,7 @@ public final class BloctoWalletProvider: WalletProvider {
     public let providerInfo: ProviderInfo = ProviderInfo(
         title: "Blocto",
         desc: "Entrance to blockchain world.",
-        icon: URL(string: "https://fcl-discovery.onflow.org/images/blocto.png")
+        icon: URL(string: "https://ipfs.blocto.app/ipfs/QmTmQQBz5KfVUcHW83S3kxqh29vSQ3cH7pcsc6cngYsG5U")
     )
     private(set) var network: Network
     private(set) var environment: BloctoEnvironment

@@ -15,7 +15,7 @@ public final class DapperWalletProvider: WalletProvider {
         let info = ProviderInfo(
             title: "Dapper Wallet",
             desc: nil,
-            icon: URL(string: "https://i.imgur.com/L1dgOKn.png")
+            icon: URL(string: "https://ipfs.blocto.app/ipfs/Qmb81oGbB9qxUct7udtHsAqiJkRf4ey2bxuDhdg1ojFDfr")
         )
         return DapperWalletProvider(providerInfo: info)
     }()
@@ -39,7 +39,7 @@ public final class DapperWalletProvider: WalletProvider {
     init(providerInfo: ProviderInfo) {
         self.providerInfo = providerInfo
     }
-    
+
     public func updateNetwork(_ network: Network) {}
 
     public func authn(accountProofData: FCLAccountProofData?) async throws {
