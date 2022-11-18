@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name             = 'FCL-SDK'
-  s.version          = '0.2.1'
+  s.version          = '0.2.2'
   s.summary          = 'Flow Client Library Swift version.'
 
   s.homepage         = 'https://github.com/portto/fcl-swift'
