@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 final class WalletProviderSelectionViewController: UIViewController {
-    
+
     var onSelect: ((WalletProvider) -> Void)?
     var onCancel: (() -> Void)?
 
@@ -30,7 +30,7 @@ final class WalletProviderSelectionViewController: UIViewController {
         stackView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -20).isActive = true
         return view
     }()
-    
+
     private lazy var titleLabel: UILabel = {
         let label = UILabel()
         label.text = "Select a wallet"
@@ -39,7 +39,7 @@ final class WalletProviderSelectionViewController: UIViewController {
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
-    
+
     private lazy var cancelButton: UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
@@ -70,26 +70,26 @@ final class WalletProviderSelectionViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         view.addSubview(cancelButton)
         cancelButton.topAnchor.constraint(equalTo: view.topAnchor).isActive = true
         cancelButton.leadingAnchor.constraint(equalTo: view.leadingAnchor).isActive = true
         cancelButton.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         cancelButton.trailingAnchor.constraint(equalTo: view.trailingAnchor).isActive = true
-        
+
         cancelButton.addSubview(containerView)
         containerView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
         containerView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
         containerView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 50).isActive = true
         containerView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -50).isActive = true
-        
+
         for (index, provider) in providers.enumerated() {
             let button = createProviderSelectionButton(from: provider.providerInfo, index: index)
-            button.addTarget(self, action: #selector(self.onClicked(sender:)), for: .touchUpInside)
+            button.addTarget(self, action: #selector(onClicked(sender:)), for: .touchUpInside)
             stackView.addArrangedSubview(button)
         }
     }
-    
+
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         containerView.layer.cornerRadius = 10
@@ -137,7 +137,7 @@ final class WalletProviderSelectionViewController: UIViewController {
         container.alignment = .leading
         container.distribution = .equalSpacing
         button.addSubview(container)
-        
+
         container.addArrangedSubview(titleLabel)
 
         if let desc = info.desc {
@@ -161,7 +161,7 @@ final class WalletProviderSelectionViewController: UIViewController {
         container.bottomAnchor.constraint(equalTo: button.bottomAnchor, constant: -12).isActive = true
         return button
     }
-    
+
     @objc
     private func onClicked(sender: UIButton) {
         cancelButton.isUserInteractionEnabled = false
@@ -180,10 +180,12 @@ final class WalletProviderSelectionViewController: UIViewController {
     }
 }
 
+// MARK: UIAdaptivePresentationControllerDelegate
+
 extension WalletProviderSelectionViewController: UIAdaptivePresentationControllerDelegate {
-    
+
     func presentationControllerShouldDismiss(_ presentationController: UIPresentationController) -> Bool {
-        return false
+        false
     }
-    
+
 }
