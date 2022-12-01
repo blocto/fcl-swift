@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/portto/flow-swift-sdk.git",
       "state" : {
-        "revision" : "1467c999cd076e7607e3575364a52693613d19f8",
-        "version" : "0.4.0"
+        "revision" : "b5e4c381def8b166a39496f2a32e184f4d8a17d1",
+        "version" : "0.4.2"
       }
     },
     {
