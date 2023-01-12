@@ -99,7 +99,8 @@ public enum AppUtilities {
         case .testnet:
             return Address(hexString: "0x74daa6f9c7ef24b1")
         case .canarynet,
-             .emulator:
+                .sandboxnet,
+                .emulator:
             throw FCLError.currentNetworkNotSupported
         }
     }

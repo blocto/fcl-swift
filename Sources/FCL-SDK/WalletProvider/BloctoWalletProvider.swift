@@ -333,6 +333,8 @@ public final class BloctoWalletProvider: WalletProvider {
             return .dev
         case .canarynet:
             return nil
+        case .sandboxnet:
+            return nil
         case .emulator:
             return nil
         }
