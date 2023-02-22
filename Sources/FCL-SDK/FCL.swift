@@ -274,10 +274,7 @@ extension FCL: ASWebAuthenticationPresentationContextProviding {
 extension FCL {
 
     func send(_ builds: [TransactionBuild]) async throws -> Identifier {
-        var ix = prepare(ix: Interaction(), builder: builds)
-
-        // The line below to replace resolveComputeLimit in fcl.js.
-        ix.message.computeLimit = fcl.config.computeLimit
+        let ix = prepare(ix: Interaction(), builder: builds)
 
         let resolvers: [Resolver] = [
             CadenceResolver(),
@@ -312,8 +309,26 @@ extension FCL {
             }
         }
 
+        newIX = setComputeLimitIfNeeded(ix: newIX, builder: builder)
+
         newIX.status = .ok
 
+        return newIX
+    }
+
+    private func setComputeLimitIfNeeded(ix: Interaction, builder: [TransactionBuild]) -> Interaction {
+        var newIX = ix
+        let computeLimitCase = builder.first(where: {
+            if case .computeLimit = $0 {
+                return true
+            } else {
+                return false
+            }
+        })
+
+        if computeLimitCase == nil {
+            newIX.message.computeLimit = fcl.config.computeLimit
+        }
         return newIX
     }
 
@@ -388,7 +403,7 @@ extension FCL {
         guard let walletProvider = fcl.config.selectedWalletProvider else {
             throw FCLError.walletProviderNotSpecified
         }
-        
+
         let items = fcl.config.addressReplacements
         let newCadence = items.reduce(cadence) { result, replacement in
             result.replacingOccurrences(of: replacement.placeholder, with: replacement.replacement.hexStringWithPrefix)
@@ -412,8 +427,11 @@ extension FCL {
     }
 
     func sendIX(ix: Interaction) async throws -> Identifier {
-        let tx = try await ix.toFlowTransaction()
-        return try await fcl.flowAPIClient.sendTransaction(transaction: tx)
+        let result = Task(priority: .background) {
+            let tx = try await ix.toFlowTransaction()
+            return try await fcl.flowAPIClient.sendTransaction(transaction: tx)
+        }
+        return try await result.value
     }
 
 }
