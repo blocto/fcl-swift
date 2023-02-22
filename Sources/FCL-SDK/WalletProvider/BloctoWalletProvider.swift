@@ -204,7 +204,7 @@ public final class BloctoWalletProvider: WalletProvider {
                 script: Data(cadence.utf8),
                 arguments: arguments,
                 referenceBlockId: block.blockHeader.id,
-                limit: limit,
+                gasLimit: limit,
                 proposalKey: proposalKey,
                 payer: feePayer,
                 authorizers: authorizers
