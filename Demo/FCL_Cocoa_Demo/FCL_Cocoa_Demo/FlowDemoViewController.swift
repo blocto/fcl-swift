@@ -507,6 +507,11 @@ final class FlowDemoViewController: UIViewController {
                     ))
             } else {
                 try fcl.config
+                    .put(.appDetail(AppDetail(
+                        title: "My Company",
+                        icon: URL(string: "https://www.google.com.tw/"),
+                        custom: ["test": "value"]
+                    )))
                     .put(.network(.testnet))
                     .put(.supportedWalletProviders(
                         [
@@ -696,19 +701,19 @@ final class FlowDemoViewController: UIViewController {
     private func authn() {
         /// 1. request account only
         /*
-        Task {
-            do {
-                let address = try await fcl.login()
-                self.requestAccountResultLabel.text = address.hexStringWithPrefix
-                let hasAccountProof = fcl.currentUser?.accountProof != nil
-                self.requestAccountCopyButton.isHidden = false
-                self.requestAccountExplorerButton.isHidden = false
-                self.accountProofVerifyButton.isHidden = !hasAccountProof
-            } catch {
-                self.handleRequestAccountError(error)
-            }
-        }
-        */
+         Task {
+             do {
+                 let address = try await fcl.login()
+                 self.requestAccountResultLabel.text = address.hexStringWithPrefix
+                 let hasAccountProof = fcl.currentUser?.accountProof != nil
+                 self.requestAccountCopyButton.isHidden = false
+                 self.requestAccountExplorerButton.isHidden = false
+                 self.accountProofVerifyButton.isHidden = !hasAccountProof
+             } catch {
+                 self.handleRequestAccountError(error)
+             }
+         }
+         */
 
         /// 2. Authanticate like FCL
         let accountProofData = FCLAccountProofData(

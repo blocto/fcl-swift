@@ -33,8 +33,12 @@ public struct AppDetail: Encodable {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(title, forKey: .title)
         try container.encode(icon, forKey: .icon)
-        var unkeyedContainer = encoder.unkeyedContainer()
-        try unkeyedContainer.encode(JSON(custom))
+        var dynamicContainer = encoder.container(keyedBy: DynamicKey.self)
+        for (key, value) in custom {
+            if let codingKey = DynamicKey(stringValue: key) {
+                try dynamicContainer.encode(value, forKey: codingKey)
+            }
+        }
     }
 
 }
