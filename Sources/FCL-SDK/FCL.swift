@@ -25,7 +25,12 @@ public class FCL: NSObject {
     public var delegate: FCLDelegate?
 
     var flowAPIClient: Client {
-        Client(network: config.network)
+        get async throws {
+            let task = Task(priority: .utility) {
+                Client(network: config.network)
+            }
+            return await task.value
+        }
     }
 
     private var webAuthSession: ASWebAuthenticationSession?
@@ -427,11 +432,8 @@ extension FCL {
     }
 
     func sendIX(ix: Interaction) async throws -> Identifier {
-        let result = Task(priority: .background) {
-            let tx = try await ix.toFlowTransaction()
-            return try await fcl.flowAPIClient.sendTransaction(transaction: tx)
-        }
-        return try await result.value
+        let tx = try await ix.toFlowTransaction()
+        return try await fcl.flowAPIClient.sendTransaction(transaction: tx)
     }
 
 }
