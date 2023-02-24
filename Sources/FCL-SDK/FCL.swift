@@ -9,6 +9,7 @@ import Foundation
 import FlowSDK
 import Cadence
 import AuthenticationServices
+import GRPC
 
 public let fcl: FCL = FCL()
 
@@ -439,6 +440,25 @@ extension FCL {
 }
 
 public extension FCL {
+
+    func getEventsForHeightRange(
+        eventType: String,
+        startHeight: UInt64,
+        endHeight: UInt64,
+        options: CallOptions? = nil
+    ) async throws -> [BlockEvents] {
+        try await flowAPIClient
+            .getEventsForHeightRange(eventType: eventType, startHeight: startHeight, endHeight: endHeight, options: options)
+    }
+
+    func getEventsForBlockIDs(
+        eventType: String,
+        blockIds: [Identifier],
+        options: CallOptions? = nil
+    ) async throws -> [BlockEvents] {
+        try await flowAPIClient
+            .getEventsForBlockIDs(eventType: eventType, blockIds: blockIds, options: options)
+    }
 
     func getAccount(address: String) async throws -> FlowSDK.Account? {
         try await flowAPIClient
