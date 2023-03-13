@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum ResponseStatus: String, Decodable {
+public enum ResponseStatus: String, Decodable {
     case pending = "PENDING"
     case approved = "APPROVED"
     case declined = "DECLINED"

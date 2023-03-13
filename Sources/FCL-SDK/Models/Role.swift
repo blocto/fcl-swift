@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Role: Encodable {
+struct Role: Codable {
     var proposer: Bool = false
     var authorizer: Bool = false
     var payer: Bool = false

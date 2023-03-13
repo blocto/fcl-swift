@@ -9,12 +9,12 @@ import Foundation
 import SwiftyJSON
 import UIKit
 
-public struct Service: Decodable {
+public struct Service: Codable {
     let fclType: String?
     let fclVersion: String?
     let type: ServiceType?
     let method: ServiceMethod?
-    let endpoint: URL?
+    let endpoint: String?
     let uid: String?
     let id: String?
     let identity: ServiceIdentity?
@@ -36,13 +36,39 @@ public struct Service: Decodable {
         case data
     }
 
+    public init(
+        fclType: String = "Service",
+        fclVersion: String = "1.0.0",
+        type: ServiceType,
+        method: ServiceMethod,
+        endpoint: String? = nil,
+        uid: String? = nil,
+        id: String? = nil,
+        identity: ServiceIdentity? = nil,
+        provider: ServiceProvider? = nil,
+        params: [String: String] = [:],
+        data: ServiceDataType = .notExist
+    ) {
+        self.fclType = fclType
+        self.fclVersion = fclVersion
+        self.type = type
+        self.method = method
+        self.endpoint = endpoint
+        self.uid = uid
+        self.id = id
+        self.identity = identity
+        self.provider = provider
+        self.params = params
+        self.data = data
+    }
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.fclType = try? container.decode(String.self, forKey: .fclType)
         self.fclVersion = try? container.decode(String.self, forKey: .fclVersion)
         self.type = try? container.decode(ServiceType.self, forKey: .type)
         self.method = try? container.decode(ServiceMethod.self, forKey: .method)
-        self.endpoint = try? container.decode(URL.self, forKey: .endpoint)
+        self.endpoint = try? container.decode(String.self, forKey: .endpoint)
         self.uid = try? container.decode(String.self, forKey: .uid)
         self.id = try? container.decode(String.self, forKey: .id)
         self.identity = try? container.decode(ServiceIdentity.self, forKey: .identity)
@@ -82,6 +108,30 @@ public struct Service: Decodable {
             self.data = .notExist
         }
     }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(fclType, forKey: .fclType)
+        try container.encodeIfPresent(fclVersion, forKey: .fclVersion)
+        try container.encodeIfPresent(type, forKey: .type)
+        try container.encodeIfPresent(method, forKey: .method)
+        try container.encodeIfPresent(endpoint, forKey: .endpoint)
+        try container.encodeIfPresent(uid, forKey: .uid)
+        try container.encodeIfPresent(id, forKey: .id)
+        try container.encodeIfPresent(identity, forKey: .identity)
+        try container.encodeIfPresent(provider, forKey: .provider)
+        try container.encode(params, forKey: .params)
+        switch data {
+        case let .openId(json):
+            try container.encode(json, forKey: .data)
+        case let .accountProof(serviceAccountProof):
+            try container.encode(serviceAccountProof, forKey: .data)
+        case let .json(json):
+            try container.encode(json, forKey: .data)
+        case .notExist:
+            break
+        }
+    }
 }
 
 extension Service {
@@ -96,10 +146,11 @@ extension Service {
              .backChannel,
              .authz,
              .none:
-            guard let endpoint = endpoint else {
+            guard let endpoint = endpoint,
+                  let endpointURL = URL(string: endpoint) else {
                 throw FCLError.serviceError
             }
-            guard let requestURL = buildURL(url: endpoint, params: params) else {
+            guard let requestURL = buildURL(url: endpointURL, params: params) else {
                 throw FCLError.invalidRequest
             }
             let object = try body?.toDictionary() ?? [:]

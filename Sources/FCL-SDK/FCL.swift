@@ -384,7 +384,10 @@ extension FCL {
         let items = fcl.config.addressReplacements
 
         let newScript = items.reduce(script) { result, replacement in
-            result.replacingOccurrences(of: replacement.placeholder, with: replacement.replacement.hexStringWithPrefix)
+            result.replacingOccurrences(
+                of: replacement.placeholder,
+                with: replacement.replacement.hexStringWithPrefix
+            )
         }
         return try await fcl.flowAPIClient
             .executeScriptAtLatestBlock(
@@ -412,7 +415,10 @@ extension FCL {
 
         let items = fcl.config.addressReplacements
         let newCadence = items.reduce(cadence) { result, replacement in
-            result.replacingOccurrences(of: replacement.placeholder, with: replacement.replacement.hexStringWithPrefix)
+            result.replacingOccurrences(
+                of: replacement.placeholder,
+                with: replacement.replacement.hexStringWithPrefix
+            )
         }
 
         // TODO: support additional authorizers.
@@ -448,7 +454,12 @@ public extension FCL {
         options: CallOptions? = nil
     ) async throws -> [BlockEvents] {
         try await flowAPIClient
-            .getEventsForHeightRange(eventType: eventType, startHeight: startHeight, endHeight: endHeight, options: options)
+            .getEventsForHeightRange(
+                eventType: eventType,
+                startHeight: startHeight,
+                endHeight: endHeight,
+                options: options
+            )
     }
 
     func getEventsForBlockIDs(
@@ -457,7 +468,11 @@ public extension FCL {
         options: CallOptions? = nil
     ) async throws -> [BlockEvents] {
         try await flowAPIClient
-            .getEventsForBlockIDs(eventType: eventType, blockIds: blockIds, options: options)
+            .getEventsForBlockIDs(
+                eventType: eventType,
+                blockIds: blockIds,
+                options: options
+            )
     }
 
     func getAccount(address: String) async throws -> FlowSDK.Account? {

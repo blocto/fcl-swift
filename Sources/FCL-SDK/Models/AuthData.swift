@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct AuthData: Decodable {
+public struct AuthData: Codable {
     let fclType: String?
     let fclVersion: String?
     let address: String? // exist in dapper wallet authn response, blocto api/flow/payer
@@ -32,6 +32,21 @@ public struct AuthData: Decodable {
         case authorization
     }
 
+    public init(
+        address: String,
+        services: [Service]
+    ) {
+        self.fclType = nil
+        self.fclVersion = nil
+        self.address = address
+        self.services = services
+        self.keyId = nil
+        self.signature = nil
+        self.proposer = nil
+        self.payer = nil
+        self.authorization = nil
+    }
+
     public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.fclType = try container.decodeIfPresent(String.self, forKey: .fclType)
@@ -43,6 +58,19 @@ public struct AuthData: Decodable {
         self.proposer = try container.decodeIfPresent(Service.self, forKey: .proposer)
         self.payer = try container.decodeIfPresent([Service].self, forKey: .payer) ?? []
         self.authorization = try container.decodeIfPresent([Service].self, forKey: .authorization) ?? []
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encodeIfPresent(fclType, forKey: .fclType)
+        try container.encodeIfPresent(fclVersion, forKey: .fclVersion)
+        try container.encodeIfPresent(address, forKey: .address)
+        try container.encodeIfPresent(services, forKey: .services)
+        try container.encodeIfPresent(keyId, forKey: .keyId)
+        try container.encodeIfPresent(signature, forKey: .signature)
+        try container.encodeIfPresent(proposer, forKey: .proposer)
+        try container.encodeIfPresent(payer, forKey: .payer)
+        try container.encodeIfPresent(authorization, forKey: .authorization)
     }
 
     init(

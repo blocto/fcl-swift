@@ -10,7 +10,7 @@ import FlowSDK
 import Cadence
 import BigInt
 
-struct Interaction: Encodable {
+struct Interaction: Codable {
     var tag: Tag = .unknown
     var assigns = [String: String]()
     var status: Status = .ok
@@ -177,27 +177,110 @@ struct Interaction: Encodable {
         }
         return tx
     }
+
+    enum CodingKeys: CodingKey {
+        case tag
+        case assigns
+        case status
+        case reason
+        case accounts
+        case params
+        case arguments
+        case message
+        case proposer
+        case authorizations
+        case payer
+        case events
+        case transaction
+        case block
+        case account
+        case collection
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: Interaction.CodingKeys.self)
+        try container.encode(tag, forKey: Interaction.CodingKeys.tag)
+        try container.encode(assigns, forKey: Interaction.CodingKeys.assigns)
+        try container.encode(status, forKey: Interaction.CodingKeys.status)
+        try container.encodeIfPresent(reason, forKey: Interaction.CodingKeys.reason)
+        try container.encode(accounts, forKey: Interaction.CodingKeys.accounts)
+        try container.encode(params, forKey: Interaction.CodingKeys.params)
+        try container.encode(arguments, forKey: Interaction.CodingKeys.arguments)
+        try container.encode(message, forKey: Interaction.CodingKeys.message)
+        try container.encodeIfPresent(proposer, forKey: Interaction.CodingKeys.proposer)
+        try container.encode(authorizations, forKey: Interaction.CodingKeys.authorizations)
+        try container.encodeIfPresent(payer, forKey: Interaction.CodingKeys.payer)
+        try container.encode(events, forKey: Interaction.CodingKeys.events)
+        try container.encode(transaction, forKey: Interaction.CodingKeys.transaction)
+        try container.encode(block, forKey: Interaction.CodingKeys.block)
+        try container.encode(account, forKey: Interaction.CodingKeys.account)
+        try container.encode(collection, forKey: Interaction.CodingKeys.collection)
+    }
+
 }
 
-struct Argument: Encodable {
+struct Argument: Codable {
+
     var kind: String
     var tempId: String
     var value: Cadence.Value
     var asArgument: Cadence.Argument
     var xform: Xform
+
+    enum CodingKeys: CodingKey {
+        case kind
+        case tempId
+        case value
+        case asArgument
+        case xform
+    }
+
+    init(
+        kind: String,
+        tempId: String,
+        value: Cadence.Value,
+        asArgument: Cadence.Argument,
+        xform: Xform
+    ) {
+        self.kind = kind
+        self.tempId = tempId
+        self.value = value
+        self.asArgument = asArgument
+        self.xform = xform
+    }
+
+    init(from decoder: Decoder) throws {
+        var container = try decoder.container(keyedBy: CodingKeys.self)
+        kind = try container.decode(String.self, forKey: .kind)
+        tempId = try container.decode(String.self, forKey: .tempId)
+        // TODO: not yet support nested argument.
+        asArgument = try container.decode(Cadence.Argument.self, forKey: .asArgument)
+        value = asArgument.value
+        xform = try container.decode(Xform.self, forKey: .xform)
+    }
+
+    func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: Argument.CodingKeys.self)
+
+        try container.encode(kind, forKey: Argument.CodingKeys.kind)
+        try container.encode(tempId, forKey: Argument.CodingKeys.tempId)
+        try container.encode(value, forKey: Argument.CodingKeys.value)
+        try container.encode(asArgument, forKey: Argument.CodingKeys.asArgument)
+        try container.encode(xform, forKey: Argument.CodingKeys.xform)
+    }
 }
 
 struct Xform: Codable {
     var label: String
 }
 
-struct Id: Encodable {
+struct Id: Codable {
     var id: String?
 }
 
 let defaultComputeLimit: UInt64 = 100
 
-struct Message: Encodable {
+struct Message: Codable {
     var cadence: String?
     var refBlock: String?
     var computeLimit: UInt64 = defaultComputeLimit
@@ -208,24 +291,24 @@ struct Message: Encodable {
     var arguments: [String] = []
 }
 
-struct Events: Encodable {
+struct Events: Codable {
     var eventType: String?
     var start: String?
     var end: String?
     var blockIds: [String] = []
 }
 
-struct Block: Encodable {
+struct Block: Codable {
     var id: String?
     var height: Int64?
     var isSealed: Bool?
 }
 
-struct Account: Encodable {
+struct Account: Codable {
     var addr: String?
 }
 
-struct ProposalKey: Encodable {
+struct ProposalKey: Codable {
     var address: String?
     var keyId: Int?
     var sequenceNum: Int?

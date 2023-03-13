@@ -7,7 +7,7 @@
 
 import Foundation
 
-public struct ServiceAccountProof: Decodable {
+public struct ServiceAccountProof: Codable {
 
     let fclType: String
     let fclVersion: String
@@ -21,6 +21,15 @@ public struct ServiceAccountProof: Decodable {
         case address
         case nonce
         case signatures
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(fclType, forKey: .fclType)
+        try container.encode(fclVersion, forKey: .fclVersion)
+        try container.encode(address, forKey: .address)
+        try container.encode(nonce, forKey: .nonce)
+        try container.encode(signatures, forKey: .signatures)
     }
 
 }

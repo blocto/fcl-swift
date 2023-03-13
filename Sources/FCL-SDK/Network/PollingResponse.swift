@@ -8,7 +8,7 @@
 import Foundation
 
 /// Used for authn, authz and pre-authz
-struct AuthResponse: Decodable {
+public struct AuthResponse: Codable {
     let fclType: String?
     let fclVersion: String?
     let status: ResponseStatus
@@ -19,7 +19,7 @@ struct AuthResponse: Decodable {
     let compositeSignature: AuthData? // authz
     let authorizationUpdates: Service? // authz
     let userSignatures: [FCLCompositeSignature]
-    
+
     enum CodingKeys: String, CodingKey {
         case fclType = "f_type"
         case fclVersion = "f_vsn"
@@ -31,24 +31,83 @@ struct AuthResponse: Decodable {
         case compositeSignature
         case authorizationUpdates
     }
-    
-    init(from decoder: Decoder) throws {
+
+    public init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
-        fclType = try? container.decode(String.self, forKey: .fclType)
-        fclVersion = try? container.decode(String.self, forKey: .fclVersion)
-        status = try container.decode(ResponseStatus.self, forKey: .status)
-        updates = try? container.decode(Service.self, forKey: .updates)
+        self.fclType = try? container.decode(String.self, forKey: .fclType)
+        self.fclVersion = try? container.decode(String.self, forKey: .fclVersion)
+        self.status = try container.decode(ResponseStatus.self, forKey: .status)
+        self.updates = try? container.decode(Service.self, forKey: .updates)
         do {
-            local = try container.decode(Service.self, forKey: .local)
+            self.local = try container.decode(Service.self, forKey: .local)
         } catch {
             let locals = try? container.decode([Service].self, forKey: .local)
-            local = locals?.first
+            self.local = locals?.first
         }
-        data = try? container.decode(AuthData.self, forKey: .data)
-        userSignatures = (try? container.decode([FCLCompositeSignature].self, forKey: .data)) ?? []
-        reason = try? container.decode(String.self, forKey: .reason)
-        compositeSignature = try? container.decode(AuthData.self, forKey: .compositeSignature)
-        authorizationUpdates = try? container.decode(Service.self, forKey: .authorizationUpdates)
+        self.data = try? container.decode(AuthData.self, forKey: .data)
+        self.userSignatures = (try? container.decode([FCLCompositeSignature].self, forKey: .data)) ?? []
+        self.reason = try? container.decode(String.self, forKey: .reason)
+        self.compositeSignature = try? container.decode(AuthData.self, forKey: .compositeSignature)
+        self.authorizationUpdates = try? container.decode(Service.self, forKey: .authorizationUpdates)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(fclType, forKey: .fclType)
+        try container.encode(fclVersion, forKey: .fclVersion)
+        try container.encode(status.rawValue, forKey: .status)
+        try container.encodeIfPresent(reason, forKey: .reason)
+
+        if userSignatures.isEmpty == false {
+            try container.encode(userSignatures, forKey: .authorizationUpdates)
+        }
+
+        try container.encodeIfPresent(data, forKey: .data)
+        // not support update for now
+        /*
+         try container.encodeIfPresent(updates, forKey: .updates)
+         try container.encodeIfPresent(updates, forKey: .local)
+         try container.encodeIfPresent(compositeSignature, forKey: .compositeSignature)
+         try container.encodeIfPresent(authorizationUpdates, forKey: .authorizationUpdates)
+          */
+    }
+
+    public init(
+        fclType: String? = nil,
+        fclVersion: String? = nil,
+        status: ResponseStatus,
+        updates: Service? = nil,
+        local: Service? = nil,
+        data: AuthData? = nil,
+        reason: String? = nil,
+        compositeSignature: AuthData? = nil,
+        authorizationUpdates: Service? = nil,
+        userSignatures: [FCLCompositeSignature] = []
+    ) {
+        self.fclType = fclType
+        self.fclVersion = fclVersion
+        self.status = status
+        self.updates = updates
+        self.local = local
+        self.data = data
+        self.reason = reason
+        self.compositeSignature = compositeSignature
+        self.authorizationUpdates = authorizationUpdates
+        self.userSignatures = userSignatures
+    }
+
+    public static func initForSignMessageResponse(
+        type: String = "PollingResponse",
+        vsn: String = "1.0.0",
+        status: ResponseStatus,
+        userSignatures: [FCLCompositeSignature]
+    ) -> AuthResponse {
+        AuthResponse(
+            fclType: type,
+            fclVersion: vsn,
+            status: status,
+            userSignatures: userSignatures
+        )
     }
 }
 

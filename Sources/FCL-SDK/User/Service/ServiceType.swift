@@ -7,7 +7,7 @@
 
 import Foundation
 
-public enum ServiceType: String, Decodable {
+public enum ServiceType: String, Codable {
     case authn
     case authz
     case preAuthz = "pre-authz"

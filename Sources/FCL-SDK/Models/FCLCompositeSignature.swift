@@ -13,7 +13,7 @@ public protocol CompositeSignatureVerifiable {
     var signature: String { get }
 }
 
-public struct FCLCompositeSignature: CompositeSignatureVerifiable, Decodable {
+public struct FCLCompositeSignature: CompositeSignatureVerifiable, Codable {
 
     public let fclType: String
     public let fclVersion: String
@@ -40,6 +40,15 @@ public struct FCLCompositeSignature: CompositeSignatureVerifiable, Decodable {
         self.address = address
         self.keyId = keyId
         self.signature = signature
+    }
+    
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(fclType, forKey: .fclType)
+        try container.encode(fclVersion, forKey: .fclVersion)
+        try container.encode(address, forKey: .address)
+        try container.encode(keyId, forKey: .keyId)
+        try container.encode(signature, forKey: .signature)
     }
 
 }

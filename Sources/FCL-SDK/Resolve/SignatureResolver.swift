@@ -87,7 +87,7 @@ final class SignatureResolver: Resolver {
         return ix
     }
 
-    func fetchSignature(
+    private func fetchSignature(
         ix: Interaction,
         payload: String,
         id: String
@@ -106,7 +106,7 @@ final class SignatureResolver: Resolver {
         return (id: id, signature: (response.data?.signature ?? response.compositeSignature?.signature) ?? "")
     }
 
-    func encodeEnvelopeMessage(
+    private func encodeEnvelopeMessage(
         transaction: Transaction,
         ix: Interaction,
         insideSigners: [String]
@@ -126,7 +126,7 @@ final class SignatureResolver: Resolver {
         return tx.encodedEnvelope.toHexString()
     }
 
-    func buildSignable(
+    private func buildSignable(
         ix: Interaction,
         payload: String,
         account: SignableUser
