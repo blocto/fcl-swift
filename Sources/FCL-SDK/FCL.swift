@@ -382,15 +382,26 @@ extension FCL {
     /// - Parameters:
     ///   - script: Cadence Script used to query Flow.
     ///   - arguments: Arguments passed to cadence script.
+    ///   - client: Custom GRPC client for development purpose.
     /// - Returns: Cadence response Value from Flow Blockchain contract.
     public func query(
         script: String,
-        arguments: [Cadence.Argument] = []
+        arguments: [Cadence.Argument] = [],
+        client: Client? = nil
     ) async throws -> Cadence.Argument {
         let items = fcl.config.addressReplacements
 
         let newScript = items.reduce(script) { result, replacement in
             result.replacingOccurrences(of: replacement.placeholder, with: replacement.replacement.hexStringWithPrefix)
+        }
+        if let client = client {
+            let task = Task(priority: .utility) {
+                try await client.executeScriptAtLatestBlock(
+                    script: Data(newScript.utf8),
+                    arguments: arguments
+                )
+            }
+            return try await task.value
         }
         return try await fcl.flowAPIClient
             .executeScriptAtLatestBlock(
