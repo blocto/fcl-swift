@@ -46,9 +46,9 @@ public final class BloctoWalletProvider: WalletProvider {
     private var webAuthnURL: URL? {
         switch environment {
         case .prod:
-            return URL(string: "https://flow-wallet.blocto.app/api/flow/authn")
+            return URL(string: "https://wallet-v2.blocto.app/api/flow/authn")
         case .dev:
-            return URL(string: "https://flow-wallet-testnet.blocto.app/api/flow/authn")
+            return URL(string: "https://wallet-v2-dev.blocto.app/api/flow/authn")
         }
     }
 
@@ -112,16 +112,17 @@ public final class BloctoWalletProvider: WalletProvider {
             guard let authnURL = webAuthnURL else {
                 throw FCLError.urlNotFound
             }
-            var data: [String: String] = [:]
-            if let accountProofData = accountProofData {
-                data["accountProofIdentifier"] = accountProofData.appId
-                data["accountProofNonce"] = accountProofData.nonce
-            }
+
+            let body = RequestBody(
+                nonce: accountProofData?.nonce,
+                appIdentifier: accountProofData?.appId,
+                config: FlowConfig(app: Config(id: bloctoAppIdentifier))
+            )
 
             let authnRequest = try RequstBuilder.buildURLRequest(
                 url: authnURL,
                 method: .httpPost,
-                body: data
+                encodableBody: body
             )
             let authResponse = try await fcl.pollingRequest(authnRequest, type: .authn)
             fcl.currentUser = try fcl.buildUser(authn: authResponse)
@@ -339,6 +340,24 @@ public final class BloctoWalletProvider: WalletProvider {
         case .emulator:
             return nil
         }
+    }
+
+}
+
+extension BloctoWalletProvider {
+
+    struct FlowConfig: Encodable {
+        let app: Config
+    }
+
+    struct Config: Encodable {
+        let id: String // Blocto dApp id
+    }
+
+    struct RequestBody: Encodable {
+        let nonce: String? // Nonce for account-proof. Must be a minimum 32-byte hex string
+        let appIdentifier: String? // Human-readable string that uniquely identifies your application name
+        let config: FlowConfig
     }
 
 }
