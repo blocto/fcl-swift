@@ -173,7 +173,8 @@ public final class BloctoWalletProvider: WalletProvider {
         cadence: String,
         arguments: [Cadence.Argument],
         limit: UInt64,
-        authorizers: [Cadence.Address]
+        authorizers: [Cadence.Address],
+        client: Client? = nil
     ) async throws -> Identifier {
         if let bloctoAppSchemeURL = URL(string: bloctoAppScheme),
            await UIApplication.shared.canOpenURL(bloctoAppSchemeURL) {

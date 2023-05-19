@@ -33,12 +33,14 @@ public protocol WalletProvider {
     ///   - arguments: Arguments of Flow transaction.
     ///   - limit: Gas limit (compute limit) of Flow transaction.
     ///   - authorizers: Addresses of accounts data being modify by current transaction.
+    ///   - client: Custom GRPC client for development purpose.
     /// - Returns: Transaction identifier (tx hash).
     func mutate(
         cadence: String,
         arguments: [Cadence.Argument],
         limit: UInt64,
-        authorizers: [Cadence.Address]
+        authorizers: [Cadence.Address],
+        client: Client?
     ) async throws -> Identifier
     
     /// Retrive preSignable info  for Flow transaction.

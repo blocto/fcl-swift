@@ -81,7 +81,8 @@ public final class DapperWalletProvider: WalletProvider {
         cadence: String,
         arguments: [Cadence.Argument],
         limit: UInt64,
-        authorizers: [Cadence.Address]
+        authorizers: [Cadence.Address],
+        client: Client? = nil
     ) async throws -> Identifier {
         throw FCLError.unsupported
     }

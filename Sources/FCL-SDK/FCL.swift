@@ -279,7 +279,10 @@ extension FCL: ASWebAuthenticationPresentationContextProviding {
 
 extension FCL {
 
-    func send(_ builds: [TransactionBuild]) async throws -> Identifier {
+    func send(
+        _ builds: [TransactionBuild],
+        client: Client? = nil
+    ) async throws -> Identifier {
         let ix = prepare(ix: Interaction(), builder: builds)
 
         let resolvers: [Resolver] = [
@@ -294,8 +297,11 @@ extension FCL {
         return try await sendIX(ix: interaction)
     }
 
-    func send(@FCL.TransactionBuilder builder: () -> [TransactionBuild]) async throws -> Identifier {
-        try await send(builder())
+    func send(
+        @FCL.TransactionBuilder builder: () -> [TransactionBuild],
+        client: Client? = nil
+    ) async throws -> Identifier {
+        try await send(builder(), client: client)
     }
 
     func prepare(ix: Interaction, builder: [TransactionBuild]) -> Interaction {
@@ -376,15 +382,26 @@ extension FCL {
     /// - Parameters:
     ///   - script: Cadence Script used to query Flow.
     ///   - arguments: Arguments passed to cadence script.
+    ///   - client: Custom GRPC client for development purpose.
     /// - Returns: Cadence response Value from Flow Blockchain contract.
     public func query(
         script: String,
-        arguments: [Cadence.Argument] = []
+        arguments: [Cadence.Argument] = [],
+        client: Client? = nil
     ) async throws -> Cadence.Argument {
         let items = fcl.config.addressReplacements
 
         let newScript = items.reduce(script) { result, replacement in
             result.replacingOccurrences(of: replacement.placeholder, with: replacement.replacement.hexStringWithPrefix)
+        }
+        if let client = client {
+            let task = Task(priority: .utility) {
+                try await client.executeScriptAtLatestBlock(
+                    script: Data(newScript.utf8),
+                    arguments: arguments
+                )
+            }
+            return try await task.value
         }
         return try await fcl.flowAPIClient
             .executeScriptAtLatestBlock(
@@ -398,12 +415,15 @@ extension FCL {
     ///   - cadence: Cadence Transaction used to mutate Flow
     ///   - arguments: Arguments passed to cadence transaction
     ///   - limit: Compute Limit (gas limit) for transaction
+    ///   - authorizers: Addresses of accounts data being modify by current transaction.
+    ///   - client: Custom GRPC client for development purpose.
     /// - Returns: Transaction id
     public func mutate(
         cadence: String,
         arguments: [Cadence.Argument] = [],
         limit: UInt64 = 1000,
-        authorizers: [Cadence.Address]
+        authorizers: [Cadence.Address],
+        client: Client? = nil
     ) async throws -> Identifier {
         // not check accessNode.api here cause we already define it in Network's endpoint.
         guard let walletProvider = fcl.config.selectedWalletProvider else {
@@ -420,7 +440,8 @@ extension FCL {
             cadence: newCadence,
             arguments: arguments,
             limit: limit,
-            authorizers: authorizers
+            authorizers: authorizers,
+            client: client
         )
     }
 
@@ -432,8 +453,18 @@ extension FCL {
         return newInteraction
     }
 
-    func sendIX(ix: Interaction) async throws -> Identifier {
+    func sendIX(
+        ix: Interaction,
+        client: Client? = nil
+    ) async throws -> Identifier {
         let tx = try await ix.toFlowTransaction()
+
+        if let client = client {
+            let task = Task(priority: .utility) {
+                try await client.sendTransaction(transaction: tx)
+            }
+            return try await task.value
+        }
         return try await fcl.flowAPIClient.sendTransaction(transaction: tx)
     }
 
@@ -448,7 +479,12 @@ public extension FCL {
         options: CallOptions? = nil
     ) async throws -> [BlockEvents] {
         try await flowAPIClient
-            .getEventsForHeightRange(eventType: eventType, startHeight: startHeight, endHeight: endHeight, options: options)
+            .getEventsForHeightRange(
+                eventType: eventType,
+                startHeight: startHeight,
+                endHeight: endHeight,
+                options: options
+            )
     }
 
     func getEventsForBlockIDs(
@@ -457,7 +493,11 @@ public extension FCL {
         options: CallOptions? = nil
     ) async throws -> [BlockEvents] {
         try await flowAPIClient
-            .getEventsForBlockIDs(eventType: eventType, blockIds: blockIds, options: options)
+            .getEventsForBlockIDs(
+                eventType: eventType,
+                blockIds: blockIds,
+                options: options
+            )
     }
 
     func getAccount(address: String) async throws -> FlowSDK.Account? {
