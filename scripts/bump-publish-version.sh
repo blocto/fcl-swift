@@ -17,7 +17,7 @@ sed -i '' -e 's/pod '\''FCL-SDK'\'', '\''~> [^\;]*'\''/pod '\''FCL-SDK'\'', '\''
 sed -i '' -e 's/.package(url: "https:\/\/github.com\/portto\/fcl-swift.git", .upToNextMinor(from: [^\;]*))/.package(url: "https:\/\/github.com\/portto\/fcl-swift.git", .upToNextMinor(from: "'$BUMPED_VERSION'"))/' README.md
 
 # commit all changes
-git add --all
+git add README.md FCL-SDK.podspec
 git commit -m "Bump version"
 git push origin main
 
