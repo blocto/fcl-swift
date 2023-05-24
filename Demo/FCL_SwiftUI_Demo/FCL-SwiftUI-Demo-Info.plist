@@ -9,15 +9,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>bloctocda350c8-1085-46e5-9d37-35b7eb9701db</string>
-			</array>
-		</dict>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>blocto2bc07c67-85ab-4a9a-b170-b1e04f85bbb8</string>
+				<string>bloctod9fed043-5942-496e-8595-57ffe45b759c</string>
 			</array>
 		</dict>
 	</array>
