@@ -1021,6 +1021,14 @@ final class FlowDemoViewController: UIViewController {
                 label.text = "ASWebAuthenticationSessionError \(code)"
             case let .other(code):
                 label.text = code
+            case .urlComponentsNotFound:
+                label.text = "url not found, please open an issue for this."
+            case .functionNotImplemented:
+                label.text = "internal error, please open an issue for this."
+            case .sessionIdNotProvided:
+                label.text = "request account first."
+            case .postRequestFailed(reason: let reason):
+                label.text = reason
             }
         } else if let error = error as? Error {
             label.text = error.message
