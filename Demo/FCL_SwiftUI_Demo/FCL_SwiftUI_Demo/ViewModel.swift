@@ -45,11 +45,12 @@ class ViewModel: ObservableObject {
     var bloctoSDKAppId: String {
         switch network {
         case .mainnet:
-            return "cda350c8-1085-46e5-9d37-35b7eb9701db"
+            return "0896e44c-20fd-443b-b664-d305b52fe8e8"
         case .testnet:
-            return "2bc07c67-85ab-4a9a-b170-b1e04f85bbb8"
+            return "0896e44c-20fd-443b-b664-d305b52fe8e8"
         case .canarynet,
-             .emulator:
+             .emulator,
+             .sandboxnet:
             return ""
         }
     }
@@ -61,7 +62,8 @@ class ViewModel: ObservableObject {
         case .testnet:
             return "0x5b250a8a85b44a67"
         case .canarynet,
-             .emulator:
+             .emulator,
+             .sandboxnet:
             return ""
         }
     }
@@ -73,7 +75,8 @@ class ViewModel: ObservableObject {
         case .testnet:
             return "0x5a8143da8058740c"
         case .canarynet,
-             .emulator:
+             .emulator,
+             .sandboxnet:
             return ""
         }
     }
