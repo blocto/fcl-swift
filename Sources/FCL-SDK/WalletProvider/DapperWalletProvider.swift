@@ -27,9 +27,10 @@ public final class DapperWalletProvider: WalletProvider {
     private var accessNodeApiString: String {
         switch fcl.config.network {
         case .testnet,
-                .canarynet,
-                .sandboxnet,
-                .emulator:
+             .canarynet,
+             .sandboxnet,
+             .emulator,
+             .custom:
             return ""
         case .mainnet:
             return "https://dapper-http-post.vercel.app/api/authn"

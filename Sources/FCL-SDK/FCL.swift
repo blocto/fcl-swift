@@ -27,13 +27,20 @@ public class FCL: NSObject {
 
     var flowAPIClient: Client {
         get async throws {
-            let task = Task(priority: .utility) {
-                Client(network: config.network)
+            if let internalClient {
+                return internalClient
+            } else {
+                let task = Task(priority: .utility) {
+                    let client = Client(network: config.network)
+                    self.internalClient = client
+                    return client
+                }
+                return await task.value
             }
-            return await task.value
         }
     }
 
+    private var internalClient: Client?
     private var webAuthSession: ASWebAuthenticationSession?
     private let requestSession = URLSession(configuration: .default)
 
@@ -398,6 +405,7 @@ extension FCL {
     ///   - cadence: Cadence Transaction used to mutate Flow
     ///   - arguments: Arguments passed to cadence transaction
     ///   - limit: Compute Limit (gas limit) for transaction
+    ///   - authorizers: Addresses of accounts data being modify by current transaction.
     /// - Returns: Transaction id
     public func mutate(
         cadence: String,
@@ -448,7 +456,12 @@ public extension FCL {
         options: CallOptions? = nil
     ) async throws -> [BlockEvents] {
         try await flowAPIClient
-            .getEventsForHeightRange(eventType: eventType, startHeight: startHeight, endHeight: endHeight, options: options)
+            .getEventsForHeightRange(
+                eventType: eventType,
+                startHeight: startHeight,
+                endHeight: endHeight,
+                options: options
+            )
     }
 
     func getEventsForBlockIDs(
@@ -457,7 +470,11 @@ public extension FCL {
         options: CallOptions? = nil
     ) async throws -> [BlockEvents] {
         try await flowAPIClient
-            .getEventsForBlockIDs(eventType: eventType, blockIds: blockIds, options: options)
+            .getEventsForBlockIDs(
+                eventType: eventType,
+                blockIds: blockIds,
+                options: options
+            )
     }
 
     func getAccount(address: String) async throws -> FlowSDK.Account? {

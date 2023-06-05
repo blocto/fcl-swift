@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/portto/blocto-ios-sdk.git",
       "state" : {
-        "revision" : "6c24b03c33076f9d5f17c013483dad040a687467",
-        "version" : "0.4.2"
+        "revision" : "977b0a4f2284c85ce3795ba959866e675cc39aac",
+        "version" : "0.4.4"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/portto/flow-swift-sdk.git",
       "state" : {
-        "revision" : "b5e4c381def8b166a39496f2a32e184f4d8a17d1",
-        "version" : "0.4.2"
+        "revision" : "52448238d0e887af02fc0bdaf50ca76426317289",
+        "version" : "0.5.0"
       }
     },
     {

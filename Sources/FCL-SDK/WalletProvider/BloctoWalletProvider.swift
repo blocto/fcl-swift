@@ -332,11 +332,10 @@ public final class BloctoWalletProvider: WalletProvider {
             return .prod
         case .testnet:
             return .dev
-        case .canarynet:
-            return nil
-        case .sandboxnet:
-            return nil
-        case .emulator:
+        case .canarynet,
+             .sandboxnet,
+             .emulator,
+             .custom:
             return nil
         }
     }
