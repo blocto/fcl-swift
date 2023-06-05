@@ -20,9 +20,9 @@ var isProduction = false
 
 var bloctoSDKAppId: String {
     if isProduction {
-        return "62a48d5a-3fd1-4f41-9b9d-5b20ba2482ec"
+        return "d9fed043-5942-496e-8595-57ffe45b759c"
     } else {
-        return "024d8dd5-260c-40b4-837e-b16c90326d24"
+        return "d9fed043-5942-496e-8595-57ffe45b759c"
     }
 }
 
@@ -1016,6 +1016,14 @@ final class ViewController: UIViewController {
                 label.text = "ASWebAuthenticationSessionError \(code)"
             case let .other(code):
                 label.text = code
+            case .urlComponentsNotFound:
+                label.text = "url not found, please open an issue for this."
+            case .functionNotImplemented:
+                label.text = "internal error, please open an issue for this."
+            case .sessionIdNotProvided:
+                label.text = "request account first."
+            case .postRequestFailed(reason: let reason):
+                label.text = reason
             }
         } else if let error = error as? Error {
             label.text = error.message
