@@ -339,6 +339,8 @@ public final class BloctoWalletProvider: WalletProvider {
             return nil
         case .emulator:
             return nil
+        case .custom:
+            return nil
         }
     }
 
