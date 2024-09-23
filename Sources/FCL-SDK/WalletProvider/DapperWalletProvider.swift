@@ -29,7 +29,8 @@ public final class DapperWalletProvider: WalletProvider {
         case .testnet,
                 .canarynet,
                 .sandboxnet,
-                .emulator:
+                .emulator,
+                .custom:
             return ""
         case .mainnet:
             return "https://dapper-http-post.vercel.app/api/authn"
